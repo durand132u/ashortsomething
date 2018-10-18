@@ -113,10 +113,7 @@ void convert_int (struct sprite_t *perso, SDL_Rect *spritePosition)
 
 void draw_background(SDL_Surface *screen)
 {
-	SDL_Rect position;
-	position.x = 0;
-	position.y =0;
-	SDL_BlitSurface(grass, NULL, screen, &position);
+	//A REFAIRE AU PROPRE GROS SAGOUIN
 }
 
 

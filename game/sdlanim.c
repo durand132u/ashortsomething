@@ -1,9 +1,8 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <math.h>
-#include <SDL_ttf.h>
+#include <stdbool.h>
 #include "game.h"
 
 
@@ -31,12 +30,8 @@
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     5*
 
-
-
 struct sprite_t perso;
 struct sprite_t fireball;
-int gameover = 1;
-int life =1;
 
 
 /* Handle events coming from the user:
@@ -114,7 +109,6 @@ int main(int argc, char* argv[]){
 
     /* initialize SDL */
     SDL_Init(SDL_INIT_VIDEO);
-	TTF_Init();
 
     /* set the title bar */
     SDL_WM_SetCaption("SDL Animation", "SDL Animation");
@@ -141,28 +135,26 @@ int main(int argc, char* argv[]){
     colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
     SDL_SetColorKey(spritefire, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 	
+	int gameover = 0;
 	
-	if (gameover !=0){
-	
-	
-		perso.currDirection = 0;
-		perso.display = 1;
-		perso.life =life;
-		perso.size = 32;
-		fireball.size = 8;
-		
-		/*initialisation*/
-		init(&perso);
-		
-		/*load grass picture*/
-		temp = SDL_LoadBMP("grass.bmp");
-		grass = SDL_DisplayFormat(temp);
-		SDL_FreeSurface(temp);
-		
+	perso.currDirection = 0;
+	perso.display = 1;
+	perso.life =1;
+	perso.size = 32;
+	fireball.size = 8;
 		
 	
-		/* main loop: check events and re-draw the window until the end */
-		while (!gameover)
+	/*load grass picture*/
+	temp = SDL_LoadBMP("grass.bmp");
+	grass = SDL_DisplayFormat(temp);
+	SDL_FreeSurface(temp);
+	
+	/*initialisation*/
+	init(&perso);
+		
+	
+	/* main loop: check events and re-draw the window until the end */
+	while (gameover==0)
 		{
 			SDL_Event event;
 
@@ -190,7 +182,14 @@ int main(int argc, char* argv[]){
 			}
 			
 			/* draw the background */
-			draw_background(screen);
+			for (int x=0;x<SCREEN_WIDTH / GRASS_SIZE;x++){
+				for(int y = 0;y <SCREEN_HEIGHT / GRASS_SIZE ; y++){
+					SDL_Rect position;
+					position.x =x*GRASS_SIZE;
+					position.y =y*GRASS_SIZE;
+					SDL_BlitSurface(grass, NULL, screen, &position);
+				}
+			}
 	  
 			/* draw sprite*/
 
@@ -201,15 +200,10 @@ int main(int argc, char* argv[]){
 			if (fireball.display != 0) {
 				hitboxFireball( &fireball, spritefire, screen);
 			}
-			
-			
-		
 
 			/* update the screen */
 			SDL_UpdateRect(screen, 0, 0, 0, 0);
-			SDL_Delay(12);
-		}
-	}		
+		}	
 	/* clean up */
 		SDL_FreeSurface(sprite);
 		SDL_FreeSurface(grass);
