@@ -79,7 +79,7 @@ void HandleEvent(SDL_Event event,
 				fireball->life = 80;
 				fireball->pos.x = perso->pos.x;
 				fireball->pos.y = perso->pos.y;
-				double angle = (perso->currDirection * ((2*M_PI/4) + (M_PI/4)));
+				double angle = (perso->currDirection * (3*M_PI/4));
 				fireball->v.x = 4*cos(angle);
 				fireball->v.y = -4 * sin(angle);
 				fireball->display = 1;
@@ -153,7 +153,7 @@ int main(int argc, char* argv[]){
 	perso.currDirection = 0;
 	perso.display = 1;
 	perso.size = 32;
-	fireball.size = 8;
+	fireball.size = 32;
 		
 	/*initialisation*/
 		{
@@ -242,8 +242,8 @@ int main(int argc, char* argv[]){
 				fireballImage.y = 0;
 				fireballImage.w = fireball.size;
 				fireballImage.h = fireball.size;
-				fireballImage.x = fireball.size;
-				SDL_BlitSurface(sprite, &fireballImage, screen, &fireballPosition);
+				fireballImage.x = 0;
+				SDL_BlitSurface(spritefire, &fireballImage, screen, &fireballPosition);
 			}
 		}
 			
@@ -256,6 +256,7 @@ int main(int argc, char* argv[]){
 	}		
 	/* clean up */
 		SDL_FreeSurface(sprite);
+		SDL_FreeSurface(spritefire);
 		SDL_FreeSurface(grass);
 		SDL_Quit();
 
