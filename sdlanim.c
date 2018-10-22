@@ -153,7 +153,7 @@ int main(int argc, char* argv[]){
 	perso.currDirection = 0;
 	perso.display = 1;
 	perso.size = 32;
-	fireball.size = 32;
+	fireball.size = 16;
 		
 	/*initialisation*/
 		{
