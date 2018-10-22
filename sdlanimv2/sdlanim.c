@@ -35,7 +35,7 @@
    We also change the animation bit used for creating the "walk" effect.
 */
 void HandleEvent(SDL_Event event,
-		 int *quit, int *currDirection, int *animFlip, SDL_Rect *position, SDL_Rect *fireballPosition)
+		 int *quit, int *animFlip, SDL_Rect *position, SDL_Rect *fireballPosition)
 {
   switch (event.type) {
     /* close button clicked */
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
         /* look for an event; possibly update the position and the shape
          * of the sprite. */
         if (SDL_PollEvent(&event)) {
-            HandleEvent(event, &gameover, &currentDirection,
+            HandleEvent(event, &gameover,
 			&animationFlip, &spritePosition, &fireballPosition);
         }
 
