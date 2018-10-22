@@ -23,6 +23,7 @@
 
 struct vector vit = {0,0};
 struct sprite_t perso;
+struct sprite_t monster;
 struct sprite_t fireball;
 /* Handle events coming from the user:
    - quit the game?
@@ -79,9 +80,9 @@ void HandleEvent(SDL_Event event,
 				fireball->life = 80;
 				fireball->pos.x = perso->pos.x;
 				fireball->pos.y = perso->pos.y;
-				double angle = (perso->currDirection * ((2*M_PI/4) + (M_PI/4)));
-				fireball->v.x = 4*cos(angle);
-				fireball->v.y = -4 * sin(angle);
+				double angle = (perso->currDirection * (2*M_PI/4));
+				fireball->v.x = 2*cos(angle);
+				fireball->v.y = -2 * sin(angle);
 				fireball->display = 1;
 			}
 		  break;
@@ -99,7 +100,7 @@ void HandleEvent(SDL_Event event,
 int main(int argc, char* argv[]){
 
   int gameover =1                  ;
-  SDL_Surface *screen, *temp, *sprite, *grass, *spritefire;
+  SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster;
     int colorkey;
 
     /* Information about the current situation of the sprite: */
@@ -128,6 +129,10 @@ int main(int argc, char* argv[]){
 		sprite = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
 
+		temp = SDL_LoadBMP("monster.bmp");
+		spritemonster = SDL_DisplayFormat(temp);
+		SDL_FreeSurface(temp);
+		
 		temp = SDL_LoadBMP("fireball.bmp");
 		spritefire = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
@@ -144,21 +149,26 @@ int main(int argc, char* argv[]){
 	{
 		colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
 		SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-
-		colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
 		SDL_SetColorKey(spritefire, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+		SDL_SetColorKey(spritemonster, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 	}
 	
 	/* initialise struct */
 	perso.currDirection = 0;
+	monster.currDirection =0;
 	perso.display = 1;
+	monster.display =1;
 	perso.size = 32;
-	fireball.size = 8;
+	monster.size =32;
+	fireball.size = 16;
 		
 	/*initialisation*/
 		{
 			perso.pos.x = (SCREEN_WIDTH - perso.size)/2;
 			perso.pos.y = (SCREEN_HEIGHT - perso.size)/2;
+			
+			monster.pos.x = 0;
+			monster.pos.y =0;
 		}
 		
 	/* main loop: check events and re-draw the window until the end */
@@ -233,6 +243,18 @@ int main(int argc, char* argv[]){
 				spriteImage.x = perso.size*(perso.currDirection*2);
 				SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
 			}
+			
+			if (monster.display != 0) {
+				SDL_Rect monsterImage;
+				SDL_Rect monsterPos;
+				monsterPos.x = monster.pos.x;
+				monsterPos.y = monster.pos.y;
+				monsterImage.y = 0;
+				monsterImage.w = monster.size;
+				monsterImage.h = monster.size;
+				monsterImage.x = monster.size*(monster.currDirection*2);
+				SDL_BlitSurface(spritemonster, &monsterImage, screen, &monsterPos);
+			}
 				
 			if (fireball.display != 0) {
 				SDL_Rect fireballImage;
@@ -242,8 +264,8 @@ int main(int argc, char* argv[]){
 				fireballImage.y = 0;
 				fireballImage.w = fireball.size;
 				fireballImage.h = fireball.size;
-				fireballImage.x = fireball.size;
-				SDL_BlitSurface(sprite, &fireballImage, screen, &fireballPosition);
+				fireballImage.x = 0;
+				SDL_BlitSurface(spritefire, &fireballImage, screen, &fireballPosition);
 			}
 		}
 			
@@ -256,6 +278,8 @@ int main(int argc, char* argv[]){
 	}		
 	/* clean up */
 		SDL_FreeSurface(sprite);
+		SDL_FreeSurface(spritefire);
+		SDL_FreeSurface(spritemonster);
 		SDL_FreeSurface(grass);
 		SDL_Quit();
 
