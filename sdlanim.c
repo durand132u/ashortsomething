@@ -25,6 +25,8 @@ struct vector vit = {0,0};
 struct sprite_t perso;
 struct sprite_t monster;
 struct sprite_t fireball;
+struct sprite_t poisonball;
+struct sprite_t deathball;
 /* Handle events coming from the user:
    - quit the game?
    - use of arrows to move the sprite
@@ -33,7 +35,7 @@ struct sprite_t fireball;
    We also change the animation bit used for creating the "walk" effect.
 */
 void HandleEvent(SDL_Event event,
-		 int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *fireball)
+		 int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *fireball, struct sprite_t *deathball, struct sprite_t *poisonball)
 {
   switch (event.type) {
     /* close button clicked */
@@ -78,12 +80,103 @@ void HandleEvent(SDL_Event event,
 		
 			if (fireball->life ==0) {
 				fireball->life = 80;
-				fireball->pos.x = perso->pos.x;
-				fireball->pos.y = perso->pos.y;
-				double angle = (perso->currDirection * (2*M_PI/4));
-				fireball->v.x = 2*cos(angle);
-				fireball->v.y = -2 * sin(angle);
-				fireball->display = 1;
+				fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+				fireball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+				if(perso->currDirection == DIR_RIGHT){
+					double angle = (perso->currDirection * (2*M_PI));
+					fireball->v.x = 2*cos(angle);
+					fireball->v.y = -2 * sin(angle);
+					fireball->display = 1;
+				}
+				if(perso->currDirection == DIR_LEFT){
+					double angle = (perso->currDirection * (2*M_PI));
+					fireball->v.x = -2*cos(angle);
+					fireball->v.y = 2 * sin(angle);
+					fireball->display = 1;
+				}
+				if(perso->currDirection == DIR_UP){
+					double angle = (perso->currDirection * (2*M_PI));
+					fireball->v.x = 2 * sin(angle);
+					fireball->v.y = -2*cos(angle);
+					fireball->display = 1;
+				}
+				if(perso->currDirection == DIR_DOWN){
+					double angle = (perso->currDirection * (2*M_PI));
+					fireball->v.x = -2 * sin(angle);
+					fireball->v.y = 2*cos(angle);
+					fireball->display = 1;
+				}
+
+			}
+		  break;
+
+
+		case SDLK_F1:
+		
+			if (poisonball->life ==0) {
+				poisonball->life = 80;
+				poisonball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+				poisonball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+				if(perso->currDirection == DIR_RIGHT){
+					double angle = (perso->currDirection * (2*M_PI));
+					poisonball->v.x = 2*cos(angle);
+					poisonball->v.y = -2 * sin(angle);
+					poisonball->display = 1;
+				}
+				if(perso->currDirection == DIR_LEFT){
+					double angle = (perso->currDirection * (2*M_PI));
+					poisonball->v.x = -2*cos(angle);
+					poisonball->v.y = 2 * sin(angle);
+					poisonball->display = 1;
+				}
+				if(perso->currDirection == DIR_UP){
+					double angle = (perso->currDirection * (2*M_PI));
+					poisonball->v.x = 2 * sin(angle);
+					poisonball->v.y = -2*cos(angle);
+					poisonball->display = 1;
+				}
+				if(perso->currDirection == DIR_DOWN){
+					double angle = (perso->currDirection * (2*M_PI));
+					poisonball->v.x = -2 * sin(angle);
+					poisonball->v.y = 2*cos(angle);
+					poisonball->display = 1;
+				}
+
+			}
+		  break;
+
+
+		case SDLK_F2:
+		
+			if (deathball->life ==0) {
+				deathball->life = 80;
+				deathball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+				deathball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+				if(perso->currDirection == DIR_RIGHT){
+					double angle = (perso->currDirection * (2*M_PI));
+					deathball->v.x = 2*cos(angle);
+					deathball->v.y = -2 * sin(angle);
+					deathball->display = 1;
+				}
+				if(perso->currDirection == DIR_LEFT){
+					double angle = (perso->currDirection * (2*M_PI));
+					deathball->v.x = -2*cos(angle);
+					deathball->v.y = 2 * sin(angle);
+					deathball->display = 1;
+				}
+				if(perso->currDirection == DIR_UP){
+					double angle = (perso->currDirection * (2*M_PI));
+					deathball->v.x = 2 * sin(angle);
+					deathball->v.y = -2*cos(angle);
+					deathball->display = 1;
+				}
+				if(perso->currDirection == DIR_DOWN){
+					double angle = (perso->currDirection * (2*M_PI));
+					deathball->v.x = -2 * sin(angle);
+					deathball->v.y = 2*cos(angle);
+					deathball->display = 1;
+				}
+
 			}
 		  break;
 		  
@@ -100,7 +193,7 @@ void HandleEvent(SDL_Event event,
 int main(int argc, char* argv[]){
 
   int gameover =1                  ;
-  SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster;
+  SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison;
     int colorkey;
 
     /* Information about the current situation of the sprite: */
@@ -136,6 +229,15 @@ int main(int argc, char* argv[]){
 		temp = SDL_LoadBMP("fireball.bmp");
 		spritefire = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
+		
+		temp = SDL_LoadBMP("poisonball.bmp");
+		spritepoison = SDL_DisplayFormat(temp);
+		SDL_FreeSurface(temp);
+
+		temp = SDL_LoadBMP("deathball.bmp");
+		spritedeath = SDL_DisplayFormat(temp);
+		SDL_FreeSurface(temp);
+		
 	}
 	
 	/*load background picture*/
@@ -151,6 +253,8 @@ int main(int argc, char* argv[]){
 		SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritefire, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritemonster, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+		SDL_SetColorKey(spritepoison, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+		SDL_SetColorKey(spritedeath, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 	}
 	
 	/* initialise struct */
@@ -161,13 +265,15 @@ int main(int argc, char* argv[]){
 	perso.size = 32;
 	monster.size =32;
 	fireball.size = 16;
+	poisonball.size = 16;
+	deathball.size = 16;
 		
 	/*initialisation*/
 		{
 			perso.pos.x = (SCREEN_WIDTH - perso.size)/2;
 			perso.pos.y = (SCREEN_HEIGHT - perso.size)/2;
 			
-			monster.pos.x = 0;
+			monster.pos.x =0;
 			monster.pos.y =0;
 		}
 		
@@ -180,7 +286,7 @@ int main(int argc, char* argv[]){
 		 * of the sprite. */
 		if (SDL_PollEvent(&event)) {
 			HandleEvent(event, &gameover, &currentDirection,
-			&animationFlip, &perso, &fireball);
+			&animationFlip, &perso, &fireball, &poisonball, &deathball);
 		}
 			
 			
@@ -190,6 +296,21 @@ int main(int argc, char* argv[]){
 				fireball.pos.x = fireball.pos.x + fireball.v.x;
 				fireball.pos.y = fireball.pos.y + fireball.v.y;
 			}
+			
+			if (poisonball.display == 1){
+				poisonball.pos.x = poisonball.pos.x + poisonball.v.x;
+				poisonball.pos.y = poisonball.pos.y + poisonball.v.y;
+			}
+
+			if (deathball.display == 1){
+				deathball.pos.x = deathball.pos.x + deathball.v.x;
+				deathball.pos.y = deathball.pos.y + deathball.v.y;
+			}
+			
+		/* Déplacement du monstre */
+				monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
+				monster.pos.y = monster.pos.y + deathball.v.y;
+			
 		}
 			
 		/*hyperspace*/
@@ -206,9 +327,22 @@ int main(int argc, char* argv[]){
 			if (perso.pos.y > SCREEN_HEIGHT - perso.size) {
 				perso.pos.y = perso.size;
 			}
+		/* Monster hyperspace */
+			if (monster.pos.x < 0)  {
+				monster.pos.x = SCREEN_WIDTH - perso.size;
+			}
+			if (monster.pos.x > SCREEN_WIDTH - perso.size) {
+				monster.pos.x = perso.size ;
+			}
+			if (monster.pos.y < 0){
+				monster.pos.y = SCREEN_HEIGHT - perso.size;
+			}
+			if (monster.pos.y > SCREEN_HEIGHT - perso.size) {
+				monster.pos.y = perso.size;
+			}
 		}
 
-		/*check and refresh fireball life */
+		/*check and refresh ball life */
 		{
 			if(fireball.life == 0){
 				fireball.display=0;
@@ -216,6 +350,21 @@ int main(int argc, char* argv[]){
 			else{
 				fireball.life = fireball.life -1;
 			}
+
+			if(poisonball.life == 0){
+				poisonball.display=0;
+			}
+			else{
+				poisonball.life = poisonball.life -1;
+			}
+
+			if(deathball.life == 0){
+				deathball.display=0;
+			}
+			else{
+				deathball.life = deathball.life -5;
+			}
+		
 		}
 			
 		/* draw the background */
@@ -267,6 +416,36 @@ int main(int argc, char* argv[]){
 				fireballImage.x = 0;
 				SDL_BlitSurface(spritefire, &fireballImage, screen, &fireballPosition);
 			}
+
+
+			if (poisonball.display != 0) {
+				SDL_Rect poisonballImage;
+				SDL_Rect poisonballPosition;
+				poisonballPosition.x = poisonball.pos.x;
+				poisonballPosition.y = poisonball.pos.y;
+				poisonballImage.y = 0;
+				poisonballImage.w = poisonball.size;
+				poisonballImage.h = poisonball.size;
+				poisonballImage.x = 0;
+				SDL_BlitSurface(spritepoison, &poisonballImage, screen, &poisonballPosition);
+			}
+
+
+			if (deathball.display != 0) {
+				SDL_Rect deathballImage;
+				SDL_Rect deathballPosition;
+				deathballPosition.x = deathball.pos.x;
+				deathballPosition.y = deathball.pos.y;
+				deathballImage.y = 0;
+				deathballImage.w = deathball.size;
+				deathballImage.h = deathball.size;
+				deathballImage.x = 0;
+				SDL_BlitSurface(spritedeath, &deathballImage, screen, &deathballPosition);
+			}
+
+			
+
+
 		}
 			
 		
@@ -280,6 +459,8 @@ int main(int argc, char* argv[]){
 		SDL_FreeSurface(sprite);
 		SDL_FreeSurface(spritefire);
 		SDL_FreeSurface(spritemonster);
+		SDL_FreeSurface(spritepoison);
+		SDL_FreeSurface(spritedeath);
 		SDL_FreeSurface(grass);
 		SDL_Quit();
 
