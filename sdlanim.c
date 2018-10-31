@@ -706,6 +706,8 @@ int main(int argc, char* argv[]){
 		SDL_FreeSurface(spritemonster);
 		SDL_FreeSurface(spriteludo);
 		SDL_FreeSurface(barreDeVie_Ludo);
+		SDL_FreeSurface(barreDeVie_perso);
+		SDL_FreeSurface(barreDeVie_monstre);
 		SDL_FreeSurface(spritepoison);
 		SDL_FreeSurface(spritedeath);
 		SDL_FreeSurface(grass);
