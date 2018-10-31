@@ -30,7 +30,7 @@ struct sprite_t ludo;
 struct sprite_t fireball;
 struct sprite_t poisonball;
 struct sprite_t deathball;
-
+struct sprite_t HP_potion;
 SDL_Surface* barreDeVie_Ludo;
 SDL_Surface* barreDeVie_monstre;
 SDL_Surface* barreDeVie_perso;
@@ -43,7 +43,7 @@ SDL_Surface* barreDeVie_perso;
    We also change the animation bit used for creating the "walk" effect.
 */
 void HandleEvent(SDL_Event event,
-		 int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo, struct sprite_t *fireball, struct sprite_t *deathball, struct sprite_t *poisonball)
+		 int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo, struct sprite_t *fireball, struct sprite_t *deathball, struct sprite_t *poisonball, struct sprite_t *HP_potion)
 {
   switch (event.type) {
     /* close button clicked */
@@ -227,7 +227,7 @@ void HandleEvent(SDL_Event event,
 int main(int argc, char* argv[]){
 
   int gameover =1                  ;
-  SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo;
+  SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion;
     int colorkey;
 
     /* Information about the current situation of the sprite: */
@@ -276,6 +276,9 @@ int main(int argc, char* argv[]){
 		spriteludo = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp); 
 		
+		temp = SDL_LoadBMP("moyenne_potion_rouge.bmp");
+		spritepotion = SDL_DisplayFormat(temp);
+		SDL_FreeSurface(temp);
 	}
 	
 	/*load background picture*/
@@ -294,6 +297,9 @@ int main(int argc, char* argv[]){
 		SDL_SetColorKey(spritemonster, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritepoison, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritedeath, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+		SDL_SetColorKey(spritepotion, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+
+
 	}
 	
 	/* initialise struct */
@@ -311,6 +317,11 @@ int main(int argc, char* argv[]){
 	fireball.size = 16;
 	poisonball.size = 16;
 	deathball.size = 16;
+	HP_potion.size = 32;
+	HP_potion.life=1;
+	HP_potion.display = 1;
+
+	
 	
 	//printf(" fX %lf\n fY %lf",fireball.pos.x, fireball.pos.y); printf 
 		
@@ -321,6 +332,9 @@ int main(int argc, char* argv[]){
 			
 			monster.pos.x =0;
 			monster.pos.y =0;
+			
+			HP_potion.pos.x=400;
+			HP_potion.pos.y=400;
 			
 			//Initialisation barre de vie
 			barreDeVie_Ludo = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
@@ -340,7 +354,7 @@ int main(int argc, char* argv[]){
 		 * of the sprite. */
 		if (SDL_PollEvent(&event)) {
 			HandleEvent(event, &gameover, &currentDirection,
-			&animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball);
+			&animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion);
 		}
 			
 		
@@ -457,6 +471,7 @@ int main(int argc, char* argv[]){
 				ludo.display = 1;
 				ludo.pos.x = 100;
 				ludo.pos.y = 100;
+			
 			
 		}
 
@@ -627,6 +642,18 @@ int main(int argc, char* argv[]){
 				deathballImage.h = deathball.size;
 				deathballImage.x = 0;
 				SDL_BlitSurface(spritedeath, &deathballImage, screen, &deathballPosition);
+			}
+				
+			if (HP_potion.display != 0) {
+				SDL_Rect HP_potionImage;
+				SDL_Rect HP_potionPosition;
+				HP_potionPosition.x = HP_potion.pos.x;
+				HP_potionPosition.y = HP_potion.pos.y;
+				HP_potionImage.y = 0;
+				HP_potionImage.w = HP_potion.size;
+				HP_potionImage.h = HP_potion.size;
+				HP_potionImage.x = 0;
+				SDL_BlitSurface(spritepotion, &HP_potionImage, screen, &HP_potionPosition);
 				
 				
 	
@@ -689,6 +716,12 @@ int main(int argc, char* argv[]){
 				monster.life -=1;
 			}
 			
+			if(Collision(&HP_potion,&perso, Toto)&&((HP_potion.display!=0))){
+				HP_potion.display=0;
+				perso.life +=30;
+				printf("perso.life %d", perso.life);
+				
+			}
 			
 		}
 		
