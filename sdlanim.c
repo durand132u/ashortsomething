@@ -31,7 +31,9 @@ struct sprite_t fireball;
 struct sprite_t poisonball;
 struct sprite_t deathball;
 
-SDL_Surface* barreDeVie;
+SDL_Surface* barreDeVie_Ludo;
+SDL_Surface* barreDeVie_monstre;
+SDL_Surface* barreDeVie_perso;
 
 /* Handle events coming from the user:
    - quit the game?
@@ -299,11 +301,12 @@ int main(int argc, char* argv[]){
 	monster.currDirection =0;
 	perso.display = 1;
 	perso.size = 32;
+	perso.life = 100;
 	ludo.display = 1;
 	ludo.size = 32;
 	ludo.life = 100;
 	monster.display = 1;
-	monster.life=10;
+	monster.life=100;
 	monster.size =32;
 	fireball.size = 16;
 	poisonball.size = 16;
@@ -320,8 +323,9 @@ int main(int argc, char* argv[]){
 			monster.pos.y =0;
 			
 			//Initialisation barre de vie
-			barreDeVie = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
-
+			barreDeVie_Ludo = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
+			barreDeVie_monstre = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
+			barreDeVie_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 
 
 		}
@@ -339,15 +343,77 @@ int main(int argc, char* argv[]){
 			&animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball);
 		}
 			
-		//FillRect d'une barre de vie avec règle de trois basique
-		SDL_FillRect(barreDeVie, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-		SDL_Rect dstrect;
-		dstrect.x = 0;
-		dstrect.y = 0;
-		dstrect.w = ludo.life*ludo.size/MAX_HP;
-		dstrect.h = 3;
-		SDL_FillRect(barreDeVie, &dstrect, SDL_MapRGB(barreDeVie->format, 0, 255, 0));
-			
+		
+		//Barre de vie ludo
+		
+		//FillRect d'un SDLRect avec règle de trois basique
+		SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+		SDL_Rect HP_ludo;
+		HP_ludo.x = 0;
+		HP_ludo.y = 0;
+		HP_ludo.w = ludo.life*ludo.size/MAX_HP;
+		HP_ludo.h = 3;
+			if(ludo.life>80){
+				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 0, 255, 0));
+			}
+			if(ludo.life>60&&ludo.life<=80){
+				SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 255, 0)); //jaune
+			}
+			if(ludo.life>40&&ludo.life<=60){
+				SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 112, 0)); //orange
+			}
+			if(ludo.life>0&&ludo.life<=40){
+				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 0, 0)); // rouge
+			}
+		
+		//Barre de vie monstre
+		SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+		SDL_Rect HP_monstre;
+		HP_monstre.x = 0;
+		HP_monstre.y = 0;
+		HP_monstre.w = monster.life*monster.size/MAX_HP;
+		HP_monstre.h = 3;
+		if(monster.life>80){
+			SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 0, 255, 0));
+		}
+		if(monster.life>60&&monster.life<=80){
+				SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 255, 0)); //jaune
+			}
+		if(monster.life>40&&monster.life<=60){
+				SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 112, 0)); //orange
+		}
+		if(monster.life>0&&monster.life<=40){
+				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 0, 0)); // rouge
+		}
+		
+		//Barre de vie personnage
+		SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+		SDL_Rect HP_perso;
+		HP_perso.x = 0;
+		HP_perso.y = 0;
+		HP_perso.w = perso.life*perso.size/MAX_HP;
+		HP_perso.h = 3;
+		SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
+		if(perso.life>80){
+			SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
+		}
+		if(perso.life>60&&perso.life<=80){
+				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
+			}
+		if(perso.life>40&&perso.life<=60){
+				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
+		}
+		if(perso.life>0&&perso.life<=40){
+				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
+		}
+		
+		
 		/*position*/
 		{
 			if (fireball.display == 1){
@@ -447,7 +513,7 @@ int main(int argc, char* argv[]){
 			else{
 				deathball.life = deathball.life -10;
 			}
-			if(monster.life == 0){
+			if(monster.life <= 0){
 				monster.display = 0;
 			}
 			else{
@@ -485,6 +551,9 @@ int main(int argc, char* argv[]){
 				spriteImage.h = perso.size;
 				spriteImage.x = perso.size*(perso.currDirection*2);
 				SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
+				SDL_BlitSurface(barreDeVie_perso, NULL, screen, &spritePos);
+
+
 			}
 			
 			if (monster.display != 0) {
@@ -497,6 +566,9 @@ int main(int argc, char* argv[]){
 				monsterImage.h = monster.size;
 				monsterImage.x = monster.size*(monster.currDirection*2);
 				SDL_BlitSurface(spritemonster, &monsterImage, screen, &monsterPos);
+				SDL_BlitSurface(barreDeVie_monstre, NULL, screen, &monsterPos);
+
+
 				
 			}
 			
@@ -510,8 +582,14 @@ int main(int argc, char* argv[]){
 				ludoImage.h = ludo.size;
 				ludoImage.x = ludo.size*(ludo.currDirection*2);
 				SDL_BlitSurface(spriteludo, &ludoImage, screen, &ludoPos);
-				SDL_BlitSurface(barreDeVie, NULL, screen, &ludoPos);
+				SDL_BlitSurface(barreDeVie_Ludo, NULL, screen, &ludoPos);
+
+
+
 			}
+
+
+			
 				
 			if (fireball.display != 0) {
 				SDL_Rect fireballImage;
@@ -553,8 +631,7 @@ int main(int argc, char* argv[]){
 				
 	
 			}
-
-		        
+			
 			
 
 
@@ -592,17 +669,29 @@ int main(int argc, char* argv[]){
 
 			//Working Test utilisation fonction Collision
 			int Toto = 0;
+			
 			if(Collision(&ludo, &perso, Toto)&&((ludo.display!=0)||(ludo.life!=0))){ 
 				ludo.life -=1;
 			}
+			
 			if(Collision(&ludo, &fireball, Toto)&&((fireball.display!=0)||(fireball.life!=0))){ // Présence de quelques bugs en utilisant cette fonction avec la fireball, pour être plus précis voire //2//
 				fireball.display = 0;
-				ludo.life -=1;
-				
+				ludo.life -=1;	
+			}
+			
+			if(Collision(&monster, &fireball, Toto)&&((fireball.display!=0)||(fireball.life>=0))){
+				fireball.display=0;
+				monster.life -=1;
 
 			}
 			
+			if(Collision(&monster, &perso, Toto)){ 
+				monster.life -=1;
+			}
+			
+			
 		}
+		
 			
 		
 
@@ -616,7 +705,7 @@ int main(int argc, char* argv[]){
 		SDL_FreeSurface(spritefire);
 		SDL_FreeSurface(spritemonster);
 		SDL_FreeSurface(spriteludo);
-		SDL_FreeSurface(barreDeVie);
+		SDL_FreeSurface(barreDeVie_Ludo);
 		SDL_FreeSurface(spritepoison);
 		SDL_FreeSurface(spritedeath);
 		SDL_FreeSurface(grass);
