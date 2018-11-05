@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -10,36 +11,17 @@
 
 int main(int argc, char* argv[])
 {
-    SDL_Surface *screen, *temp, *sprite, *grass;
-    SDL_Rect spritePosition;
-    int colorkey, gameover;
+    SDL_Surface *screen;
+    int gameover;
 
     /* initialize video system */
     SDL_Init(SDL_INIT_VIDEO);
 
     /* set the title bar */
-    SDL_WM_SetCaption("SDL Move", "SDL Move");
+    SDL_WM_SetCaption("Menu Test", "Menu Test");
 
     /* create window */
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-
-    /* load sprite */
-    temp   = SDL_LoadBMP("sprite.bmp");
-    sprite = SDL_DisplayFormat(temp);
-    SDL_FreeSurface(temp);
-
-    /* setup sprite colorkey and turn on RLE */
-    colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
-    SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-
-    /* load grass */
-    temp  = SDL_LoadBMP("grass.bmp");
-    grass = SDL_DisplayFormat(temp);
-    SDL_FreeSurface(temp);
-
-    /* set sprite position */
-    spritePosition.x = 0;
-    spritePosition.y = 0;
 
     gameover = 0;
 
@@ -47,7 +29,6 @@ int main(int argc, char* argv[])
     while (!gameover)
     {
         SDL_Event event;
-        Uint8 *keystate;
 
         /* look for an event */
         if (SDL_PollEvent(&event)) {
@@ -72,55 +53,11 @@ int main(int argc, char* argv[])
             }
         }
 
-        /* handle sprite movement */
-        keystate = SDL_GetKeyState(NULL);
-
-        if (keystate[SDLK_LEFT] ) {
-            spritePosition.x -= 2;
-        }
-        if (keystate[SDLK_RIGHT] ) {
-            spritePosition.x += 2;
-        }
-        if (keystate[SDLK_UP] ) {
-            spritePosition.y -= 2;
-        }
-        if (keystate[SDLK_DOWN] ) {
-            spritePosition.y += 2;
-        }
-
-        /* collide with edges of screen */
-        if (spritePosition.x < 0) {
-            spritePosition.x = 0;
-        } else if (spritePosition.x > SCREEN_WIDTH - SPRITE_SIZE) {
-            spritePosition.x = SCREEN_WIDTH - SPRITE_SIZE;
-        }
-
-        if (spritePosition.y < 0) {
-            spritePosition.y = 0;
-        } else if (spritePosition.y > SCREEN_HEIGHT - SPRITE_SIZE) {
-            spritePosition.y = SCREEN_HEIGHT - SPRITE_SIZE;
-        }
-
-        /* map the grass texture on the whole background */
-        for (int x = 0; x < SCREEN_WIDTH/GRASS_SIZE; x++) {
-            for (int y = 0; y < SCREEN_HEIGHT/GRASS_SIZE; y++) {
-                SDL_Rect position;
-                position.x = x * GRASS_SIZE;
-                position.y = y * GRASS_SIZE;
-                SDL_BlitSurface(grass, NULL, screen, &position);
-            }
-        }
-
-        /* draw the sprite */
-        SDL_BlitSurface(sprite, NULL, screen, &spritePosition);
-
         /* update the screen */
         SDL_UpdateRect(screen,0,0,0,0);
     }
 
     /* clean up */
-    SDL_FreeSurface(sprite);
-    SDL_FreeSurface(grass);
     SDL_Quit();
 
     return 0;
