@@ -27,7 +27,7 @@ struct vector vit = {0,0};
 struct sprite_t perso;
 struct sprite_t monster;
 struct sprite_t ludo;
-struct sprite_t fireball;
+struct bdf_t fireball;
 struct sprite_t poisonball;
 struct sprite_t deathball;
 struct sprite_t HP_potion;
@@ -43,7 +43,7 @@ SDL_Surface* barreDeVie_perso;
    We also change the animation bit used for creating the "walk" effect.
 */
 void HandleEvent(SDL_Event event,
-		 int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo, struct sprite_t *fireball, struct sprite_t *deathball, struct sprite_t *poisonball, struct sprite_t *HP_potion)
+		 int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo, struct bdf_t *fireball, struct sprite_t *deathball, struct sprite_t *poisonball, struct sprite_t *HP_potion)
 {
   switch (event.type) {
     /* close button clicked */
@@ -86,33 +86,30 @@ void HandleEvent(SDL_Event event,
 		  
 		case SDLK_SPACE:
 		
-			if (fireball->life ==0) {
-				fireball->life = 80;
+			if (fireball->display==0) {
+				fireball->display=1;
+				fireball->range=100;
 				fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
 				fireball->pos.y = perso->pos.y+(GRASS_SIZE/3);
 				if(perso->currDirection == DIR_RIGHT){
 					double angle = (perso->currDirection * (2*M_PI));
 					fireball->v.x = 2*cos(angle);
 					fireball->v.y = -2 * sin(angle);
-					fireball->display = 1;
 				}
 				if(perso->currDirection == DIR_LEFT){
 					double angle = (perso->currDirection * (2*M_PI));
 					fireball->v.x = -2*cos(angle);
 					fireball->v.y = 2 * sin(angle);
-					fireball->display = 1;
 				}
 				if(perso->currDirection == DIR_UP){
 					double angle = (perso->currDirection * (2*M_PI));
 					fireball->v.x = 2 * sin(angle);
 					fireball->v.y = -2*cos(angle);
-					fireball->display = 1;
 				}
 				if(perso->currDirection == DIR_DOWN){
 					double angle = (perso->currDirection * (2*M_PI));
 					fireball->v.x = -2 * sin(angle);
 					fireball->v.y = 2*cos(angle);
-					fireball->display = 1;
 				}
 
 			}
@@ -211,16 +208,34 @@ void HandleEvent(SDL_Event event,
 
 /*Working Collision Ludo -> Perso*/ 	
 
-	int Collision(struct sprite_t* a, struct sprite_t* b, int Test){
-		float diffX, diffY;
-		diffX = fabs(((a->pos.x-a->size/2)-(b->pos.x)+b->size/2));
-		diffY = fabs(((a->pos.y-a->size/2)-(b->pos.y)+b->size/2));
-		if(diffX < (a->size+b->size)/2 && diffY < (a->size+b->size)/2)
-			Test = 1;
-	    else
-			Test = 0;
-		return Test;
+	int CollisionBdf(struct sprite_t* a, struct bdf_t* b, int Test){
+		if((a->display==1)&&(b->display==1)){
+			float diffX, diffY;
+			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size/2));
+			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size/2));
+			if((diffX<b->size)&&(diffY<b->size)&&(b->display!=0)){
+				printf("Collision\n");
+				return 1;
+			}
+			return 0;
+		}
+		return 0;
+		
 	}
+	int Collision(struct sprite_t* a, struct sprite_t* b, int Test){
+		if((a->display==1)&&(b->display==1)){
+			float diffX, diffY;
+			diffX = fabs(((a->pos.x-a->size/2)-(b->pos.x)+b->size/2));
+			diffY = fabs(((a->pos.y-a->size/2)-(b->pos.y)+b->size/2));
+			if(diffX < (a->size+b->size)/2 && diffY < (a->size+b->size)/2)
+				Test = 1;
+			else
+				Test = 0;
+			return Test;
+		}
+		return 0;
+	}
+
 
 
 
@@ -507,14 +522,6 @@ int main(int argc, char* argv[]){
 
 		/*check and refresh ball life */
 		{
-			if(fireball.life == 0){
-				
-				fireball.display=0;
-			}
-			else{
-				fireball.life = fireball.life -1;
-			}
-
 			if(poisonball.life == 0){
 				poisonball.display=0;
 			}
@@ -531,14 +538,14 @@ int main(int argc, char* argv[]){
 			if(monster.life <= 0){
 				monster.display = 0;
 			}
-			else{
-				monster.display=1;
-			}
 			if(ludo.life <= 0){
 				ludo.display = 0;
 			}
-			else{
-				ludo.display=1;
+			if(fireball.display!=0&&fireball.range!=0){
+			    fireball.range--;
+			}
+			if(fireball.display!=0&&fireball.range==0){
+				fireball.display=0;
 			}
 		}
 			
@@ -701,14 +708,17 @@ int main(int argc, char* argv[]){
 				ludo.life -=1;
 			}
 			
-			if(Collision(&ludo, &fireball, Toto)&&((fireball.display!=0)||(fireball.life!=0))){ // Présence de quelques bugs en utilisant cette fonction avec la fireball, pour être plus précis voire //2//
+			if(CollisionBdf(&ludo, &fireball, Toto)&&fireball.display!=0){ // Présence de quelques bugs en utilisant cette fonction avec la fireball, pour être plus précis voire //2//
 				fireball.display = 0;
-				ludo.life -=1;	
+				ludo.life -=10;
+				if(ludo.life<=0){
+					
+				}
 			}
 			
-			if(Collision(&monster, &fireball, Toto)&&((fireball.display!=0)||(fireball.life>=0))){
+			if(CollisionBdf(&monster, &fireball, Toto)&&fireball.display!=0){
 				fireball.display=0;
-				monster.life -=1;
+				monster.life -=10;
 
 			}
 			
@@ -716,18 +726,11 @@ int main(int argc, char* argv[]){
 				monster.life -=1;
 			}
 			
-			if(Collision(&HP_potion,&perso, Toto)&&((HP_potion.display!=0))){
+			if(Collision(&HP_potion,&perso, Toto)&&HP_potion.display!=0){
 				HP_potion.display=0;
 				perso.life +=30;
-				printf("perso.life %d", perso.life);
-				
 			}
-			
 		}
-		
-			
-		
-
 		/* update the screen */
 		SDL_UpdateRect(screen, 0, 0, 0, 0);
 		SDL_Delay(12);

@@ -18,7 +18,17 @@ struct sprite_t
 	int size;
 	int life;
 	SDL_Surface *sprite;
-	int counter;
 	int display;
+};
+
+struct bdf_t
+{
+	struct vector pos;
+	struct vector v;
+	int currDirection;
+	int size;
+	int display;
+	int range;
+	SDL_Surface *sprite;
 };
 #endif
