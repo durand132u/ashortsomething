@@ -208,13 +208,12 @@ void HandleEvent(SDL_Event event,
 
 /*Working Collision Ludo -> Perso*/ 	
 
-	int CollisionBdf(struct sprite_t* a, struct bdf_t* b, int Test){
+	int CollisionBdf(struct sprite_t* a, struct bdf_t* b){
 		if((a->display==1)&&(b->display==1)){
 			float diffX, diffY;
 			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size/2));
 			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size/2));
 			if((diffX<b->size)&&(diffY<b->size)&&(b->display!=0)){
-				printf("Collision\n");
 				return 1;
 			}
 			return 0;
@@ -222,16 +221,15 @@ void HandleEvent(SDL_Event event,
 		return 0;
 		
 	}
-	int Collision(struct sprite_t* a, struct sprite_t* b, int Test){
+	int Collision(struct sprite_t* a, struct sprite_t* b){
 		if((a->display==1)&&(b->display==1)){
 			float diffX, diffY;
-			diffX = fabs(((a->pos.x-a->size/2)-(b->pos.x)+b->size/2));
-			diffY = fabs(((a->pos.y-a->size/2)-(b->pos.y)+b->size/2));
-			if(diffX < (a->size+b->size)/2 && diffY < (a->size+b->size)/2)
-				Test = 1;
-			else
-				Test = 0;
-			return Test;
+			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size/2));
+			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size/2));
+			if((diffX<b->size)&&(diffY<b->size)&&(b->display!=0)){
+				return 1;
+			}
+			return 0;
 		}
 		return 0;
 	}
@@ -463,26 +461,31 @@ int main(int argc, char* argv[]){
 		/* Déplacement du monstre */
 
 
-		/* Gestion aléatoire entre -2 et 4 */
-		/*int nbalea = 0;
+		/*Gestion aléatoire entre -2 et 4 */
 		srand(time(NULL));
-		int a = rand()%5;
-		if(a==0){
-			nbalea=-2;
-		} else if(a==1){
-			nbalea=-1;
-		} else if(a==2){
-			nbalea=1;
-		} else if(a==3){
-			nbalea=2;
-		} else if(a==4){
-			nbalea=0;
-		}*/
+		int a = rand()%5;		
+		switch(a){
+			case(0):
+				break;
+			case(1):
+				monster.pos.x = monster.pos.x +5;
+				break;
+			case(2):
+				monster.pos.x = monster.pos.x -5;
+				break;
+			case(3):
+				monster.pos.y = monster.pos.y +5;
+				break;
+			case(4):
+				monster.pos.x = monster.pos.y -5;
+				break;
+			default :
+				break;
+		}
+			
 
-				monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
-				monster.pos.y = monster.pos.y + deathball.v.y;
-				//monster.pos.x = monster.pos.x +nbalea; // IA random du monstre
-				//monster.pos.y = monster.pos.y +nbalea;
+				//monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
+				//monster.pos.y = monster.pos.y + deathball.v.y;
 				ludo.display = 1;
 				ludo.pos.x = 100;
 				ludo.pos.y = 100;
@@ -702,13 +705,12 @@ int main(int argc, char* argv[]){
 
 
 			//Working Test utilisation fonction Collision
-			int Toto = 0;
 			
-			if(Collision(&ludo, &perso, Toto)&&((ludo.display!=0)||(ludo.life!=0))){ 
+			if(Collision(&ludo, &perso)&&((ludo.display!=0)||(ludo.life!=0))){ 
 				ludo.life -=1;
 			}
 			
-			if(CollisionBdf(&ludo, &fireball, Toto)&&fireball.display!=0){ // Présence de quelques bugs en utilisant cette fonction avec la fireball, pour être plus précis voire //2//
+			if(CollisionBdf(&ludo, &fireball)&&fireball.display!=0){ // Présence de quelques bugs en utilisant cette fonction avec la fireball, pour être plus précis voire //2//
 				fireball.display = 0;
 				ludo.life -=10;
 				if(ludo.life<=0){
@@ -716,17 +718,17 @@ int main(int argc, char* argv[]){
 				}
 			}
 			
-			if(CollisionBdf(&monster, &fireball, Toto)&&fireball.display!=0){
+			if(CollisionBdf(&monster, &fireball)&&fireball.display!=0){
 				fireball.display=0;
 				monster.life -=10;
 
 			}
 			
-			if(Collision(&monster, &perso, Toto)){ 
+			if(Collision(&monster, &perso)){ 
 				monster.life -=1;
 			}
 			
-			if(Collision(&HP_potion,&perso, Toto)&&HP_potion.display!=0){
+			if(Collision(&HP_potion,&perso)&&HP_potion.display!=0){
 				HP_potion.display=0;
 				perso.life +=30;
 			}
