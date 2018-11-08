@@ -234,6 +234,31 @@ void HandleEvent(SDL_Event event,
 		return 0;
 	}
 
+	int CollisionDistance(struct sprite_t* a, struct sprite_t* b, int Dx){
+		if((a->display==1)&&(b->display==1)){
+			float diffX, diffY;
+			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
+			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size));
+			if((diffX<Dx)&&(diffY<Dx)&&(b->display!=0)){
+				return 1;
+			}
+			return 0;
+		}
+		return 0;
+	}
+
+	/*int IAFUYARDE(struct sprite_t* a, struct sprite_t* b){
+			if((a->display==1)&&(b->display==1)){
+			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
+			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size));
+			if((diffX<200&&(a->display==1)&&(b->display==1))*/
+			   
+			   
+
+
+
+
+
 
 
 
@@ -486,11 +511,40 @@ int main(int argc, char* argv[]){
 
 				//monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
 				//monster.pos.y = monster.pos.y + deathball.v.y;
+			/* // Le monstre tourne en rond
+			double angle2 = (rand()%90);
 				ludo.display = 1;
-				ludo.pos.x = 100;
-				ludo.pos.y = 100;
+				ludo.pos.x += 2 * cos(angle2);
+				ludo.pos.y += 2*sin(angle2);
+				
+				*/
+			//IA Aggressive
+			if(perso.pos.x>ludo.pos.x){
+				ludo.pos.x+=5;
+			} 
+			if(perso.pos.x<ludo.pos.x){
+				ludo.pos.x-=5;
+			} 
+			if(perso.pos.y > ludo.pos.y){
+				ludo.pos.y+=5;	
+			}
+			if(perso.pos.y < ludo.pos.y){
+				ludo.pos.y-=5;	
+			}
 			
-			
+			//IA Fuyarde 
+			/*if(perso.pos.x<ludo.pos.x){
+				ludo.pos.x+=3;
+			} 
+			if(perso.pos.x>ludo.pos.x){
+				ludo.pos.x-=3;
+			} 
+			if(perso.pos.y <ludo.pos.y){
+				ludo.pos.y+=3;	
+			}
+			if(perso.pos.y > ludo.pos.y){
+				ludo.pos.y-=3;	
+			}*/
 		}
 
 
@@ -520,6 +574,20 @@ int main(int argc, char* argv[]){
 			}
 			if (monster.pos.y > SCREEN_HEIGHT - perso.size) {
 				monster.pos.y = perso.size;
+			}
+			
+			/* Ludo Hyperspace*/
+				if (ludo.pos.x < 0)  {
+				ludo.pos.x = SCREEN_WIDTH - perso.size;
+			}
+			if (ludo.pos.x > SCREEN_WIDTH - perso.size) {
+				ludo.pos.x = perso.size ;
+			}
+			if (ludo.pos.y < 0){
+				ludo.pos.y = SCREEN_HEIGHT - perso.size;
+			}
+			if (ludo.pos.y > SCREEN_HEIGHT - perso.size) {
+				ludo.pos.y = perso.size;
 			}
 		}
 
