@@ -34,6 +34,9 @@ struct sprite_t HP_potion;
 SDL_Surface* barreDeVie_Ludo;
 SDL_Surface* barreDeVie_monstre;
 SDL_Surface* barreDeVie_perso;
+int choice = 0;
+int choiceTEST = 0;
+
 
 /* Handle events coming from the user:
    - quit the game?
@@ -194,6 +197,18 @@ void HandleEvent(SDL_Event event,
 		
 			
 		break;
+			
+		case SDLK_F4:
+			if(choiceTEST){
+				choice = 1;
+				choiceTEST= 0;
+			} else {
+				choice = 0;
+				choiceTEST = 1;
+			}
+		break;
+
+
 	
 			
 		  
@@ -246,21 +261,7 @@ void HandleEvent(SDL_Event event,
 		}
 		return 0;
 	}
-
-	/*int IAFUYARDE(struct sprite_t* a, struct sprite_t* b){
-			if((a->display==1)&&(b->display==1)){
-			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
-			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size));
-			if((diffX<200&&(a->display==1)&&(b->display==1))*/
-			   
-			   
-
-
-
-
-
-
-
+			  			 
 
 int main(int argc, char* argv[]){
 
@@ -515,36 +516,41 @@ int main(int argc, char* argv[]){
 			double angle2 = (rand()%90);
 				ludo.display = 1;
 				ludo.pos.x += 2 * cos(angle2);
-				ludo.pos.y += 2*sin(angle2);
+				ludo.pos.y += 2*sin(angle2);*/
 				
-				*/
+				
 			//IA Aggressive
-			if(perso.pos.x>ludo.pos.x){
-				ludo.pos.x+=5;
-			} 
-			if(perso.pos.x<ludo.pos.x){
-				ludo.pos.x-=5;
-			} 
-			if(perso.pos.y > ludo.pos.y){
-				ludo.pos.y+=5;	
-			}
-			if(perso.pos.y < ludo.pos.y){
-				ludo.pos.y-=5;	
+
+			if (choice ==1){
+				if(perso.pos.x>ludo.pos.x){
+					ludo.pos.x+=2;
+				} 
+				if(perso.pos.x<ludo.pos.x){
+					ludo.pos.x-=2;
+				} 
+				if(perso.pos.y > ludo.pos.y){
+					ludo.pos.y+=2;	
+				}
+				if(perso.pos.y < ludo.pos.y){
+					ludo.pos.y-=2;	
+				}
 			}
 			
-			//IA Fuyarde 
-			/*if(perso.pos.x<ludo.pos.x){
-				ludo.pos.x+=3;
-			} 
-			if(perso.pos.x>ludo.pos.x){
-				ludo.pos.x-=3;
-			} 
-			if(perso.pos.y <ludo.pos.y){
-				ludo.pos.y+=3;	
+				//IA Fuyarde 
+			if(choice == 0){
+				if(perso.pos.x<ludo.pos.x){
+					ludo.pos.x+=3;
+				} 
+				if(perso.pos.x>ludo.pos.x){
+					ludo.pos.x-=3;
+				} 
+				if(perso.pos.y <ludo.pos.y){
+					ludo.pos.y+=3;	
+				}
+				if(perso.pos.y > ludo.pos.y){
+					ludo.pos.y-=3;	
+				}
 			}
-			if(perso.pos.y > ludo.pos.y){
-				ludo.pos.y-=3;	
-			}*/
 		}
 
 
@@ -578,15 +584,15 @@ int main(int argc, char* argv[]){
 			
 			/* Ludo Hyperspace*/
 				if (ludo.pos.x < 0)  {
-				ludo.pos.x = SCREEN_WIDTH - perso.size;
+				ludo.pos.x = SCREEN_WIDTH ;
 			}
-			if (ludo.pos.x > SCREEN_WIDTH - perso.size) {
+			if (ludo.pos.x > SCREEN_WIDTH + perso.size) {
 				ludo.pos.x = perso.size ;
 			}
 			if (ludo.pos.y < 0){
-				ludo.pos.y = SCREEN_HEIGHT - perso.size;
+				ludo.pos.y = SCREEN_HEIGHT ;
 			}
-			if (ludo.pos.y > SCREEN_HEIGHT - perso.size) {
+			if (ludo.pos.y > SCREEN_HEIGHT) {
 				ludo.pos.y = perso.size;
 			}
 		}
@@ -804,6 +810,12 @@ int main(int argc, char* argv[]){
 			if(Collision(&HP_potion,&monster)&&HP_potion.display!=0&&monster.life<MAX_HP){
 				HP_potion.display=0;
 				monster.life +=50;
+			}
+			
+			if(Collision(&HP_potion,&ludo)&&HP_potion.display!=0&&ludo.life<MAX_HP){
+				HP_potion.display=0;
+				ludo.life +=50;
+				printf("Vie de ludo : %d \n", ludo.life);
 			}
 		}
 		/* update the screen */
