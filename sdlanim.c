@@ -20,8 +20,10 @@
 #define DIR_LEFT        3
 #define COLIDE			4/3
 #define MAX_HP    		100
+#define MAX_MANA    		100
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     5
+#define VITESSE_MOB 	2
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -34,8 +36,11 @@ struct sprite_t HP_potion;
 SDL_Surface* barreDeVie_Ludo;
 SDL_Surface* barreDeVie_monstre;
 SDL_Surface* barreDeVie_perso;
+SDL_Surface* barreDeMana_perso;
+
 int choice = 0;
 int choiceTEST = 0;
+
 
 
 /* Handle events coming from the user:
@@ -249,7 +254,19 @@ void HandleEvent(SDL_Event event,
 		return 0;
 	}
 
-	int CollisionDistance(struct sprite_t* a, struct sprite_t* b, int Dx){
+	float puissance(float x, int n)
+	{
+	  if(n==0)
+	  {
+	    return 1;
+	  }
+	  else
+	  {
+	    return x*puissance(x,n-1);
+	  }
+	}
+	
+	/*int Distance(struct sprite_t* a, struct sprite_t* b, int Dx){
 		if((a->display==1)&&(b->display==1)){
 			float diffX, diffY;
 			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
@@ -260,6 +277,17 @@ void HandleEvent(SDL_Event event,
 			return 0;
 		}
 		return 0;
+	}*/
+	
+	int DistanceXY(struct sprite_t* a, struct sprite_t* b){
+	  if((a->display==1)&&(b->display==1)){ 
+	    float diffX, diffY, res;
+	    diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
+	    diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size));
+	    res = sqrt(puissance(diffX,2)+puissance(diffY,2));
+	    return res;
+	  }
+	  return 10;
 	}
 			  			 
 
@@ -379,6 +407,7 @@ int main(int argc, char* argv[]){
 			barreDeVie_Ludo = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 			barreDeVie_monstre = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 			barreDeVie_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
+			barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 
 
 		}
@@ -420,7 +449,6 @@ int main(int argc, char* argv[]){
 			if(ludo.life>0&&ludo.life<=(40*MAX_HP/100)){
 				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 0, 0)); // rouge
 			}
-		
 		//Barre de vie monstre
 		SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
 		SDL_Rect HP_monstre;
@@ -466,6 +494,15 @@ int main(int argc, char* argv[]){
 				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
 		}
 		
+		//Bare de mana personnage
+		SDL_FillRect(barreDeMana_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+		SDL_Rect MANA_perso;
+		MANA_perso.x = 0;
+		MANA_perso.y = 0;
+		MANA_perso.w = perso.life*perso.size/MAX_MANA;
+		MANA_perso.h = 3;
+		SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
+		
 		
 		/*position*/
 		{
@@ -494,16 +531,16 @@ int main(int argc, char* argv[]){
 			case(0):
 				break;
 			case(1):
-				monster.pos.x = monster.pos.x +5;
+				monster.pos.x = monster.pos.x + VITESSE_MOB;
 				break;
 			case(2):
-				monster.pos.x = monster.pos.x -5;
+				monster.pos.x = monster.pos.x -VITESSE_MOB;
 				break;
 			case(3):
-				monster.pos.y = monster.pos.y +5;
+				monster.pos.y = monster.pos.y +VITESSE_MOB;
 				break;
 			case(4):
-				monster.pos.y = monster.pos.y -5;
+				monster.pos.y = monster.pos.y -VITESSE_MOB;
 				break;
 			default :
 				break;
@@ -512,8 +549,8 @@ int main(int argc, char* argv[]){
 
 				//monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
 				//monster.pos.y = monster.pos.y + deathball.v.y;
-			/* // Le monstre tourne en rond
-			double angle2 = (rand()%90);
+				/* // Le monstre tourne en rond
+				double angle2 = (rand()%90);
 				ludo.display = 1;
 				ludo.pos.x += 2 * cos(angle2);
 				ludo.pos.y += 2*sin(angle2);*/
@@ -538,6 +575,7 @@ int main(int argc, char* argv[]){
 			
 				//IA Fuyarde 
 			if(choice == 0){
+			    if(DistanceXY(&perso,&ludo)<=100){
 				if(perso.pos.x<ludo.pos.x){
 					ludo.pos.x+=3;
 				} 
@@ -550,6 +588,21 @@ int main(int argc, char* argv[]){
 				if(perso.pos.y > ludo.pos.y){
 					ludo.pos.y-=3;	
 				}
+			    } else if(DistanceXY(&perso,&ludo)>180){
+			      	if(perso.pos.x>ludo.pos.x){
+					ludo.pos.x+=2;
+				} 
+				if(perso.pos.x<ludo.pos.x){
+					ludo.pos.x-=2;
+				} 
+				if(perso.pos.y > ludo.pos.y){
+					ludo.pos.y+=2;	
+				}
+				if(perso.pos.y < ludo.pos.y){
+					ludo.pos.y-=2;	
+				}
+			      
+			    }
 			}
 		}
 
@@ -643,6 +696,9 @@ int main(int argc, char* argv[]){
 			if (perso.display != 0) {
 				SDL_Rect spriteImage;
 				SDL_Rect spritePos;
+				SDL_Rect manaPos;
+				manaPos.x = perso.pos.x;
+				manaPos.y = perso.pos.y - 3;
 				spritePos.x = perso.pos.x;
 				spritePos.y = perso.pos.y;
 				spriteImage.y = 0;
@@ -650,7 +706,9 @@ int main(int argc, char* argv[]){
 				spriteImage.h = perso.size;
 				spriteImage.x = perso.size*(perso.currDirection*2);
 				SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
-				SDL_BlitSurface(barreDeVie_perso, NULL, screen, &spritePos);
+				SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos);
+				SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
+
 
 
 			}
@@ -817,6 +875,7 @@ int main(int argc, char* argv[]){
 				ludo.life +=50;
 				printf("Vie de ludo : %d \n", ludo.life);
 			}
+			//printf("Distance entre HP potions et perso : %d", DistanceXY(&HP_potion,&perso));
 		}
 		/* update the screen */
 		SDL_UpdateRect(screen, 0, 0, 0, 0);
