@@ -60,7 +60,8 @@ int main(int argc, char* argv[])
 	SDL_Rect posMes3={80*SCREEN_WIDTH/100,40*SCREEN_HEIGHT/100};
 	message4 = TTF_RenderText_Solid(font36,"Quit",textColor);
 	SDL_Rect posMes4={80*SCREEN_WIDTH/100,60*SCREEN_HEIGHT/100};
-
+	int *posMouseX=0;
+	int *posMouseY=0;
     /* main loop: check events and re-draw the window until the end */
     while (!gameover)
     {
@@ -86,15 +87,19 @@ int main(int argc, char* argv[])
                             break;
                     }
                     break;
+				case SDL_MOUSEBUTTONDOWN:
+					posMouse=SDL_GetMouseState(event.button.x,event.button.y);
+					printf("POS MOUSE X %d POS MOUSE Y %d\n",posMouse.x,posMouse.y);
+					break;
             }
         }
 
         /* update the screen */
+		
 		SDL_BlitSurface(message,NULL,screen,&posMes1);
 		SDL_BlitSurface(message2,NULL,screen,&posMes2);
 		SDL_BlitSurface(message3,NULL,screen,&posMes3);
 		SDL_BlitSurface(message4,NULL,screen,&posMes4);
-		
         SDL_UpdateRect(screen,0,0,0,0);
     }
 
