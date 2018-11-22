@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include <time.h>
+#include <SDL_ttf.h>
 #include "game.h"
 
 
@@ -20,7 +21,7 @@
 #define DIR_LEFT        3
 #define COLIDE			4/3
 #define MAX_HP    		100
-#define MAX_MANA    		100
+#define MAX_MANA    	100
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     5
 #define VITESSE_MOB 	2
@@ -50,179 +51,190 @@ int choiceTEST = 0;
    position of the sprite in the window.
    We also change the animation bit used for creating the "walk" effect.
 */
-void HandleEvent(SDL_Event event,
-		 int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo, struct bdf_t *fireball, struct sprite_t *deathball, struct sprite_t *poisonball, struct sprite_t *HP_potion)
+void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo,
+ struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,int *display, int *posMouseX, int *posMouseY)
 {
-  switch (event.type) {
-    /* close button clicked */
-  case SDL_QUIT:
-    *gameover = 1;
-    break;
+	switch (event.type) {
+		/* close button clicked */
+		case SDL_QUIT:
+			*gameover = 1;
+			break;
 
-    /* handle the keyboard */
-    
-  case SDL_KEYDOWN:
-    switch (event.key.keysym.sym) {
-		case SDLK_ESCAPE:   
-		case SDLK_q:
-			*gameover = 0;
-			break;
-		  
-		case SDLK_LEFT:
-			perso->currDirection = DIR_LEFT;
-			*animFlip = 1 - *animFlip;
-			perso->pos.x -= SPRITE_STEP;
-			break;
-		  
-		case SDLK_RIGHT:
-			perso->currDirection = DIR_RIGHT;
-			*animFlip = 1 - *animFlip;
-			perso->pos.x += SPRITE_STEP;
-			break;
-		  
-		case SDLK_UP:
-			perso->currDirection = DIR_UP;
-			*animFlip = 1 - *animFlip;
-			perso->pos.y -= SPRITE_STEP;
-			break;
+		/* handle the keyboard */
+		
+		case SDL_KEYDOWN:
+			switch (event.key.keysym.sym) {
+				case SDLK_ESCAPE:   
+				case SDLK_q:
+					*gameover = 0;
+					break;
+			  
+				case SDLK_LEFT:
+					perso->currDirection = DIR_LEFT;
+					*animFlip = 1 - *animFlip;
+					perso->pos.x -= SPRITE_STEP;
+					break;
+			  
+				case SDLK_RIGHT:
+					perso->currDirection = DIR_RIGHT;
+					*animFlip = 1 - *animFlip;
+					perso->pos.x += SPRITE_STEP;
+					break;
+			  
+				case SDLK_UP:
+					perso->currDirection = DIR_UP;
+					*animFlip = 1 - *animFlip;
+					perso->pos.y -= SPRITE_STEP;
+					break;
+				
+				case SDLK_DOWN:
+					perso->currDirection = DIR_DOWN;
+					*animFlip = 1 - *animFlip;
+					perso->pos.y += SPRITE_STEP;
+					break;
+			  
+				case SDLK_SPACE:
 			
-		case SDLK_DOWN:
-			perso->currDirection = DIR_DOWN;
-			*animFlip = 1 - *animFlip;
-			perso->pos.y += SPRITE_STEP;
+					if (fireball->display==0) {
+						fireball->display=1;
+						fireball->range=100;
+						fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+						fireball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+						if(perso->currDirection == DIR_RIGHT){
+							double angle = (perso->currDirection * (2*M_PI));
+							fireball->v.x = 2*cos(angle);
+							fireball->v.y = -2 * sin(angle);
+						}
+						if(perso->currDirection == DIR_LEFT){
+							double angle = (perso->currDirection * (2*M_PI));
+							fireball->v.x = -2*cos(angle);
+							fireball->v.y = 2 * sin(angle);
+						}
+						if(perso->currDirection == DIR_UP){
+							double angle = (perso->currDirection * (2*M_PI));
+							fireball->v.x = 2 * sin(angle);
+							fireball->v.y = -2*cos(angle);
+						}
+						if(perso->currDirection == DIR_DOWN){
+							double angle = (perso->currDirection * (2*M_PI));
+							fireball->v.x = -2 * sin(angle);
+							fireball->v.y = 2*cos(angle);
+						}
+
+					}
+					break;
+
+
+				case SDLK_F1:
+			
+					if (poisonball->life ==0) {
+						poisonball->life = 80;
+						poisonball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+						poisonball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+						if(perso->currDirection == DIR_RIGHT){
+							double angle = (perso->currDirection * (2*M_PI)); 
+							poisonball->v.x = 2*cos(angle);
+							poisonball->v.y = 2 * sin(angle);
+							poisonball->display = 1;
+						}
+						if(perso->currDirection == DIR_LEFT){
+							double angle = (perso->currDirection * (2*M_PI));
+							poisonball->v.x = -2*cos(angle);
+							poisonball->v.y = 2 * sin(angle);
+							poisonball->display = 1;
+						}
+						if(perso->currDirection == DIR_UP){
+							double angle = (perso->currDirection * (2*M_PI));
+							poisonball->v.x = 2 * sin(angle);
+							poisonball->v.y = -2*cos(angle);
+							poisonball->display = 1;
+						}
+						if(perso->currDirection == DIR_DOWN){
+							double angle = (perso->currDirection * (2*M_PI));
+							poisonball->v.x = -2 * sin(angle);
+							poisonball->v.y = 2*cos(angle);
+							poisonball->display = 1;
+						}
+
+					}
+					break;
+
+
+				case SDLK_F2:
+			
+					if (deathball->life ==0) {
+						deathball->life = 80;
+						deathball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+						deathball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+						if(perso->currDirection == DIR_RIGHT){
+							double angle = (perso->currDirection * (2*M_PI));
+							deathball->v.x = 2*cos(angle);
+							deathball->v.y = -2 * sin(angle);
+							deathball->display = 1;
+						}
+						if(perso->currDirection == DIR_LEFT){
+							double angle = (perso->currDirection * (2*M_PI));
+							deathball->v.x = -2*cos(angle);
+							deathball->v.y = 2 * sin(angle);
+							deathball->display = 1;
+						}
+						if(perso->currDirection == DIR_UP){
+							double angle = (perso->currDirection * (2*M_PI));
+							deathball->v.x = 2 * sin(angle);
+							deathball->v.y = -2*cos(angle);
+							deathball->display = 1;
+						}
+						if(perso->currDirection == DIR_DOWN){
+							double angle = (perso->currDirection * (2*M_PI));
+							deathball->v.x = -2 * sin(angle);
+							deathball->v.y = 2*cos(angle);
+							deathball->display = 1;
+						}
+
+					}
+					break;
+				
+				case SDLK_F3:
+					/* Apparition PNJ Ludo */
+					ludo->life= 100;
+					ludo->display = 1;
+					ludo->pos.x = 200;
+					ludo->pos.y = 200;
+				break;
+				
+				case SDLK_F4:
+					if(choiceTEST){
+						choice = 1;
+						choiceTEST= 0;
+					} else {
+						choice = 0;
+						choiceTEST = 1;
+					}
+				break;
+				default:
+					break;
+				}
+				break;
+		case SDL_MOUSEBUTTONDOWN:
+			if((*display==1)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+			}
+			//800 150 / 925 200    --  800 300 / 980 350 -- 810 460 / 925 500
+			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=150)&&(*posMouseY<=200)&&(*display==1)){
+				//Lancement du jeu
+				*display=2;
+			}
+			if((*posMouseX>=800)&&(*posMouseX<=980)&&(*posMouseY>=300)&&(*posMouseY<=350)&&(*display==1)){
+				//Lancement des options
+				*display=3;
+			}
+			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=450)&&(*posMouseY<=500)&&(*display==1)){
+				//fermeture du jeu
+				*gameover=0;
+			}
 			break;
-		  
-		case SDLK_SPACE:
-		
-			if (fireball->display==0) {
-				fireball->display=1;
-				fireball->range=100;
-				fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
-				fireball->pos.y = perso->pos.y+(GRASS_SIZE/3);
-				if(perso->currDirection == DIR_RIGHT){
-					double angle = (perso->currDirection * (2*M_PI));
-					fireball->v.x = 2*cos(angle);
-					fireball->v.y = -2 * sin(angle);
-				}
-				if(perso->currDirection == DIR_LEFT){
-					double angle = (perso->currDirection * (2*M_PI));
-					fireball->v.x = -2*cos(angle);
-					fireball->v.y = 2 * sin(angle);
-				}
-				if(perso->currDirection == DIR_UP){
-					double angle = (perso->currDirection * (2*M_PI));
-					fireball->v.x = 2 * sin(angle);
-					fireball->v.y = -2*cos(angle);
-				}
-				if(perso->currDirection == DIR_DOWN){
-					double angle = (perso->currDirection * (2*M_PI));
-					fireball->v.x = -2 * sin(angle);
-					fireball->v.y = 2*cos(angle);
-				}
-
-			}
-		  break;
-
-
-		case SDLK_F1:
-		
-			if (poisonball->life ==0) {
-				poisonball->life = 80;
-				poisonball->pos.x = perso->pos.x+(GRASS_SIZE/3);
-				poisonball->pos.y = perso->pos.y+(GRASS_SIZE/3);
-				if(perso->currDirection == DIR_RIGHT){
-					double angle = (perso->currDirection * (2*M_PI)); 
-					poisonball->v.x = 2*cos(angle);
-					poisonball->v.y = 2 * sin(angle);
-					poisonball->display = 1;
-				}
-				if(perso->currDirection == DIR_LEFT){
-					double angle = (perso->currDirection * (2*M_PI));
-					poisonball->v.x = -2*cos(angle);
-					poisonball->v.y = 2 * sin(angle);
-					poisonball->display = 1;
-				}
-				if(perso->currDirection == DIR_UP){
-					double angle = (perso->currDirection * (2*M_PI));
-					poisonball->v.x = 2 * sin(angle);
-					poisonball->v.y = -2*cos(angle);
-					poisonball->display = 1;
-				}
-				if(perso->currDirection == DIR_DOWN){
-					double angle = (perso->currDirection * (2*M_PI));
-					poisonball->v.x = -2 * sin(angle);
-					poisonball->v.y = 2*cos(angle);
-					poisonball->display = 1;
-				}
-
-			}
-		  break;
-
-
-		case SDLK_F2:
-		
-			if (deathball->life ==0) {
-				deathball->life = 80;
-				deathball->pos.x = perso->pos.x+(GRASS_SIZE/3);
-				deathball->pos.y = perso->pos.y+(GRASS_SIZE/3);
-				if(perso->currDirection == DIR_RIGHT){
-					double angle = (perso->currDirection * (2*M_PI));
-					deathball->v.x = 2*cos(angle);
-					deathball->v.y = -2 * sin(angle);
-					deathball->display = 1;
-				}
-				if(perso->currDirection == DIR_LEFT){
-					double angle = (perso->currDirection * (2*M_PI));
-					deathball->v.x = -2*cos(angle);
-					deathball->v.y = 2 * sin(angle);
-					deathball->display = 1;
-				}
-				if(perso->currDirection == DIR_UP){
-					double angle = (perso->currDirection * (2*M_PI));
-					deathball->v.x = 2 * sin(angle);
-					deathball->v.y = -2*cos(angle);
-					deathball->display = 1;
-				}
-				if(perso->currDirection == DIR_DOWN){
-					double angle = (perso->currDirection * (2*M_PI));
-					deathball->v.x = -2 * sin(angle);
-					deathball->v.y = 2*cos(angle);
-					deathball->display = 1;
-				}
-
-			}
-		  break;
-			
-		case SDLK_F3:
-			/* Apparition PNJ Ludo */
-			ludo->life= 100;
-			ludo->display = 1;
-			ludo->pos.x = 200;
-			ludo->pos.y = 200;
-		
-			
 		break;
-			
-		case SDLK_F4:
-			if(choiceTEST){
-				choice = 1;
-				choiceTEST= 0;
-			} else {
-				choice = 0;
-				choiceTEST = 1;
-			}
-		break;
-
-
-	
-			
-		  
-		default:
-			break;
-    }
-    
-    break;
-  }
+	}
 }
 
 
@@ -293,8 +305,8 @@ void HandleEvent(SDL_Event event,
 
 int main(int argc, char* argv[]){
 
-  int gameover =1                  ;
-  SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion;
+	
+	SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion;
     int colorkey;
 
     /* Information about the current situation of the sprite: */
@@ -307,19 +319,40 @@ int main(int argc, char* argv[]){
 
     /* initialize SDL */
     SDL_Init(SDL_INIT_VIDEO);
+	TTF_Init();
 
     /* set the title bar */
-    SDL_WM_SetCaption("SDL Animation", "SDL Animation");
+    SDL_WM_SetCaption("Ashortsomething", "Ashortsomething");
 
     /* create window */
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     /* set keyboard repeat */
     SDL_EnableKeyRepeat(10, 10);
+	
+	int gameover =1;
+	int display=1; // 1 menu 2 jeu 3 config 4 menu de pause
+	
+	//Les surfaces du menu
+	SDL_Surface *background; 
+	SDL_Surface *message; 
+	SDL_Surface *message2; 
+	SDL_Surface *message3; 
+	SDL_Surface *message4; 
 
+	//Les Fonts qu'on va utiliser pour le menu
+	TTF_Font *font50; 
+	TTF_Font *font36;
+	
+	//La couleur du Font 
+	SDL_Color textColor = { 255, 255, 255 };
+	
+	font50 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 50);
+	font36 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 36);
+	
     /* load sprite */
 	{
-		temp   = SDL_LoadBMP("sprite.bmp");
+		temp = SDL_LoadBMP("sprite.bmp");
 		sprite = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
 
@@ -346,6 +379,10 @@ int main(int argc, char* argv[]){
 		temp = SDL_LoadBMP("moyenne_potion_rouge.bmp");
 		spritepotion = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
+		
+		temp = SDL_LoadBMP("background.bmp");
+		background = SDL_DisplayFormat(temp);
+		SDL_FreeSurface(temp);
 	}
 	
 	/*load background picture*/
@@ -368,6 +405,20 @@ int main(int argc, char* argv[]){
 
 
 	}
+	
+	//Mise en place du ttf
+	message = TTF_RenderText_Solid(font50,"Welcome to AShortSomething !",textColor);
+	SDL_Rect posMes1={50*SCREEN_WIDTH/100-400,0.0};
+	message2 = TTF_RenderText_Solid(font36,"Play",textColor);
+	SDL_Rect posMes2={80*SCREEN_WIDTH/100,20*SCREEN_HEIGHT/100};
+	message3 = TTF_RenderText_Solid(font36,"Options",textColor);
+	SDL_Rect posMes3={80*SCREEN_WIDTH/100,40*SCREEN_HEIGHT/100};
+	message4 = TTF_RenderText_Solid(font36,"Quit",textColor);
+	SDL_Rect posMes4={80*SCREEN_WIDTH/100,60*SCREEN_HEIGHT/100};
+	
+	//Positions souris
+	int posMouseX=0;
+	int posMouseY=0;
 	
 	/* initialise struct */
 	perso.currDirection = 0;
@@ -413,99 +464,97 @@ int main(int argc, char* argv[]){
 		}
 		
 	/* main loop: check events and re-draw the window until the end */
-	while (gameover !=0)
+	while (gameover)
 	{
+		int disp=display;
 		SDL_Event event;
-		
-
 		/* look for an event; possibly update the position and the shape
 		 * of the sprite. */
 		if (SDL_PollEvent(&event)) {
-			HandleEvent(event, &gameover, &currentDirection,
-			&animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion);
+			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion,&display,&posMouseX,&posMouseY);
 		}
 			
-		
 		//Barre de vie ludo
 		
 		//FillRect d'un SDLRect avec règle de trois basique
-		SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-		SDL_Rect HP_ludo;
-		HP_ludo.x = 0;
-		HP_ludo.y = 0;
-		HP_ludo.w = ludo.life*ludo.size/MAX_HP;
-		HP_ludo.h = 3;
-			if(ludo.life>(80*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 0, 255, 0));
+		if(disp==2){
+			SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+			SDL_Rect HP_ludo;
+			HP_ludo.x = 0;
+			HP_ludo.y = 0;
+			HP_ludo.w = ludo.life*ludo.size/MAX_HP;
+			HP_ludo.h = 3;
+				if(ludo.life>(80*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 0, 255, 0));
+				}
+				if(ludo.life>(60*MAX_HP/100)&&ludo.life<=(80*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 255, 0)); //jaune
+				}
+				if(ludo.life>40&&ludo.life<=(60*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 112, 0)); //orange
+				}
+				if(ludo.life>0&&ludo.life<=(40*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 0, 0)); // rouge
+				}
+			//Barre de vie monstre
+			SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+			SDL_Rect HP_monstre;
+			HP_monstre.x = 0;
+			HP_monstre.y = 0;
+			HP_monstre.w = monster.life*monster.size/MAX_HP;
+			HP_monstre.h = 3;
+			if(monster.life>(80*MAX_HP/100)){
+				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 0, 255, 0));
 			}
-			if(ludo.life>(60*MAX_HP/100)&&ludo.life<=(80*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 255, 0)); //jaune
+			if(monster.life>(60*MAX_HP/100)&&monster.life<=(80*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+					SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 255, 0)); //jaune
+				}
+			if(monster.life>(40*MAX_HP/100)&&monster.life<=(60*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+					SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 112, 0)); //orange
 			}
-			if(ludo.life>40&&ludo.life<=(60*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 112, 0)); //orange
+			if(monster.life>0&&monster.life<=(40*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 0, 0)); // rouge
 			}
-			if(ludo.life>0&&ludo.life<=(40*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 0, 0)); // rouge
+			
+			//Barre de vie personnage
+			SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+			SDL_Rect HP_perso;
+			HP_perso.x = 0;
+			HP_perso.y = 0;
+			HP_perso.w = perso.life*perso.size/MAX_HP;
+			HP_perso.h = 3;
+			SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
+			if(perso.life>(80*MAX_HP/100)){
+				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
 			}
-		//Barre de vie monstre
-		SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-		SDL_Rect HP_monstre;
-		HP_monstre.x = 0;
-		HP_monstre.y = 0;
-		HP_monstre.w = monster.life*monster.size/MAX_HP;
-		HP_monstre.h = 3;
-		if(monster.life>(80*MAX_HP/100)){
-			SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 0, 255, 0));
-		}
-		if(monster.life>(60*MAX_HP/100)&&monster.life<=(80*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 255, 0)); //jaune
+			if(perso.life>(60*MAX_HP/100)&&perso.life<=(80*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+					SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
+				}
+			if(perso.life>(40*MAX_HP/100)&&perso.life<=(60*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+					SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
 			}
-		if(monster.life>(40*MAX_HP/100)&&monster.life<=(60*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 112, 0)); //orange
-		}
-		if(monster.life>0&&monster.life<=(40*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 0, 0)); // rouge
-		}
-		
-		//Barre de vie personnage
-		SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-		SDL_Rect HP_perso;
-		HP_perso.x = 0;
-		HP_perso.y = 0;
-		HP_perso.w = perso.life*perso.size/MAX_HP;
-		HP_perso.h = 3;
-		SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
-		if(perso.life>(80*MAX_HP/100)){
-			SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
-		}
-		if(perso.life>(60*MAX_HP/100)&&perso.life<=(80*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
+			if(perso.life>0&&perso.life<=(40*MAX_HP/100)){
+					SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
 			}
-		if(perso.life>(40*MAX_HP/100)&&perso.life<=(60*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
+			
+			//Bare de mana personnage
+			SDL_FillRect(barreDeMana_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+			SDL_Rect MANA_perso;
+			MANA_perso.x = 0;
+			MANA_perso.y = 0;
+			MANA_perso.w = perso.life*perso.size/MAX_MANA;
+			MANA_perso.h = 3;
+			SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
 		}
-		if(perso.life>0&&perso.life<=(40*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
-		}
-		
-		//Bare de mana personnage
-		SDL_FillRect(barreDeMana_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-		SDL_Rect MANA_perso;
-		MANA_perso.x = 0;
-		MANA_perso.y = 0;
-		MANA_perso.w = perso.life*perso.size/MAX_MANA;
-		MANA_perso.h = 3;
-		SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
-		
 		
 		/*position*/
-		{
+		if(disp==2){
 			if (fireball.display == 1){
 				fireball.pos.x = fireball.pos.x + fireball.v.x;
 				fireball.pos.y = fireball.pos.y + fireball.v.y;
@@ -520,30 +569,32 @@ int main(int argc, char* argv[]){
 				deathball.pos.x = deathball.pos.x + deathball.v.x;
 				deathball.pos.y = deathball.pos.y + deathball.v.y;
 			}
-			
+		}
 		/* Déplacement du monstre */
 
 
 		/*Gestion aléatoire entre -2 et 4 */
-		srand(time(NULL));
-		int a = rand()%5;		
-		switch(a){
-			case(0):
-				break;
-			case(1):
-				monster.pos.x = monster.pos.x + VITESSE_MOB;
-				break;
-			case(2):
-				monster.pos.x = monster.pos.x -VITESSE_MOB;
-				break;
-			case(3):
-				monster.pos.y = monster.pos.y +VITESSE_MOB;
-				break;
-			case(4):
-				monster.pos.y = monster.pos.y -VITESSE_MOB;
-				break;
-			default :
-				break;
+		if(disp==2){
+			srand(time(NULL));
+			int a = rand()%5;		
+			switch(a){
+				case(0):
+					break;
+				case(1):
+					monster.pos.x = monster.pos.x + VITESSE_MOB;
+					break;
+				case(2):
+					monster.pos.x = monster.pos.x -VITESSE_MOB;
+					break;
+				case(3):
+					monster.pos.y = monster.pos.y +VITESSE_MOB;
+					break;
+				case(4):
+					monster.pos.y = monster.pos.y -VITESSE_MOB;
+					break;
+				default :
+					break;
+			}
 		}
 			
 
@@ -557,7 +608,7 @@ int main(int argc, char* argv[]){
 				
 				
 			//IA Aggressive
-
+		if(disp==2){
 			if (choice ==1){
 				if(perso.pos.x>ludo.pos.x){
 					ludo.pos.x+=2;
@@ -608,7 +659,7 @@ int main(int argc, char* argv[]){
 
 
 		/*hyperspace*/
-		{
+		if(disp==2){
 			if (perso.pos.x < 0)  {
 				perso.pos.x = SCREEN_WIDTH - perso.size;
 			}
@@ -651,7 +702,7 @@ int main(int argc, char* argv[]){
 		}
 
 		/*check and refresh ball life */
-		{
+		if(disp==2){
 			if(poisonball.life == 0){
 				poisonball.display=0;
 			}
@@ -680,7 +731,10 @@ int main(int argc, char* argv[]){
 		}
 			
 		/* draw the background */
-		{			
+		if(disp==1){
+			SDL_BlitSurface(background,NULL,screen,NULL);
+		}
+		if(disp==2){
 			for(int x =0; x< SCREEN_WIDTH/GRASS_SIZE; x++){
 				for(int y =0; y< SCREEN_HEIGHT/GRASS_SIZE; y++){				
 					SDL_Rect position;
@@ -692,7 +746,7 @@ int main(int argc, char* argv[]){
 		}
 	  
 		/* draw sprite*/
-		{
+		if(disp==2){ // si le jeu est en route
 			if (perso.display != 0) {
 				SDL_Rect spriteImage;
 				SDL_Rect spritePos;
@@ -800,44 +854,7 @@ int main(int argc, char* argv[]){
 				
 	
 			}
-			
-			
-
-
-
-			//1//100% Working Collision Perso -> Ludo	
-			/*float diffX, diffY;
-			diffX = fabs(((perso.pos.x+perso.size/2)-(ludo.pos.x)+ludo.size/2));
-			diffY = fabs(((perso.pos.y+perso.size/2)-(ludo.pos.y)+ludo.size/2));
-			if(diffX<40&&diffY<40){
-				printf("Collision");
-				ludo.life -=1;
-			}
-			printf("Difference de x %lf\n\n Diffference de y %lf\n\n", diffX,diffY);
-			printf("Vie de ludo %d", ludo.life);*/
-
-			
-			
-			//2//100% Working Collision Boule de feu -> Ludo
-			/*float diffX, diffY;
-			diffX = fabs(((fireball.pos.x+fireball.size)-(ludo.pos.x)+ludo.size/2-32));
-			diffY = fabs(((fireball.pos.y+fireball.size)-(ludo.pos.y)+ludo.size/2-32));
-			if(diffX<16&&diffY<16&&fireball.display!=0){
-				double i;
-				i++;
-				printf("%lf Collision\n", i);
-				
-				fireball.display = 0;
-				ludo.life -=25;
-			}
-			printf("Difference de x %lf\n\n Diffference de y %lf\n\n", diffX,diffY);
-			printf("Vie de ludo %d", ludo.life);*/
-
-
-
-
-			//Working Test utilisation fonction Collision
-			
+			//Collisions si le jeu tourne
 			if(Collision(&ludo, &perso)&&((ludo.display!=0)||(ludo.life!=0))){ 
 				ludo.life -=1;
 			}
@@ -875,10 +892,15 @@ int main(int argc, char* argv[]){
 				ludo.life +=50;
 				printf("Vie de ludo : %d \n", ludo.life);
 			}
-			//printf("Distance entre HP potions et perso : %d", DistanceXY(&HP_potion,&perso));
 		}
 		/* update the screen */
-		SDL_UpdateRect(screen, 0, 0, 0, 0);
+		if(disp==1){
+			SDL_BlitSurface(message,NULL,screen,&posMes1);
+			SDL_BlitSurface(message2,NULL,screen,&posMes2);
+			SDL_BlitSurface(message3,NULL,screen,&posMes3);
+			SDL_BlitSurface(message4,NULL,screen,&posMes4);
+		}
+        SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
 		
 	}		
@@ -893,6 +915,12 @@ int main(int argc, char* argv[]){
 		SDL_FreeSurface(spritepoison);
 		SDL_FreeSurface(spritedeath);
 		SDL_FreeSurface(grass);
+		SDL_FreeSurface(background);
+		SDL_FreeSurface(screen);
+		SDL_FreeSurface(message);
+		SDL_FreeSurface(message2);
+		SDL_FreeSurface(message3);
+		SDL_FreeSurface(message4);
 		SDL_Quit();
 
 		return 0;
