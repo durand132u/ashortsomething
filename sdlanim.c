@@ -52,7 +52,7 @@ int choiceTEST = 0;
    We also change the animation bit used for creating the "walk" effect.
 */
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo,
- struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,int *display, int *posMouseX, int *posMouseY)
+ struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,int *display, int *posMouseX, int *posMouseY, int *selection)
 {
 	switch (event.type) {
 		/* close button clicked */
@@ -64,9 +64,9 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
-				case SDLK_ESCAPE:   
+				case SDLK_ESCAPE:   // retour au menu
 				case SDLK_q:
-					*gameover = 0;
+					*display =1 ;
 					break;
 			  
 				case SDLK_LEFT:
@@ -233,6 +233,23 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 				*gameover=0;
 			}
 			break;
+			
+		case SDL_MOUSEMOTION:
+			*selection=-1; //reset
+			if((*display==1)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+			}
+			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=150)&&(*posMouseY<=200)&&(*display==1)){
+				*selection=1; //play
+			}
+			if((*posMouseX>=800)&&(*posMouseX<=980)&&(*posMouseY>=300)&&(*posMouseY<=350)&&(*display==1)){
+				*selection=2; //options
+			}
+			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=450)&&(*posMouseY<=500)&&(*display==1)){
+				*selection=3; //quit
+			}
+			break;
+				
 		break;
 	}
 }
@@ -339,6 +356,8 @@ int main(int argc, char* argv[]){
 	SDL_Surface *message2; 
 	SDL_Surface *message3; 
 	SDL_Surface *message4; 
+	SDL_Surface *fleche;
+	int selection=-1;
 
 	//Les Fonts qu'on va utiliser pour le menu
 	TTF_Font *font50; 
@@ -416,6 +435,9 @@ int main(int argc, char* argv[]){
 	message4 = TTF_RenderText_Solid(font36,"Quit",textColor);
 	SDL_Rect posMes4={80*SCREEN_WIDTH/100,60*SCREEN_HEIGHT/100};
 	
+	fleche = TTF_RenderText_Solid(font50,">>>",textColor);
+	SDL_Rect posFleche={70*SCREEN_WIDTH/100,(20*SCREEN_HEIGHT/100)*selection}; // Fleche du menu
+	
 	//Positions souris
 	int posMouseX=0;
 	int posMouseY=0;
@@ -471,7 +493,7 @@ int main(int argc, char* argv[]){
 		/* look for an event; possibly update the position and the shape
 		 * of the sprite. */
 		if (SDL_PollEvent(&event)) {
-			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion,&display,&posMouseX,&posMouseY);
+			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion,&display,&posMouseX,&posMouseY,&selection);
 		}
 			
 		//Barre de vie ludo
@@ -899,6 +921,10 @@ int main(int argc, char* argv[]){
 			SDL_BlitSurface(message2,NULL,screen,&posMes2);
 			SDL_BlitSurface(message3,NULL,screen,&posMes3);
 			SDL_BlitSurface(message4,NULL,screen,&posMes4);
+			if(selection!=-1){
+				SDL_Rect posFleche={65*SCREEN_WIDTH/100,((20*SCREEN_HEIGHT/100)*selection)-(2*SCREEN_HEIGHT/100)};
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
 		}
         SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
