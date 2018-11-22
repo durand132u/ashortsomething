@@ -13,6 +13,7 @@ int main(int argc, char* argv[])
 {
     SDL_Surface *screen,*temp;
     int gameover;
+	int display;
 
     /* initialize video system */
     SDL_Init(SDL_INIT_VIDEO);
@@ -25,7 +26,7 @@ int main(int argc, char* argv[])
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     gameover = 0;
-	
+	display = 1; // 1 menu 2 jeu 3 config 4 menu de pause
 	//Les surfaces 
 	SDL_Surface *background; 
 	SDL_Surface *message; 
@@ -60,8 +61,8 @@ int main(int argc, char* argv[])
 	SDL_Rect posMes3={80*SCREEN_WIDTH/100,40*SCREEN_HEIGHT/100};
 	message4 = TTF_RenderText_Solid(font36,"Quit",textColor);
 	SDL_Rect posMes4={80*SCREEN_WIDTH/100,60*SCREEN_HEIGHT/100};
-	int *posMouseX=0;
-	int *posMouseY=0;
+	int posMouseX=0;
+	int posMouseY=0;
     /* main loop: check events and re-draw the window until the end */
     while (!gameover)
     {
@@ -88,8 +89,9 @@ int main(int argc, char* argv[])
                     }
                     break;
 				case SDL_MOUSEBUTTONDOWN:
-					posMouse=SDL_GetMouseState(event.button.x,event.button.y);
-					printf("POS MOUSE X %d POS MOUSE Y %d\n",posMouse.x,posMouse.y);
+					SDL_GetMouseState(&posMouseX,&posMouseY);
+					
+					printf("POS MOUSE X %d POS MOUSE Y %d\n",posMouseX,posMouseY);
 					break;
             }
         }
