@@ -89,9 +89,22 @@ int main(int argc, char* argv[])
                     }
                     break;
 				case SDL_MOUSEBUTTONDOWN:
-					SDL_GetMouseState(&posMouseX,&posMouseY);
-					
-					printf("POS MOUSE X %d POS MOUSE Y %d\n",posMouseX,posMouseY);
+					if(display==1){
+						SDL_GetMouseState(&posMouseX,&posMouseY);
+					}
+					//800 150 / 925 200    --  800 300 / 980 350 -- 810 460 / 925 500
+					if((posMouseX>=800)&&(posMouseX<=925)&&(posMouseY>=150)&&(posMouseY<=200)&&(display==1)){
+						//Lancement du jeu
+						display=2;
+					}
+					if((posMouseX>=800)&&(posMouseX<=980)&&(posMouseY>=300)&&(posMouseY<=350)&&(display==1)){
+						//Lancement des options
+						display=3;
+					}
+					if((posMouseX>=800)&&(posMouseX<=925)&&(posMouseY>=450)&&(posMouseY<=500)&&(display==1)){
+						//fermeture du jeu
+						gameover=1;
+					}
 					break;
             }
         }
