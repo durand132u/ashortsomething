@@ -426,6 +426,9 @@ int main(int argc, char* argv[]){
 	
 	//Mise en place du ttf
 	
+	fleche = TTF_RenderText_Solid(font50,">>>",textColor);
+	SDL_Rect posFleche={70*SCREEN_WIDTH/100,(20*SCREEN_HEIGHT/100)*selection}; // Fleche du menu
+	
 	//Positions souris
 	int posMouseX=0;
 	int posMouseY=0;
