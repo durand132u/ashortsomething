@@ -218,19 +218,38 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		case SDL_MOUSEBUTTONDOWN:
 			if((*display==1)){
 				SDL_GetMouseState(posMouseX,posMouseY);
+				if((*posMouseX>=78*SCREEN_WIDTH/100)&&(*posMouseX<=90*SCREEN_WIDTH/100)&&(*posMouseY>=20*SCREEN_HEIGHT/100)&&(*posMouseY<=25*SCREEN_HEIGHT/100)){
+					//Lancement du jeu
+					*display=2;
+				}
+				if((*posMouseX>=78*SCREEN_WIDTH/100)&&(*posMouseX<=96*SCREEN_WIDTH/100)&&(*posMouseY>=40*SCREEN_HEIGHT/100)&&(*posMouseY<=45*SCREEN_HEIGHT/100)){
+					//Lancement des options
+					*display=3;
+				}
+				if((*posMouseX>=78*SCREEN_WIDTH/100)&&(*posMouseX<=90*SCREEN_WIDTH/100)&&(*posMouseY>=60*SCREEN_HEIGHT/100)&&(*posMouseY<=65*SCREEN_HEIGHT/100)){
+					//fermeture du jeu
+					*gameover=0;
+				}
 			}
-			//800 150 / 925 200    --  800 300 / 980 350 -- 810 460 / 925 500
-			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=150)&&(*posMouseY<=200)&&(*display==1)){
-				//Lancement du jeu
-				*display=2;
+			if((*display==3)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=40*SCREEN_HEIGHT/100)&&(*posMouseY<=45*SCREEN_HEIGHT/100)){
+					printf("ECRAN A AGRANDIR EN 16/9e"); //agrandir ecran
+				}
+				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=60*SCREEN_HEIGHT/100)&&(*posMouseY<=65*SCREEN_HEIGHT/100)){
+					printf("ECRAN A REDUIRE EN 16/9e"); //reduire ecran
+				}
+				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=80*SCREEN_HEIGHT/100)&&(*posMouseY<=85*SCREEN_HEIGHT/100)){
+					printf("AJOUTER GESTION DES CONTROLES"); //controles
+					*display=4; //menu de controles
+				}
+				if((*posMouseX>=60*SCREEN_WIDTH/100)&&(*posMouseX<=80*SCREEN_WIDTH/100)&&(*posMouseY>=20*SCREEN_HEIGHT/100)&&(*posMouseY<=25*SCREEN_HEIGHT/100)){
+					*display=1; //retour menu
+				}
 			}
-			if((*posMouseX>=800)&&(*posMouseX<=980)&&(*posMouseY>=300)&&(*posMouseY<=350)&&(*display==1)){
-				//Lancement des options
-				*display=3;
-			}
-			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=450)&&(*posMouseY<=500)&&(*display==1)){
-				//fermeture du jeu
-				*gameover=0;
+			
+			if((*display==4)){
+				SDL_GetMouseState(posMouseX,posMouseY); // A GERER : INTERFACE DE REDEFINITION DES CONTROLES
 			}
 			break;
 			
@@ -238,15 +257,36 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 			*selection=-1; //reset
 			if((*display==1)){
 				SDL_GetMouseState(posMouseX,posMouseY);
+				*selection=-1; //reset
+				if((*posMouseX>=78*SCREEN_WIDTH/100)&&(*posMouseX<=90*SCREEN_WIDTH/100)&&(*posMouseY>=20*SCREEN_HEIGHT/100)&&(*posMouseY<=25*SCREEN_HEIGHT/100)){
+					*selection=1; //play
+				}
+				if((*posMouseX>=78*SCREEN_WIDTH/100)&&(*posMouseX<=96*SCREEN_WIDTH/100)&&(*posMouseY>=40*SCREEN_HEIGHT/100)&&(*posMouseY<=45*SCREEN_HEIGHT/100)){
+					*selection=2; //options
+				}
+				if((*posMouseX>=78*SCREEN_WIDTH/100)&&(*posMouseX<=90*SCREEN_WIDTH/100)&&(*posMouseY>=60*SCREEN_HEIGHT/100)&&(*posMouseY<=65*SCREEN_HEIGHT/100)){
+					*selection=3; //quit
+				}
 			}
-			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=150)&&(*posMouseY<=200)&&(*display==1)){
-				*selection=1; //play
+			if((*display==3)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				*selection=-1; //reset
+				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=40*SCREEN_HEIGHT/100)&&(*posMouseY<=45*SCREEN_HEIGHT/100)){
+					*selection=1; //agrandir ecran
+				}
+				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=60*SCREEN_HEIGHT/100)&&(*posMouseY<=65*SCREEN_HEIGHT/100)){
+					*selection=2; //reduire ecran
+				}
+				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=80*SCREEN_HEIGHT/100)&&(*posMouseY<=85*SCREEN_HEIGHT/100)){
+					*selection=3; //controles
+				}
+				if((*posMouseX>=60*SCREEN_WIDTH/100)&&(*posMouseX<=80*SCREEN_WIDTH/100)&&(*posMouseY>=20*SCREEN_HEIGHT/100)&&(*posMouseY<=25*SCREEN_HEIGHT/100)){
+					*selection=0; //retour menu
+				}
 			}
-			if((*posMouseX>=800)&&(*posMouseX<=980)&&(*posMouseY>=300)&&(*posMouseY<=350)&&(*display==1)){
-				*selection=2; //options
-			}
-			if((*posMouseX>=800)&&(*posMouseX<=925)&&(*posMouseY>=450)&&(*posMouseY<=500)&&(*display==1)){
-				*selection=3; //quit
+			if((*display==4)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				//Gestion des controles poussée
 			}
 			break;
 				
@@ -348,7 +388,7 @@ int main(int argc, char* argv[]){
     SDL_EnableKeyRepeat(10, 10);
 	
 	int gameover =1;
-	int display=1; // 1 menu 2 jeu 3 config 4 menu de pause
+	int display=1; // 1 menu 2 jeu 3 config 4 controles 5 menu de pause
 	
 	//Les surfaces du menu
 	SDL_Surface *background; 
@@ -361,12 +401,14 @@ int main(int argc, char* argv[]){
 	//Les Fonts qu'on va utiliser pour le menu
 	TTF_Font *font50; 
 	TTF_Font *font36;
+	TTF_Font *fontCTRL;
 	
 	//La couleur du Font 
 	SDL_Color textColor = { 255, 255, 255 };
 	
-	font50 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 50);
-	font36 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 36);
+	font50 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 50); //Taille Gros titres
+	font36 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 36); //Taille de toutes les lignes de menu hors gros titres
+	fontCTRL = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 16); //taille du menu de controle uniquement
 	
     /* load sprite */
 	{
@@ -424,11 +466,6 @@ int main(int argc, char* argv[]){
 
 	}
 	
-	//Mise en place du ttf
-	
-	fleche = TTF_RenderText_Solid(font50,">>>",textColor);
-	SDL_Rect posFleche={70*SCREEN_WIDTH/100,(20*SCREEN_HEIGHT/100)*selection}; // Fleche du menu
-	
 	//Positions souris
 	int posMouseX=0;
 	int posMouseY=0;
@@ -479,6 +516,7 @@ int main(int argc, char* argv[]){
 	/* main loop: check events and re-draw the window until the end */
 	while (gameover)
 	{
+		printf("");
 		int disp=display;
 		SDL_Event event;
 		/* look for an event; possibly update the position and the shape
@@ -952,6 +990,22 @@ int main(int argc, char* argv[]){
 			posMes.x=5*SCREEN_WIDTH/100;
 			posMes.y=80*SCREEN_HEIGHT/100;
 			SDL_BlitSurface(message,NULL,screen,&posMes);
+			message = TTF_RenderText_Solid(font36,"Retour",textColor);
+			posMes.x=60*SCREEN_WIDTH/100;
+			posMes.y=20*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			if(selection!=-1){
+				fleche = TTF_RenderText_Solid(font50,"<<<",textColor);
+				posFleche.x=65*SCREEN_WIDTH/100;
+				posFleche.y=((20*SCREEN_HEIGHT/100)*(selection+1))-(2*SCREEN_HEIGHT/100);
+				if(selection==0){
+					posFleche.x=80*SCREEN_WIDTH/100;
+				}
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
+		}
+		if(disp==4){
+			//Creation des boutons du menu de controles
 		}
         SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
