@@ -25,6 +25,7 @@
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     5
 #define VITESSE_MOB 	2
+#define fps 60
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -358,7 +359,13 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 	  }
 	  return 10;
 	}
-			  			 
+	
+	//Limiter fps
+	void cap_fps (Uint32 starting_tick){
+		if ( (1000/fps) > SDL_GetTicks() - starting_tick ) {
+			SDL_Delay ( 1000 / fps - ( SDL_GetTicks() - starting_tick ) );
+		}
+	}
 
 int main(int argc, char* argv[]){
 
@@ -502,6 +509,8 @@ int main(int argc, char* argv[]){
 	HP_potion.life=1;
 	HP_potion.display = 1;
 
+	/*Initialise framerate */
+	Uint32 starting_tick;
 	
 
 
@@ -538,7 +547,10 @@ int main(int argc, char* argv[]){
 		if (SDL_PollEvent(&event)) {
 			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion,&display,&posMouseX,&posMouseY,&selection);
 		}
-			
+		
+		//fps
+		starting_tick = SDL_GetTicks();
+		
 		//Barre de vie ludo
 		
 		//FillRect d'un SDLRect avec règle de trois basique
@@ -1022,8 +1034,8 @@ int main(int argc, char* argv[]){
 			//Creation des boutons du menu de controles
 		}
         SDL_UpdateRect(screen,0,0,0,0);
-		SDL_Delay(12);
 		
+		cap_fps(starting_tick);
 	}		
 	/* clean up */
 		SDL_FreeSurface(sprite);
