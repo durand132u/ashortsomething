@@ -406,9 +406,21 @@ int main(int argc, char* argv[]){
 	//La couleur du Font 
 	SDL_Color textColor = { 255, 255, 255 };
 	
-	font50 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 50); //Taille Gros titres
-	font36 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 36); //Taille de toutes les lignes de menu hors gros titres
-	fontCTRL = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 16); //taille du menu de controle uniquement
+	font50 = TTF_OpenFont( "ALoveOfThunder.ttf", 50); //Taille Gros titres
+	if(!font50){
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		return 2;
+		}
+	font36 = TTF_OpenFont( "ALoveOfThunder.ttf", 36); //Taille de toutes les lignes de menu hors gros titres
+	if(!font36){
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+	return 2;
+	}
+	fontCTRL = TTF_OpenFont( "ALoveOfThunder.ttf", 16); //taille du menu de controle uniquement
+	if(!fontCTRL){
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+	return 2;
+	}
 	
     /* load sprite */
 	{
@@ -465,7 +477,8 @@ int main(int argc, char* argv[]){
 
 
 	}
-	
+
+
 	//Positions souris
 	int posMouseX=0;
 	int posMouseY=0;
@@ -490,7 +503,8 @@ int main(int argc, char* argv[]){
 	HP_potion.display = 1;
 
 	
-	
+
+
 	//printf(" fX %lf\n fY %lf",fireball.pos.x, fireball.pos.y); printf 
 		
 	/*initialisation*/
