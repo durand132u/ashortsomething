@@ -17,6 +17,7 @@ struct sprite_t
 	int currDirection;
 	int size;
 	int life;
+	int argent;
 	SDL_Surface *sprite;
 	int display;
 };
@@ -30,5 +31,10 @@ struct bdf_t
 	int display;
 	int range;
 	SDL_Surface *sprite;
+};
+
+struct inventaire
+{
+	int champignon;
 };
 #endif
