@@ -9,8 +9,7 @@
 
 
 /* Size of the window */
-#define SCREEN_WIDTH  1024
-#define SCREEN_HEIGHT 768
+
 
 #define GRASS_SIZE 32
 
@@ -42,6 +41,10 @@ SDL_Surface* barreDeMana_perso;
 int choice = 0;
 int choiceTEST = 0;
 
+int SCREEN_WIDTH=1024;
+int SCREEN_HEIGHT=768;
+int resolutions[4][2];
+int actualRes=2;
 
 
 /* Handle events coming from the user:
@@ -234,10 +237,18 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 			if((*display==3)){
 				SDL_GetMouseState(posMouseX,posMouseY);
 				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=40*SCREEN_HEIGHT/100)&&(*posMouseY<=45*SCREEN_HEIGHT/100)){
-					printf("ECRAN A AGRANDIR EN 16/9e"); //agrandir ecran
+					if(actualRes<3){
+						actualRes++;	//agrandir ecran
+						SCREEN_HEIGHT=resolutions[actualRes][1];
+						SCREEN_WIDTH=resolutions[actualRes][2];
+					}
 				}
 				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=60*SCREEN_HEIGHT/100)&&(*posMouseY<=65*SCREEN_HEIGHT/100)){
-					printf("ECRAN A REDUIRE EN 16/9e"); //reduire ecran
+					if(actualRes>0){
+						actualRes--; //reduire ecran
+						SCREEN_HEIGHT=resolutions[actualRes][1];
+						SCREEN_WIDTH=resolutions[actualRes][2];
+					}
 				}
 				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=80*SCREEN_HEIGHT/100)&&(*posMouseY<=85*SCREEN_HEIGHT/100)){
 					printf("AJOUTER GESTION DES CONTROLES"); //controles
@@ -368,7 +379,15 @@ int main(int argc, char* argv[]){
 
     /* Information about the current situation of the sprite: */
     int currentDirection = DIR_RIGHT;
-    
+	
+	resolutions[0][0]=640;
+	resolutions[0][1]=480;
+	resolutions[1][0]=800;
+	resolutions[1][1]=600;
+	resolutions[2][0]=1024;
+	resolutions[2][1]=768;
+	resolutions[3][0]=1280;
+	resolutions[3][1]=960;
     /* Walking in a direction is animated with 2 images; we use a boolean
      * that we flip after each movement to show them in turn and create
      * the illusion */
@@ -1006,6 +1025,14 @@ int main(int argc, char* argv[]){
 		}
 		if(disp==4){
 			//Creation des boutons du menu de controles
+			
+			//touches directionnelles
+			//boule de feu
+			//attaque
+			//pause
+			//boule de poison
+			//boule de mort
+			
 		}
         SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
