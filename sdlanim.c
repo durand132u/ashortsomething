@@ -1,3 +1,4 @@
+ //champs du programme
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,13 +8,7 @@
 #include <SDL_ttf.h>
 #include "game.h"
 
-
-/* Size of the window */
-
-
 #define GRASS_SIZE 32
-
-/* Order of the different directions in the picture: */
 #define DIR_UP          0
 #define DIR_RIGHT       1
 #define DIR_DOWN        2
@@ -21,29 +16,42 @@
 #define COLIDE			4/3
 #define MAX_HP    		100
 #define MAX_MANA    	100
-/* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     5
 #define VITESSE_MOB 	2
-#define fps 80
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
 SDL_Surface *background, *message, *fleche; //menu
 SDL_Surface *messageQ1; //quetes
+SDL_Rect posMes;
+SDL_Rect posFleche;
+SDL_Rect posMesQ1;
+SDL_Color textColor = { 255, 255, 255 };
+TTF_Font *font50;
+TTF_Font *font36;
+TTF_Font *fontCTRL;
+TTF_Font *fontQ1;
+
 int currentDirection = DIR_RIGHT;
 int animationFlip = 0;
 int gameover;
 int display;
 int selection;
 double ratio;
-SDL_Rect posMes;
-SDL_Rect posFleche;
-SDL_Rect posMesQ1;
-TTF_Font *font50;
-TTF_Font *font36;
-TTF_Font *fontCTRL;
-TTF_Font *fontQ1;
-SDL_Color textColor = { 255, 255, 255 };
+int posMouseX;
+int posMouseY;
+int choice = 0;
+int choiceTEST = 0;
+int SCREEN_WIDTH=1024;
+int SCREEN_HEIGHT=768;
+int resolutions[4][2];
+int actualRes=2;
+int resChange=0;
+int quest = 0;
+int questTEST = 0;
+int quest1[5][2][2];
+int QTchampignon = 0;
+
 struct vector vit = {0,0};
 struct sprite_t perso;
 struct sprite_t monster;
@@ -54,30 +62,6 @@ struct sprite_t deathball;
 struct sprite_t HP_potion;
 struct sprite_t champignon;
 
-int posMouseX;
-int posMouseY;
-
-int choice = 0;
-int choiceTEST = 0;
-
-int SCREEN_WIDTH=1024;
-int SCREEN_HEIGHT=768;
-int resolutions[4][2];
-int actualRes=2;
-int resChange=0;
-int quest = 0;
-int questTEST = 0;
-int quest1[5][2][2];
-
-int QTchampignon = 0;
-
-/* Handle events coming from the user:
-   - quit the game?
-   - use of arrows to move the sprite
-   In the second case, we modify the current direction and the
-   position of the sprite in the window.
-   We also change the animation bit used for creating the "walk" effect.
-*/
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, int *display, int *posMouseX, int *posMouseY, int *selection)
 {
@@ -276,6 +260,8 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 						SCREEN_HEIGHT=resolutions[actualRes][0];
 						SCREEN_WIDTH=resolutions[actualRes][1];
 						resChange=1;
+					}else{
+						//POP UP ECRAN AGRANDI AU MAX
 					}
 					*selection=-1; //reset
 				}
@@ -285,6 +271,9 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 						SCREEN_HEIGHT=resolutions[actualRes][0];
 						SCREEN_WIDTH=resolutions[actualRes][1];
 						resChange=1;
+					}
+					else{
+						//POP UP ECRAN REDUIT AU MAX
 					}
 					*selection=-1; //reset
 				}
@@ -337,6 +326,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 			}
 			if((*display==4)){
 				SDL_GetMouseState(posMouseX,posMouseY);
+				*selection=-1; //reset
 				//Gestion des controles poussée
 			}
 			break;
@@ -348,7 +338,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 
 /*Working Collision Ludo -> Perso*/ 	
 
-	int CollisionBdf(struct sprite_t* a, struct bdf_t* b){
+int CollisionBdf(struct sprite_t* a, struct bdf_t* b){
 		if((a->display==1)&&(b->display==1)){
 			float diffX, diffY;
 			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size/2));
@@ -361,7 +351,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		return 0;
 		
 	}
-	int Collision(struct sprite_t* a, struct sprite_t* b){
+int Collision(struct sprite_t* a, struct sprite_t* b){
 		if((a->display==1)&&(b->display==1)){
 			float diffX, diffY;
 			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
@@ -374,8 +364,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		return 0;
 	}
 
-	float puissance(float x, int n)
-	{
+float puissance(float x, int n){
 	  if(n==0)
 	  {
 	    return 1;
@@ -386,7 +375,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 	  }
 	}
 	
-	int DistanceXY(struct sprite_t* a, struct sprite_t* b){
+int DistanceXY(struct sprite_t* a, struct sprite_t* b){
 	  if((a->display==1)&&(b->display==1)){ 
 	    float diffX, diffY, res;
 	    diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
@@ -397,7 +386,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 	  return 10;
 	}
 	
-	void initAll(){
+void initAll(){
 		SDL_Init(SDL_INIT_VIDEO);
 		TTF_Init();
 		SDL_WM_SetCaption("Ashortsomething", "Ashortsomething");
@@ -410,6 +399,14 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		display=1; // 1 menu 2 jeu 3 config 4 controles 5 menu de pause
 		//Les surfaces du menu
 		selection=-1;
+		resolutions[0][1]=640;
+		resolutions[0][0]=480;
+		resolutions[1][1]=800;
+		resolutions[1][0]=600;
+		resolutions[2][1]=1024;
+		resolutions[2][0]=768;
+		resolutions[3][1]=1280;
+		resolutions[3][0]=960;
 		//La couleur du Font 
 		ratio = 1024.0/SCREEN_HEIGHT;
 		font50 = TTF_OpenFont( "ALoveOfThunder.ttf", 50/ratio); //Taille Gros titres 50 = 1024 768  800 600   1024/800    768/600
@@ -493,7 +490,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 }
 
-	void resetAll(){
+void resetAll(){
 		SDL_FreeSurface(screen);
 		SDL_FreeSurface(sprite);
 		SDL_FreeSurface(grass);
@@ -519,20 +516,12 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		TTF_Quit();
 		SDL_Quit();
 	}
+
 int main(int argc, char* argv[]){
-	resolutions[0][1]=640;
-	resolutions[0][0]=480;
-	resolutions[1][1]=800;
-	resolutions[1][0]=600;
-	resolutions[2][1]=1024;
-	resolutions[2][0]=768;
-	resolutions[3][1]=1280;
-	resolutions[3][0]=960;
-	initAll();
-	/* main loop: check events and re-draw the window until the end */
-	while (gameover)
+	initAll(); //initialise tout
+	while (gameover) // Boucle principale dexecution
 	{
-		if(resChange==1){
+		if(resChange==1){ //si agrandissement / reduction ecran reboot laffichage
 			resetAll();
 			initAll();
 			resChange=0;
@@ -540,16 +529,12 @@ int main(int argc, char* argv[]){
 		}
 		int disp=display;
 		SDL_Event event;
-		/* look for an event; possibly update the position and the shape
-		 * of the sprite. */
-		if (SDL_PollEvent(&event)) {
+		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
 			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &display,&posMouseX,&posMouseY,&selection);
 		}
 		
-		//Barre de vie ludo
-		
-		//FillRect d'un SDLRect avec règle de trois basique
-		if(disp==2){
+		if(disp==2||disp==5){
+			//Barre de vie Ludo
 			SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
 			SDL_Rect HP_ludo;
 			HP_ludo.x = 0;
@@ -604,15 +589,15 @@ int main(int argc, char* argv[]){
 				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
 			}
 			if(perso.life>(60*MAX_HP/100)&&perso.life<=(80*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-					SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
-				}
+				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
+			}
 			if(perso.life>(40*MAX_HP/100)&&perso.life<=(60*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-					SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
+				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
 			}
 			if(perso.life>0&&perso.life<=(40*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
+				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
 			}
 			
 			//Bare de mana personnage
@@ -624,9 +609,7 @@ int main(int argc, char* argv[]){
 			MANA_perso.h = 3;
 			SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
 		}
-		
-		/*position*/
-		if(disp==2){
+		if(disp==2){ //Gestion des evenements dus aux deplacements collisions actualisations etc
 			if (fireball.display == 1){
 				fireball.pos.x = fireball.pos.x + fireball.v.x;
 				fireball.pos.y = fireball.pos.y + fireball.v.y;
@@ -641,12 +624,6 @@ int main(int argc, char* argv[]){
 				deathball.pos.x = deathball.pos.x + deathball.v.x;
 				deathball.pos.y = deathball.pos.y + deathball.v.y;
 			}
-		}
-		/* Déplacement du monstre */
-
-
-		/*Gestion aléatoire entre -2 et 4 */
-		if(disp==2){
 			srand(time(NULL));
 			int a = rand()%5;		
 			switch(a){
@@ -667,8 +644,6 @@ int main(int argc, char* argv[]){
 				default :
 					break;
 			}
-		}
-			
 
 				//monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
 				//monster.pos.y = monster.pos.y + deathball.v.y;
@@ -680,7 +655,6 @@ int main(int argc, char* argv[]){
 				
 				
 			//IA Aggressive
-		if(disp==2){
 			if (choice ==1){
 				if(perso.pos.x>ludo.pos.x){
 					ludo.pos.x+=2;
@@ -727,11 +701,7 @@ int main(int argc, char* argv[]){
 			      
 			    }
 			}
-		}
-
-
 		/*hyperspace*/
-		if(disp==2){
 			if (perso.pos.x < 0)  {
 				perso.pos.x = SCREEN_WIDTH - perso.size;
 			}
@@ -759,7 +729,7 @@ int main(int argc, char* argv[]){
 			}
 			
 			/* Ludo Hyperspace*/
-				if (ludo.pos.x < 0)  {
+			if (ludo.pos.x < 0)  {
 				ludo.pos.x = SCREEN_WIDTH ;
 			}
 			if (ludo.pos.x > SCREEN_WIDTH + perso.size) {
@@ -771,10 +741,7 @@ int main(int argc, char* argv[]){
 			if (ludo.pos.y > SCREEN_HEIGHT) {
 				ludo.pos.y = perso.size;
 			}
-		}
-
 		/*check and refresh ball life */
-		if(disp==2){
 			if(poisonball.life == 0){
 				poisonball.display=0;
 			}
@@ -800,163 +767,11 @@ int main(int argc, char* argv[]){
 			if(fireball.display!=0&&fireball.range==0){
 				fireball.display=0;
 			}
-		}
-			
-		/* draw the background */
-		if((disp==1)||(disp==3)){
-			SDL_BlitSurface(background,NULL,screen,NULL);
-		}
-		if(disp==2){
-			for(int x =0; x< SCREEN_WIDTH/GRASS_SIZE; x++){
-				for(int y =0; y< SCREEN_HEIGHT/GRASS_SIZE; y++){				
-					SDL_Rect position;
-					position.x = x * GRASS_SIZE;
-					position.y = y * GRASS_SIZE;
-					SDL_BlitSurface(grass, NULL, screen, &position);
-				}
-			}
-		}
-	  
-		/* draw sprite*/
-		if(disp==2){ // si le jeu est en route
-			if (perso.display != 0) {
-				SDL_Rect spriteImage;
-				SDL_Rect spritePos;
-				SDL_Rect manaPos;
-				manaPos.x = perso.pos.x;
-				manaPos.y = perso.pos.y - 3;
-				spritePos.x = perso.pos.x;
-				spritePos.y = perso.pos.y;
-				spriteImage.y = 0;
-				spriteImage.w = perso.size;
-				spriteImage.h = perso.size;
-				spriteImage.x = perso.size*(perso.currDirection*2);
-				SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
-				SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos);
-				SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
-				//Message quest
-				//Compteur de temps pour les quêtes
-				posMesQ1.x = 10*SCREEN_WIDTH/100;
-				posMesQ1.y = 90*SCREEN_HEIGHT/100;
-			}
-			if(DistanceXY(&HP_potion,&perso)<50){
-				if(quest1[0][0][0]==0){
-					messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher des champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
-				}
-				if(quest1[0][0][0]>0){
-					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor); //Si acceptation quête
-					if(QTchampignon==1){ //Si on a été cueillir le champignon
-						messageQ1 = TTF_RenderText_Solid(fontQ1, "Quete termine", textColor); //Ecriture quête terminé
-						//RECOMPENSE DE QUETE ICI
-						perso.argent = perso.argent + 5;
-						Uint32 compteurA = SDL_GetTicks();
-						Uint32 compteurB = SDL_GetTicks() + 2000;
-						if(compteurA-compteurB<=0){
-							quest1[0][0][0] = 0;
-						}
-					}
-				}
-				if(quest1[0][1][0]>0){
-					messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor); //Si refus de la quête(press n)
-					quest1[0][1][0]=0;
-				}
-			} else {
-				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
-			}
-			SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
-				
 			//Gestion du champignon
 			if(Collision(&champignon, &perso)&&((champignon.display!=0)||(champignon.life!=0))){ 
 				champignon.display = 0;
 				QTchampignon +=1;
 			}	
-			
-			if (monster.display != 0) {
-				SDL_Rect monsterImage;
-				SDL_Rect monsterPos;
-				monsterPos.x = monster.pos.x;
-				monsterPos.y = monster.pos.y;
-				monsterImage.y = 0;
-				monsterImage.w = monster.size;
-				monsterImage.h = monster.size;
-				monsterImage.x = monster.size*(monster.currDirection*2);
-				SDL_BlitSurface(spritemonster, &monsterImage, screen, &monsterPos);
-				SDL_BlitSurface(barreDeVie_monstre, NULL, screen, &monsterPos);
-			}
-			
-			if (ludo.display != 0) {
-				SDL_Rect ludoImage;
-				SDL_Rect ludoPos;
-				ludoPos.x = ludo.pos.x;
-				ludoPos.y = ludo.pos.y;
-				ludoImage.y = 0;
-				ludoImage.w = ludo.size;
-				ludoImage.h = ludo.size;
-				ludoImage.x = ludo.size*(ludo.currDirection*2);
-				SDL_BlitSurface(spriteludo, &ludoImage, screen, &ludoPos);
-				SDL_BlitSurface(barreDeVie_Ludo, NULL, screen, &ludoPos);
-			}
-			
-			if(champignon.display != 0){
-				SDL_Rect champignonImage;
-				SDL_Rect champignonPos;
-				champignonPos.x = champignon.pos.x;
-				champignonPos.y = champignon.pos.y;
-								
-				champignonImage.y = 0;
-				champignonImage.w = champignon.size;
-				champignonImage.h = champignon.size;
-				champignonImage.x = ludo.size*(ludo.currDirection*2);
-				SDL_BlitSurface(spritechampignon, &champignonImage, screen, &champignonPos);
-			}
-
-			if (fireball.display != 0) {
-				SDL_Rect fireballImage;
-				SDL_Rect fireballPosition;
-				fireballPosition.x = fireball.pos.x;
-				fireballPosition.y = fireball.pos.y;
-				fireballImage.y = 0;
-				fireballImage.w = fireball.size;
-				fireballImage.h = fireball.size;
-				fireballImage.x = 0;
-				SDL_BlitSurface(spritefire, &fireballImage, screen, &fireballPosition);
-			}
-
-			if (poisonball.display != 0) {
-				SDL_Rect poisonballImage;
-				SDL_Rect poisonballPosition;
-				poisonballPosition.x = poisonball.pos.x;
-				poisonballPosition.y = poisonball.pos.y;
-				poisonballImage.y = 0;
-				poisonballImage.w = poisonball.size;
-				poisonballImage.h = poisonball.size;
-				poisonballImage.x = 0;
-				SDL_BlitSurface(spritepoison, &poisonballImage, screen, &poisonballPosition);
-			}
-
-			if (deathball.display != 0) {
-				SDL_Rect deathballImage;
-				SDL_Rect deathballPosition;
-				deathballPosition.x = deathball.pos.x;
-				deathballPosition.y = deathball.pos.y;
-				deathballImage.y = 0;
-				deathballImage.w = deathball.size;
-				deathballImage.h = deathball.size;
-				deathballImage.x = 0;
-				SDL_BlitSurface(spritedeath, &deathballImage, screen, &deathballPosition);
-			}
-				
-			if (HP_potion.display != 0) {
-				SDL_Rect HP_potionImage;
-				SDL_Rect HP_potionPosition;
-				HP_potionPosition.x = HP_potion.pos.x;
-				HP_potionPosition.y = HP_potion.pos.y;
-				HP_potionImage.y = 0;
-				HP_potionImage.w = HP_potion.size;
-				HP_potionImage.h = HP_potion.size;
-				HP_potionImage.x = 0;
-				SDL_BlitSurface(spritepotion, &HP_potionImage, screen, &HP_potionPosition);
-			}
 			
 			//Collisions si le jeu tourne
 			if(Collision(&ludo, &perso)&&((ludo.display!=0)||(ludo.life!=0))){ 
@@ -996,13 +811,13 @@ int main(int argc, char* argv[]){
 				}else{
 					ludo.life=MAX_HP;
 				}
-				printf("Vie de ludo : %d \n", ludo.life);
 			}
 		}
-		/* update the screen */
-		if(disp==1){
+		if((disp==1)||(disp==3)||(disp==4)){ //Affiche un ecran noir pour cacher le jeu (et donc ne pas le cacher dans les autres display)
+			SDL_BlitSurface(background,NULL,screen,NULL);
+		}
+		if(disp==1){ // si on est dans le menu
 			message = TTF_RenderText_Solid(font50,"Welcome to AShortSomething !",textColor);
-			
 			posMes.x=50*SCREEN_WIDTH/100-(400/ratio);
 			posMes.y=0.0;
 			SDL_BlitSurface(message,NULL,screen,&posMes);
@@ -1025,7 +840,149 @@ int main(int argc, char* argv[]){
 				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
 			}
 		}
-		if(disp==3){
+		if(disp==2 ||disp==5){ // si le jeu est en route
+			for(int x =0; x< SCREEN_WIDTH/GRASS_SIZE; x++){  //dessine le fond du jeu
+				for(int y =0; y< SCREEN_HEIGHT/GRASS_SIZE; y++){				
+					SDL_Rect position;
+					position.x = x * GRASS_SIZE;
+					position.y = y * GRASS_SIZE;
+					SDL_BlitSurface(grass, NULL, screen, &position);
+				}
+			}
+			if (perso.display != 0) { //affiche perso
+				SDL_Rect spriteImage;
+				SDL_Rect spritePos;
+				SDL_Rect manaPos;
+				manaPos.x = perso.pos.x;
+				manaPos.y = perso.pos.y - 3;
+				spritePos.x = perso.pos.x;
+				spritePos.y = perso.pos.y;
+				spriteImage.y = 0;
+				spriteImage.w = perso.size;
+				spriteImage.h = perso.size;
+				spriteImage.x = perso.size*(perso.currDirection*2);
+				SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
+				SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos);
+				SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
+				//Message quest
+				//Compteur de temps pour les quêtes
+				posMesQ1.x = 10*SCREEN_WIDTH/100;
+				posMesQ1.y = 90*SCREEN_HEIGHT/100;
+			}
+			if(DistanceXY(&HP_potion,&perso)<50){ //affichage d'une quete
+				if(quest1[0][0][0]==0){
+					messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher des champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
+				}
+				if(quest1[0][0][0]>0){
+					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor); //Si acceptation quête
+					if(QTchampignon==1){ //Si on a été cueillir le champignon
+						messageQ1 = TTF_RenderText_Solid(fontQ1, "Quete termine", textColor); //Ecriture quête terminé
+						//RECOMPENSE DE QUETE ICI
+						perso.argent = perso.argent + 5;
+						Uint32 compteurA = SDL_GetTicks();
+						Uint32 compteurB = SDL_GetTicks() + 2000;
+						if(compteurA-compteurB<=0){
+							quest1[0][0][0] = 0;
+						}
+					}
+				}
+				if(quest1[0][1][0]>0){
+					messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor); //Si refus de la quête(press n)
+					quest1[0][1][0]=0;
+				}
+			} else {
+				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
+			}
+			SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
+			if (monster.display != 0) { //affichage monstre
+				SDL_Rect monsterImage;
+				SDL_Rect monsterPos;
+				monsterPos.x = monster.pos.x;
+				monsterPos.y = monster.pos.y;
+				monsterImage.y = 0;
+				monsterImage.w = monster.size;
+				monsterImage.h = monster.size;
+				monsterImage.x = monster.size*(monster.currDirection*2);
+				SDL_BlitSurface(spritemonster, &monsterImage, screen, &monsterPos);
+				SDL_BlitSurface(barreDeVie_monstre, NULL, screen, &monsterPos);
+			}
+			
+			if (ludo.display != 0) { //affichage ludo
+				SDL_Rect ludoImage;
+				SDL_Rect ludoPos;
+				ludoPos.x = ludo.pos.x;
+				ludoPos.y = ludo.pos.y;
+				ludoImage.y = 0;
+				ludoImage.w = ludo.size;
+				ludoImage.h = ludo.size;
+				ludoImage.x = ludo.size*(ludo.currDirection*2);
+				SDL_BlitSurface(spriteludo, &ludoImage, screen, &ludoPos);
+				SDL_BlitSurface(barreDeVie_Ludo, NULL, screen, &ludoPos);
+			}
+			
+			if(champignon.display != 0){ //affichage champi
+				SDL_Rect champignonImage;
+				SDL_Rect champignonPos;
+				champignonPos.x = champignon.pos.x;
+				champignonPos.y = champignon.pos.y;
+								
+				champignonImage.y = 0;
+				champignonImage.w = champignon.size;
+				champignonImage.h = champignon.size;
+				champignonImage.x = ludo.size*(ludo.currDirection*2);
+				SDL_BlitSurface(spritechampignon, &champignonImage, screen, &champignonPos);
+			}
+
+			if (fireball.display != 0) { //affichage bdf
+				SDL_Rect fireballImage;
+				SDL_Rect fireballPosition;
+				fireballPosition.x = fireball.pos.x;
+				fireballPosition.y = fireball.pos.y;
+				fireballImage.y = 0;
+				fireballImage.w = fireball.size;
+				fireballImage.h = fireball.size;
+				fireballImage.x = 0;
+				SDL_BlitSurface(spritefire, &fireballImage, screen, &fireballPosition);
+			}
+
+			if (poisonball.display != 0) { //afficahge bdp
+				SDL_Rect poisonballImage;
+				SDL_Rect poisonballPosition;
+				poisonballPosition.x = poisonball.pos.x;
+				poisonballPosition.y = poisonball.pos.y;
+				poisonballImage.y = 0;
+				poisonballImage.w = poisonball.size;
+				poisonballImage.h = poisonball.size;
+				poisonballImage.x = 0;
+				SDL_BlitSurface(spritepoison, &poisonballImage, screen, &poisonballPosition);
+			}
+
+			if (deathball.display != 0) { //affichage bdm
+				SDL_Rect deathballImage;
+				SDL_Rect deathballPosition;
+				deathballPosition.x = deathball.pos.x;
+				deathballPosition.y = deathball.pos.y;
+				deathballImage.y = 0;
+				deathballImage.w = deathball.size;
+				deathballImage.h = deathball.size;
+				deathballImage.x = 0;
+				SDL_BlitSurface(spritedeath, &deathballImage, screen, &deathballPosition);
+			}
+				
+			if (HP_potion.display != 0) { //affichage popo
+				SDL_Rect HP_potionImage;
+				SDL_Rect HP_potionPosition;
+				HP_potionPosition.x = HP_potion.pos.x;
+				HP_potionPosition.y = HP_potion.pos.y;
+				HP_potionImage.y = 0;
+				HP_potionImage.w = HP_potion.size;
+				HP_potionImage.h = HP_potion.size;
+				HP_potionImage.x = 0;
+				SDL_BlitSurface(spritepotion, &HP_potionImage, screen, &HP_potionPosition);
+			}
+			
+		}
+		if(disp==3){ // si on est dans les options
 			message = TTF_RenderText_Solid(font50,"OPTIONS :",textColor);
 			posMes.x=50*SCREEN_WIDTH/100-100;
 			posMes.y=0.0;
@@ -1056,7 +1013,9 @@ int main(int argc, char* argv[]){
 				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
 			}
 		}
-		if(disp==4){
+		if(disp==4){ // si on est dans les controles
+			FILE* ctrls=fopen("CONTROLS.txt", "r+");
+			
 			//Creation des boutons du menu de controles
 			
 			//touches directionnelles
@@ -1068,11 +1027,8 @@ int main(int argc, char* argv[]){
 			
 		}
         SDL_UpdateRect(screen,0,0,0,0);
-		
 		SDL_Delay(12);
-	}		
-	/* clean up */
-	resetAll();
-
+	}
+	resetAll(); //casse tout avant de finir le programme
 	return 0;
 }
