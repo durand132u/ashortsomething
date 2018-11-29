@@ -24,6 +24,7 @@
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     5
 #define VITESSE_MOB 	2
+#define fps 80
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -33,6 +34,7 @@ struct bdf_t fireball;
 struct sprite_t poisonball;
 struct sprite_t deathball;
 struct sprite_t HP_potion;
+struct sprite_t champignon;
 SDL_Surface* barreDeVie_Ludo;
 SDL_Surface* barreDeVie_monstre;
 SDL_Surface* barreDeVie_perso;
@@ -45,7 +47,11 @@ int SCREEN_WIDTH=1024;
 int SCREEN_HEIGHT=768;
 int resolutions[4][2];
 int actualRes=2;
+int quest = 0;
+int questTEST = 0;
+int quest1[5][2][2] = {{ {0} ,{0}, {0} }};
 
+int QTchampignon = 0;
 
 /* Handle events coming from the user:
    - quit the game?
@@ -55,7 +61,7 @@ int actualRes=2;
    We also change the animation bit used for creating the "walk" effect.
 */
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo,
- struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,int *display, int *posMouseX, int *posMouseY, int *selection)
+ struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, int *display, int *posMouseX, int *posMouseY, int *selection)
 {
 	switch (event.type) {
 		/* close button clicked */
@@ -209,11 +215,18 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 					if(choiceTEST){
 						choice = 1;
 						choiceTEST= 0;
+						break;
 					} else {
 						choice = 0;
 						choiceTEST = 1;
+						break;
 					}
-				break;
+				case SDLK_o:
+					quest1[0][0][0] += 1;
+					break;
+				case SDLK_n:
+					quest1[0][1][0] += 1;
+					break;
 				default:
 					break;
 				}
@@ -369,12 +382,18 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 	  }
 	  return 10;
 	}
-			  			 
+	
+	//Limiter fps
+	void cap_fps (Uint32 starting_tick){
+		if ( (1000/fps) > SDL_GetTicks() - starting_tick ) {
+			SDL_Delay ( 1000 / fps - ( SDL_GetTicks() - starting_tick ) );
+		}
+	}
 
 int main(int argc, char* argv[]){
 
 	
-	SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion;
+	SDL_Surface *screen, *temp, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon;
     int colorkey;
 
     /* Information about the current situation of the sprite: */
@@ -416,18 +435,41 @@ int main(int argc, char* argv[]){
 	int selection=-1;
 	SDL_Rect posMes;
 	SDL_Rect posFleche;
+	//Les surfaces des quêtes
+	SDL_Rect posMesQ1;
+	SDL_Surface *messageQ1;
 
 	//Les Fonts qu'on va utiliser pour le menu
 	TTF_Font *font50; 
 	TTF_Font *font36;
 	TTF_Font *fontCTRL;
 	
+	TTF_Font *fontQ1;
+	
 	//La couleur du Font 
 	SDL_Color textColor = { 255, 255, 255 };
 	
-	font50 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 50); //Taille Gros titres
-	font36 = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 36); //Taille de toutes les lignes de menu hors gros titres
-	fontCTRL = TTF_OpenFont( "A_Love_Of_Thunder.ttf", 16); //taille du menu de controle uniquement
+	font50 = TTF_OpenFont( "ALoveOfThunder.ttf", 50); //Taille Gros titres
+	if(!font50){
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		return 2;
+		}
+	font36 = TTF_OpenFont( "ALoveOfThunder.ttf", 36); //Taille de toutes les lignes de menu hors gros titres
+	if(!font36){
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+	return 2;
+	}
+	fontCTRL = TTF_OpenFont( "ALoveOfThunder.ttf", 16); //taille du menu de controle uniquement
+	if(!fontCTRL){
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+	return 2;
+	}
+	
+	fontQ1 = TTF_OpenFont( "ALoveOfThunder.ttf", 20);
+	if(!fontCTRL){
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+	return 2;
+	}
 	
     /* load sprite */
 	{
@@ -437,7 +479,11 @@ int main(int argc, char* argv[]){
 
 		temp = SDL_LoadBMP("monster.bmp");
 		spritemonster = SDL_DisplayFormat(temp);
-		SDL_FreeSurface(temp);
+		SDL_FreeSurface(temp);	
+		
+		temp = SDL_LoadBMP("champignon.bmp");
+		spritechampignon = SDL_DisplayFormat(temp);
+		SDL_FreeSurface(temp);	
 		
 		temp = SDL_LoadBMP("fireball.bmp");
 		spritefire = SDL_DisplayFormat(temp);
@@ -481,10 +527,16 @@ int main(int argc, char* argv[]){
 		SDL_SetColorKey(spritepoison, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritedeath, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritepotion, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+		SDL_SetColorKey(spritechampignon, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+		
+
+
+
 
 
 	}
-	
+
+
 	//Positions souris
 	int posMouseX=0;
 	int posMouseY=0;
@@ -507,9 +559,18 @@ int main(int argc, char* argv[]){
 	HP_potion.size = 32;
 	HP_potion.life=1;
 	HP_potion.display = 1;
+	
+	//Position champignon
+	champignon.display = 1;
+	champignon.size = 32;
+	champignon.pos.x = 400;
+	champignon.pos.y = 400;
 
+	/*Initialise framerate */
+	Uint32 starting_tick;
 	
-	
+
+
 	//printf(" fX %lf\n fY %lf",fireball.pos.x, fireball.pos.y); printf 
 		
 	/*initialisation*/
@@ -520,7 +581,7 @@ int main(int argc, char* argv[]){
 			monster.pos.x =0;
 			monster.pos.y =0;
 			
-			HP_potion.pos.x=400;
+			HP_potion.pos.x=500;
 			HP_potion.pos.y=400;
 			
 			//Initialisation barre de vie
@@ -541,9 +602,12 @@ int main(int argc, char* argv[]){
 		/* look for an event; possibly update the position and the shape
 		 * of the sprite. */
 		if (SDL_PollEvent(&event)) {
-			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion,&display,&posMouseX,&posMouseY,&selection);
+			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &display,&posMouseX,&posMouseY,&selection);
 		}
-			
+		
+		//fps
+		starting_tick = SDL_GetTicks();
+		
 		//Barre de vie ludo
 		
 		//FillRect d'un SDLRect avec règle de trois basique
@@ -832,10 +896,51 @@ int main(int argc, char* argv[]){
 				SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
 				SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos);
 				SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
-
-
-
+				//Message quest
+				//Compteur de temps pour les quêtes
+				posMesQ1.x = 10*SCREEN_WIDTH/100;
+				posMesQ1.y = 90*SCREEN_HEIGHT/100;
+			if(DistanceXY(&HP_potion,&perso)<50){
+				if(quest1[0][0][0]==0){
+					messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher des champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
+				}
+				if(quest1[0][0][0]>0){
+					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor); //Si acceptation quête
+					if(QTchampignon==1){ //Si on a été cueillir le champignon
+						messageQ1 = TTF_RenderText_Solid(fontQ1, "Quete termine", textColor); //Ecriture quête terminé
+						//RECOMPENSE DE QUETE ICI
+						perso.argent = perso.argent + 5;
+						Uint32 compteurA = SDL_GetTicks();
+						Uint32 compteurB = SDL_GetTicks() + 2000;
+						if(compteurA-compteurB<=0){
+							quest1[0][0][0] = 0;
+						}
+						
+					
+				}
+				}
+				if(quest1[0][1][0]>0){
+					messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor); //Si refus de la quête(press n)
+					quest1[0][1][0]=0;
+				}
+			} else {
+				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
 			}
+				SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
+				
+				//Gestion du champignon
+				if(Collision(&champignon, &perso)&&((champignon.display!=0)||(champignon.life!=0))){ 
+					champignon.display = 0;
+					QTchampignon +=1;
+				}
+
+			
+
+
+
+				
+
+	}
 			
 			if (monster.display != 0) {
 				SDL_Rect monsterImage;
@@ -868,7 +973,20 @@ int main(int argc, char* argv[]){
 
 
 			}
+			
+			if(champignon.display != 0){
+				SDL_Rect champignonImage;
+				SDL_Rect champignonPos;
+				champignonPos.x = champignon.pos.x;
+				champignonPos.y = champignon.pos.y;
+								
+				champignonImage.y = 0;
+				champignonImage.w = champignon.size;
+				champignonImage.h = champignon.size;
+				champignonImage.x = ludo.size*(ludo.currDirection*2);
+				SDL_BlitSurface(spritechampignon, &champignonImage, screen, &champignonPos);
 
+			}
 
 			
 				
@@ -1022,6 +1140,9 @@ int main(int argc, char* argv[]){
 				}
 				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
 			}
+			
+
+			
 		}
 		if(disp==4){
 			//Creation des boutons du menu de controles
@@ -1035,8 +1156,8 @@ int main(int argc, char* argv[]){
 			
 		}
         SDL_UpdateRect(screen,0,0,0,0);
-		SDL_Delay(12);
 		
+		cap_fps(starting_tick);
 	}		
 	/* clean up */
 		SDL_FreeSurface(sprite);
