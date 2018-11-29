@@ -443,7 +443,6 @@ int main(int argc, char* argv[]){
 	TTF_Font *font50; 
 	TTF_Font *font36;
 	TTF_Font *fontCTRL;
-	
 	TTF_Font *fontQ1;
 	
 	//La couleur du Font 
