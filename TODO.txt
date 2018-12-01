@@ -1,5 +1,5 @@
-- Input controles clavier dans TXT
-- Interface de changement des controles
+- Input controles clavier dans TXT >> En cours de travail par félix
+- Interface de changement des controles >> prochain objectif de félix
 - Menu de pause du jeu
 
 - quetes 
