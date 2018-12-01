@@ -51,6 +51,7 @@ int quest = 0;
 int questTEST = 0;
 int quest1[5][2][2];
 int QTchampignon = 0;
+int deplacements[4];
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -75,8 +76,6 @@ SDLKey IA_touche = SDLK_F4;
 SDLKey Oui_touche = SDLK_o;
 SDLKey Non_touche = SDLK_n;
 
-
-
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, int *display, int *posMouseX, int *posMouseY, int *selection)
 {
@@ -94,19 +93,19 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			}
 			if(event.key.keysym.sym==gauche_touche){
 				perso->currDirection = DIR_LEFT;
-				perso->pos.x -= SPRITE_STEP;
+				deplacements[0]=1;
 			}
 			if(event.key.keysym.sym==droite_touche){
-				perso->currDirection = DIR_RIGHT;;
-				perso->pos.x += SPRITE_STEP;
+				perso->currDirection = DIR_RIGHT;
+				deplacements[1]=1;
 			}
 			if(event.key.keysym.sym==haut_touche){
 				perso->currDirection = DIR_UP;
-				perso->pos.y -= SPRITE_STEP;
+				deplacements[2]=1;
 			}
 			if(event.key.keysym.sym==bas_touche){
 				perso->currDirection = DIR_DOWN;
-				perso->pos.y += SPRITE_STEP;
+				deplacements[3]=1;
 			}				
 			if(event.key.keysym.sym==bdf_touche){
 				if (fireball->display==0) {
@@ -219,6 +218,20 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			}
 			if(event.key.keysym.sym==Non_touche){
 				quest1[0][1][0] += 1;
+			}
+			break;
+		case SDL_KEYUP:
+			if(event.key.keysym.sym==gauche_touche){
+				deplacements[0]=0;
+			}
+			if(event.key.keysym.sym==droite_touche){
+				deplacements[1]=0;
+			}
+			if(event.key.keysym.sym==haut_touche){
+				deplacements[2]=0;
+			}
+			if(event.key.keysym.sym==bas_touche){
+				deplacements[3]=0;
 			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -518,6 +531,19 @@ int main(int argc, char* argv[]){
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
 			HandleEvent(event, &gameover, &currentDirection, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &display,&posMouseX,&posMouseY,&selection);
+		}
+		//gestion du deplacement
+		if(deplacements[0]==1){
+			perso.pos.x -= SPRITE_STEP;
+		}
+		if(deplacements[1]==1){
+			perso.pos.x += SPRITE_STEP;
+		}
+		if(deplacements[2]==1){
+			perso.pos.y -= SPRITE_STEP;
+		}
+		if(deplacements[3]==1){
+			perso.pos.y += SPRITE_STEP;
 		}
 		
 		if(disp==2||disp==5){
