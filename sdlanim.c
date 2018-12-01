@@ -62,9 +62,22 @@ struct sprite_t deathball;
 struct sprite_t HP_potion;
 struct sprite_t champignon;
 
-SDLKey bdf = SDLK_SPACE;
+SDLKey bdf_touche = SDLK_SPACE;
+SDLKey haut_touche = SDLK_UP;
+SDLKey bas_touche = SDLK_DOWN;
+SDLKey gauche_touche = SDLK_LEFT;
+SDLKey droite_touche = SDLK_RIGHT;
+SDLKey quitter_touche = SDLK_q;
+SDLKey bdp_touche = SDLK_F1;
+SDLKey bdm_touche = SDLK_F2;
+SDLKey pnj_touche = SDLK_F3;
+SDLKey IA_touche = SDLK_F4;
+SDLKey Oui_touche = SDLK_o;
+SDLKey Non_touche = SDLK_n;
 
-void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo,
+
+
+void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, int *display, int *posMouseX, int *posMouseY, int *selection)
 {
 	switch (event.type) {
@@ -76,30 +89,26 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		/* handle the keyboard */
 		
 		case SDL_KEYDOWN:
-			if((event.key.keysym.sym==SDLK_ESCAPE)||(event.key.keysym.sym==SDLK_q)){   // retour au menu
+			if((event.key.keysym.sym==SDLK_ESCAPE)||(event.key.keysym.sym==quitter_touche)){   // retour au menu
 				*display =1 ;
 			}
-			if(event.key.keysym.sym==SDLK_LEFT){
+			if(event.key.keysym.sym==gauche_touche){
 				perso->currDirection = DIR_LEFT;
-				*animFlip = 1 - *animFlip;
 				perso->pos.x -= SPRITE_STEP;
 			}
-			if(event.key.keysym.sym==SDLK_RIGHT){
-				perso->currDirection = DIR_RIGHT;
-				*animFlip = 1 - *animFlip;
+			if(event.key.keysym.sym==droite_touche){
+				perso->currDirection = DIR_RIGHT;;
 				perso->pos.x += SPRITE_STEP;
 			}
-			if(event.key.keysym.sym==SDLK_UP){
+			if(event.key.keysym.sym==haut_touche){
 				perso->currDirection = DIR_UP;
-				*animFlip = 1 - *animFlip;
 				perso->pos.y -= SPRITE_STEP;
 			}
-			if(event.key.keysym.sym==SDLK_DOWN){
+			if(event.key.keysym.sym==bas_touche){
 				perso->currDirection = DIR_DOWN;
-				*animFlip = 1 - *animFlip;
 				perso->pos.y += SPRITE_STEP;
 			}				
-			if(event.key.keysym.sym==bdf){
+			if(event.key.keysym.sym==bdf_touche){
 				if (fireball->display==0) {
 					fireball->display=1;
 					fireball->range=100;
@@ -127,7 +136,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 					}
 				}
 			}
-			if(event.key.keysym.sym==SDLK_F1){
+			if(event.key.keysym.sym==bdp_touche){
 				if (poisonball->life ==0) {
 					poisonball->life = 80;
 					poisonball->pos.x = perso->pos.x+(GRASS_SIZE/3);
@@ -158,7 +167,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 					}
 				}
 			}
-			if(event.key.keysym.sym==SDLK_F2){
+			if(event.key.keysym.sym==bdm_touche){
 				if (deathball->life ==0) {
 					deathball->life = 80;
 					deathball->pos.x = perso->pos.x+(GRASS_SIZE/3);
@@ -189,14 +198,14 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 					}
 				}
 			}
-			if(event.key.keysym.sym==SDLK_F3){
+			if(event.key.keysym.sym==pnj_touche){
 				/* Apparition PNJ Ludo */
 				ludo->life= 100;
 				ludo->display = 1;
 				ludo->pos.x = 200;
 				ludo->pos.y = 200;
 			}	
-			if(event.key.keysym.sym==SDLK_F4){
+			if(event.key.keysym.sym==IA_touche){
 				if(choiceTEST){
 					choice = 1;
 					choiceTEST= 0;
@@ -205,10 +214,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 					choiceTEST = 1;
 				}
 			}
-			if(event.key.keysym.sym==SDLK_o){
+			if(event.key.keysym.sym==Oui_touche){
 				quest1[0][0][0] += 1;
 			}
-			if(event.key.keysym.sym==SDLK_n){
+			if(event.key.keysym.sym==Non_touche){
 				quest1[0][1][0] += 1;
 			}
 			break;
@@ -371,7 +380,6 @@ void initAll(){
 		SDL_WM_SetCaption("Ashortsomething", "Ashortsomething");
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 		currentDirection = DIR_RIGHT;
-		animationFlip = 0;
 		/* set keyboard repeat */
 		SDL_EnableKeyRepeat(10, 10);
 		gameover =1;
@@ -509,7 +517,7 @@ int main(int argc, char* argv[]){
 		int disp=display;
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
-			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &display,&posMouseX,&posMouseY,&selection);
+			HandleEvent(event, &gameover, &currentDirection, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &display,&posMouseX,&posMouseY,&selection);
 		}
 		
 		if(disp==2||disp==5){
