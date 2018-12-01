@@ -18,6 +18,7 @@
 #define MAX_MANA    	100
 #define SPRITE_STEP     5
 #define VITESSE_MOB 	2
+#define BALL_SPEED		6
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
@@ -110,28 +111,28 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			if(event.key.keysym.sym==bdf_touche){
 				if (fireball->display==0) {
 					fireball->display=1;
-					fireball->range=100;
+					fireball->range=7*BALL_SPEED;
 					fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
 					fireball->pos.y = perso->pos.y+(GRASS_SIZE/3);
 					if(perso->currDirection == DIR_RIGHT){
 						double angle = (perso->currDirection * (2*M_PI));
-						fireball->v.x = 2*cos(angle);
-						fireball->v.y = -2 * sin(angle);
+						fireball->v.x = BALL_SPEED*cos(angle);
+						fireball->v.y = -BALL_SPEED * sin(angle);
 					}
 					if(perso->currDirection == DIR_LEFT){
 						double angle = (perso->currDirection * (2*M_PI));
-						fireball->v.x = -2*cos(angle);
-						fireball->v.y = 2 * sin(angle);
+						fireball->v.x = -BALL_SPEED*cos(angle);
+						fireball->v.y = BALL_SPEED * sin(angle);
 					}
 					if(perso->currDirection == DIR_UP){
 						double angle = (perso->currDirection * (2*M_PI));
-						fireball->v.x = 2 * sin(angle);
-						fireball->v.y = -2*cos(angle);
+						fireball->v.x = BALL_SPEED * sin(angle);
+						fireball->v.y = -BALL_SPEED*cos(angle);
 					}
 					if(perso->currDirection == DIR_DOWN){
 						double angle = (perso->currDirection * (2*M_PI));
-						fireball->v.x = -2 * sin(angle);
-						fireball->v.y = 2*cos(angle);
+						fireball->v.x = -BALL_SPEED * sin(angle);
+						fireball->v.y = BALL_SPEED*cos(angle);
 					}
 				}
 			}
