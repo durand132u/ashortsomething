@@ -1,0 +1,12 @@
+- Input controles clavier dans TXT
+- Interface de changement des controles
+- Menu de pause du jeu
+
+- quetes 
+- histoire avec debut et fin
+- ecran de defaite et victoire (gameover =1 & display=2)
+
+- factorisation dans plusieurs fichiers
+- chargement de la map
+- minimap
+- ecran qui defile sur la map autour de la position du joueur (une sorte de "camera") 
