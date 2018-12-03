@@ -1172,7 +1172,13 @@ int main(int argc, char* argv[]){
 		}
 		if(disp==4){ // si on est dans les controles
 			FILE* ctrls=fopen("CONTROLS.txt", "r+");
-			
+			while(1){
+				char c = fgetc(ctrls);
+				if( feof(ctrls) ) {
+					break ;
+				}
+				printf("%c", c);
+			}
 			//Creation des boutons du menu de controles
 			
 			//touches directionnelles
