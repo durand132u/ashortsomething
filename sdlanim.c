@@ -18,6 +18,7 @@
 #define MAX_MANA    	100
 #define SPRITE_STEP     5
 #define VITESSE_MOB 	2
+#define BALL_SPEED		6
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
@@ -33,6 +34,7 @@ TTF_Font *fontCTRL;
 TTF_Font *fontQ1;
 
 int currentDirection = DIR_RIGHT;
+int lastDir = DIR_RIGHT;
 int animationFlip = 0;
 int gameover;
 int display;
@@ -51,6 +53,7 @@ int quest = 0;
 int questTEST = 0;
 int quest1[5][2][2];
 int QTchampignon = 0;
+int deplacements[4];
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -62,7 +65,20 @@ struct sprite_t deathball;
 struct sprite_t HP_potion;
 struct sprite_t champignon;
 
-void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFlip, struct sprite_t *perso, struct sprite_t *ludo,
+SDLKey bdf_touche = SDLK_SPACE;
+SDLKey haut_touche = SDLK_UP;
+SDLKey bas_touche = SDLK_DOWN;
+SDLKey gauche_touche = SDLK_LEFT;
+SDLKey droite_touche = SDLK_RIGHT;
+SDLKey quitter_touche = SDLK_q;
+SDLKey bdp_touche = SDLK_F1;
+SDLKey bdm_touche = SDLK_F2;
+SDLKey pnj_touche = SDLK_F3;
+SDLKey IA_touche = SDLK_F4;
+SDLKey Oui_touche = SDLK_o;
+SDLKey Non_touche = SDLK_n;
+
+void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, int *display, int *posMouseX, int *posMouseY, int *selection)
 {
 	switch (event.type) {
@@ -74,165 +90,169 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, int *animFl
 		/* handle the keyboard */
 		
 		case SDL_KEYDOWN:
-			switch (event.key.keysym.sym) {
-				case SDLK_ESCAPE:   // retour au menu
-				case SDLK_q:
-					*display =1 ;
-					break;
-			  
-				case SDLK_LEFT:
-					perso->currDirection = DIR_LEFT;
-					*animFlip = 1 - *animFlip;
-					perso->pos.x -= SPRITE_STEP;
-					break;
-			  
-				case SDLK_RIGHT:
-					perso->currDirection = DIR_RIGHT;
-					*animFlip = 1 - *animFlip;
-					perso->pos.x += SPRITE_STEP;
-					break;
-			  
-				case SDLK_UP:
-					perso->currDirection = DIR_UP;
-					*animFlip = 1 - *animFlip;
-					perso->pos.y -= SPRITE_STEP;
-					break;
-				
-				case SDLK_DOWN:
-					perso->currDirection = DIR_DOWN;
-					*animFlip = 1 - *animFlip;
-					perso->pos.y += SPRITE_STEP;
-					break;
-			  
-				case SDLK_SPACE:
-			
-					if (fireball->display==0) {
-						fireball->display=1;
-						fireball->range=100;
-						fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
-						fireball->pos.y = perso->pos.y+(GRASS_SIZE/3);
-						if(perso->currDirection == DIR_RIGHT){
-							double angle = (perso->currDirection * (2*M_PI));
-							fireball->v.x = 2*cos(angle);
-							fireball->v.y = -2 * sin(angle);
-						}
-						if(perso->currDirection == DIR_LEFT){
-							double angle = (perso->currDirection * (2*M_PI));
-							fireball->v.x = -2*cos(angle);
-							fireball->v.y = 2 * sin(angle);
-						}
-						if(perso->currDirection == DIR_UP){
-							double angle = (perso->currDirection * (2*M_PI));
-							fireball->v.x = 2 * sin(angle);
-							fireball->v.y = -2*cos(angle);
-						}
-						if(perso->currDirection == DIR_DOWN){
-							double angle = (perso->currDirection * (2*M_PI));
-							fireball->v.x = -2 * sin(angle);
-							fireball->v.y = 2*cos(angle);
-						}
-
+			if((event.key.keysym.sym==SDLK_ESCAPE)||(event.key.keysym.sym==quitter_touche)){   // retour au menu
+				*display =1 ;
+			}
+			if(event.key.keysym.sym==gauche_touche){
+				perso->currDirection = DIR_LEFT;
+				deplacements[0]=1;
+				*currDirection=DIR_LEFT;
+			}
+			if(event.key.keysym.sym==droite_touche){
+				perso->currDirection = DIR_RIGHT;
+				deplacements[1]=1;
+				*currDirection=DIR_RIGHT;
+			}
+			if(event.key.keysym.sym==haut_touche){
+				perso->currDirection = DIR_UP;
+				deplacements[2]=1;
+				*currDirection=DIR_UP;
+			}
+			if(event.key.keysym.sym==bas_touche){
+				perso->currDirection = DIR_DOWN;
+				deplacements[3]=1;
+				*currDirection=DIR_DOWN;
+			}				
+			if(event.key.keysym.sym==bdf_touche){
+				if (fireball->display==0) {
+					fireball->display=1;
+					fireball->range=7*BALL_SPEED;
+					fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+					fireball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+					if((deplacements[0]==1)&&(deplacements[2]==1)){ //haut + gauche
+						double angle = (currentDirection * (4*M_PI/3));
+						fireball->v.x = BALL_SPEED * sin(angle);
+						fireball->v.y = -BALL_SPEED*cos(angle);
+					}else if((deplacements[0]==1)&&(deplacements[3]==1)){ //bas + gauche
+						double angle = (currentDirection * (4*M_PI/3));
+						fireball->v.x = -BALL_SPEED*cos(angle);
+						fireball->v.y = BALL_SPEED * sin(angle);
+					}else if((deplacements[1]==1)&&(deplacements[2]==1)){ //haut + droite
+						double angle = (currentDirection * (4*M_PI/3));
+						fireball->v.x = BALL_SPEED*cos(angle);
+						fireball->v.y = -BALL_SPEED * sin(angle);
+					}else if((deplacements[1]==1)&&(deplacements[3]==1)){ //bas + droite
+						double angle = (currentDirection * (4*M_PI/3));
+						fireball->v.x = -BALL_SPEED * sin(angle);
+						fireball->v.y = BALL_SPEED*cos(angle);
+					}else if((deplacements[0]==1)&&(deplacements[1]!=1)){ //gauche
+						double angle = (currentDirection * (2*M_PI));
+						fireball->v.x = -BALL_SPEED*cos(angle);
+						fireball->v.y = BALL_SPEED * sin(angle);
+					}else if((deplacements[1]==1)&&(deplacements[0]!=1)){ //droite
+						double angle = (currentDirection * (2*M_PI));
+						fireball->v.x = BALL_SPEED*cos(angle);
+						fireball->v.y = -BALL_SPEED * sin(angle);
+					}else if((deplacements[2]==1)&&(deplacements[3]!=1)){ //haut
+						double angle = (currentDirection * (2*M_PI));
+						fireball->v.x = BALL_SPEED * sin(angle);
+						fireball->v.y = -BALL_SPEED*cos(angle);
+					}else if((deplacements[3]==1)&&(deplacements[2]!=1)){ //bas
+						double angle = (currentDirection * (2*M_PI));
+						fireball->v.x = -BALL_SPEED * sin(angle);
+						fireball->v.y = BALL_SPEED*cos(angle);
 					}
-					break;
-
-
-				case SDLK_F1:
-			
-					if (poisonball->life ==0) {
-						poisonball->life = 80;
-						poisonball->pos.x = perso->pos.x+(GRASS_SIZE/3);
-						poisonball->pos.y = perso->pos.y+(GRASS_SIZE/3);
-						if(perso->currDirection == DIR_RIGHT){
-							double angle = (perso->currDirection * (2*M_PI)); 
-							poisonball->v.x = 2*cos(angle);
-							poisonball->v.y = 2 * sin(angle);
-							poisonball->display = 1;
-						}
-						if(perso->currDirection == DIR_LEFT){
-							double angle = (perso->currDirection * (2*M_PI));
-							poisonball->v.x = -2*cos(angle);
-							poisonball->v.y = 2 * sin(angle);
-							poisonball->display = 1;
-						}
-						if(perso->currDirection == DIR_UP){
-							double angle = (perso->currDirection * (2*M_PI));
-							poisonball->v.x = 2 * sin(angle);
-							poisonball->v.y = -2*cos(angle);
-							poisonball->display = 1;
-						}
-						if(perso->currDirection == DIR_DOWN){
-							double angle = (perso->currDirection * (2*M_PI));
-							poisonball->v.x = -2 * sin(angle);
-							poisonball->v.y = 2*cos(angle);
-							poisonball->display = 1;
-						}
-
-					}
-					break;
-
-
-				case SDLK_F2:
-			
-					if (deathball->life ==0) {
-						deathball->life = 80;
-						deathball->pos.x = perso->pos.x+(GRASS_SIZE/3);
-						deathball->pos.y = perso->pos.y+(GRASS_SIZE/3);
-						if(perso->currDirection == DIR_RIGHT){
-							double angle = (perso->currDirection * (2*M_PI));
-							deathball->v.x = 2*cos(angle);
-							deathball->v.y = -2 * sin(angle);
-							deathball->display = 1;
-						}
-						if(perso->currDirection == DIR_LEFT){
-							double angle = (perso->currDirection * (2*M_PI));
-							deathball->v.x = -2*cos(angle);
-							deathball->v.y = 2 * sin(angle);
-							deathball->display = 1;
-						}
-						if(perso->currDirection == DIR_UP){
-							double angle = (perso->currDirection * (2*M_PI));
-							deathball->v.x = 2 * sin(angle);
-							deathball->v.y = -2*cos(angle);
-							deathball->display = 1;
-						}
-						if(perso->currDirection == DIR_DOWN){
-							double angle = (perso->currDirection * (2*M_PI));
-							deathball->v.x = -2 * sin(angle);
-							deathball->v.y = 2*cos(angle);
-							deathball->display = 1;
-						}
-
-					}
-					break;
-				
-				case SDLK_F3:
-					/* Apparition PNJ Ludo */
-					ludo->life= 100;
-					ludo->display = 1;
-					ludo->pos.x = 200;
-					ludo->pos.y = 200;
-				break;
-				
-				case SDLK_F4:
-					if(choiceTEST){
-						choice = 1;
-						choiceTEST= 0;
-						break;
-					} else {
-						choice = 0;
-						choiceTEST = 1;
-						break;
-					}
-				case SDLK_o:
-					quest1[0][0][0] += 1;
-					break;
-				case SDLK_n:
-					quest1[0][1][0] += 1;
-					break;
-				default:
-					break;
 				}
-				break;
+			}
+			if(event.key.keysym.sym==bdp_touche){
+				if (poisonball->life ==0) {
+					poisonball->life = 80;
+					poisonball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+					poisonball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+					if(perso->currDirection == DIR_RIGHT){
+						double angle = (perso->currDirection * (2*M_PI)); 
+						poisonball->v.x = 2*cos(angle);
+						poisonball->v.y = 2 * sin(angle);
+						poisonball->display = 1;
+					}
+					if(perso->currDirection == DIR_LEFT){
+						double angle = (perso->currDirection * (2*M_PI));
+						poisonball->v.x = -2*cos(angle);
+						poisonball->v.y = 2 * sin(angle);
+						poisonball->display = 1;
+					}
+					if(perso->currDirection == DIR_UP){
+						double angle = (perso->currDirection * (2*M_PI));
+						poisonball->v.x = 2 * sin(angle);
+						poisonball->v.y = -2*cos(angle);
+						poisonball->display = 1;
+					}
+					if(perso->currDirection == DIR_DOWN){
+						double angle = (perso->currDirection * (2*M_PI));
+						poisonball->v.x = -2 * sin(angle);
+						poisonball->v.y = 2*cos(angle);
+						poisonball->display = 1;
+					}
+				}
+			}
+			if(event.key.keysym.sym==bdm_touche){
+				if (deathball->life ==0) {
+					deathball->life = 80;
+					deathball->pos.x = perso->pos.x+(GRASS_SIZE/3);
+					deathball->pos.y = perso->pos.y+(GRASS_SIZE/3);
+					if(perso->currDirection == DIR_RIGHT){
+						double angle = (perso->currDirection * (2*M_PI));
+						deathball->v.x = 2*cos(angle);
+						deathball->v.y = -2 * sin(angle);
+						deathball->display = 1;
+					}
+					if(perso->currDirection == DIR_LEFT){
+						double angle = (perso->currDirection * (2*M_PI));
+						deathball->v.x = -2*cos(angle);
+						deathball->v.y = 2 * sin(angle);
+						deathball->display = 1;
+					}
+					if(perso->currDirection == DIR_UP){
+						double angle = (perso->currDirection * (2*M_PI));
+						deathball->v.x = 2 * sin(angle);
+						deathball->v.y = -2*cos(angle);
+						deathball->display = 1;
+					}
+					if(perso->currDirection == DIR_DOWN){
+						double angle = (perso->currDirection * (2*M_PI));
+						deathball->v.x = -2 * sin(angle);
+						deathball->v.y = 2*cos(angle);
+						deathball->display = 1;
+					}
+				}
+			}
+			if(event.key.keysym.sym==pnj_touche){
+				/* Apparition PNJ Ludo */
+				ludo->life= 100;
+				ludo->display = 1;
+				ludo->pos.x = 200;
+				ludo->pos.y = 200;
+			}	
+			if(event.key.keysym.sym==IA_touche){
+				if(choiceTEST){
+					choice = 1;
+					choiceTEST= 0;
+				} else {
+					choice = 0;
+					choiceTEST = 1;
+				}
+			}
+			if(event.key.keysym.sym==Oui_touche){
+				quest1[0][0][0] += 1;
+			}
+			if(event.key.keysym.sym==Non_touche){
+				quest1[0][1][0] += 1;
+			}
+			break;
+		case SDL_KEYUP:
+			if(event.key.keysym.sym==gauche_touche){
+				deplacements[0]=0;
+			}
+			if(event.key.keysym.sym==droite_touche){
+				deplacements[1]=0;
+			}
+			if(event.key.keysym.sym==haut_touche){
+				deplacements[2]=0;
+			}
+			if(event.key.keysym.sym==bas_touche){
+				deplacements[3]=0;
+			}
+			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if((*display==1)){
 				SDL_GetMouseState(posMouseX,posMouseY);
@@ -392,7 +412,6 @@ void initAll(){
 		SDL_WM_SetCaption("Ashortsomething", "Ashortsomething");
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 		currentDirection = DIR_RIGHT;
-		animationFlip = 0;
 		/* set keyboard repeat */
 		SDL_EnableKeyRepeat(10, 10);
 		gameover =1;
@@ -530,9 +549,23 @@ int main(int argc, char* argv[]){
 		int disp=display;
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
-			HandleEvent(event, &gameover, &currentDirection, &animationFlip, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &display,&posMouseX,&posMouseY,&selection);
+			HandleEvent(event, &gameover, &currentDirection, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &display,&posMouseX,&posMouseY,&selection);
 		}
-		
+		if(disp==2){
+			//gestion du deplacement
+			if(deplacements[0]==1){
+				perso.pos.x -= SPRITE_STEP;
+			}
+			if(deplacements[1]==1){
+				perso.pos.x += SPRITE_STEP;
+			}
+			if(deplacements[2]==1){
+				perso.pos.y -= SPRITE_STEP;
+			}
+			if(deplacements[3]==1){
+				perso.pos.y += SPRITE_STEP;
+			}
+		}
 		if(disp==2||disp==5){
 			//Barre de vie Ludo
 			SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
