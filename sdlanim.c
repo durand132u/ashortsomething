@@ -40,6 +40,7 @@ int gameover;
 int display;
 int selection;
 double ratio;
+double angle;
 int posMouseX;
 int posMouseY;
 int choice = 0;
@@ -129,56 +130,56 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					bdfdeplacements[2]=deplacements[2];
 					bdfdeplacements[3]=deplacements[3];
 					if((bdfdeplacements[0]==1)&&(bdfdeplacements[2]==1)){ //haut + gauche
-						double angle = (currentDirection * (4*M_PI/3));
+						angle = (currentDirection * (4*M_PI/3));
 						fireball->v.x = BALL_SPEED * sin(angle);
 						fireball->v.y = -BALL_SPEED*cos(angle);
 					}else if((bdfdeplacements[0]==1)&&(bdfdeplacements[3]==1)){ //bas + gauche
-						double angle = (currentDirection * (4*M_PI/3));
+						angle = (currentDirection * (4*M_PI/3));
 						fireball->v.x = -BALL_SPEED*cos(angle);
 						fireball->v.y = BALL_SPEED * sin(angle);
 					}else if((bdfdeplacements[1]==1)&&(bdfdeplacements[2]==1)){ //haut + droite
-						double angle = (currentDirection * (4*M_PI/3));
+						angle = (currentDirection * (4*M_PI/3));
 						fireball->v.x = BALL_SPEED*cos(angle);
 						fireball->v.y = -BALL_SPEED * sin(angle);
 					}else if((bdfdeplacements[1]==1)&&(bdfdeplacements[3]==1)){ //bas + droite
-						double angle = (currentDirection * (4*M_PI/3));
+						angle = (currentDirection * (4*M_PI/3));
 						fireball->v.x = -BALL_SPEED * sin(angle);
 						fireball->v.y = BALL_SPEED*cos(angle);
 					}else if((bdfdeplacements[0]==1)&&(bdfdeplacements[1]!=1)){ //gauche
-						double angle = (currentDirection * (2*M_PI));
+						angle = (currentDirection * (2*M_PI));
 						fireball->v.x = -BALL_SPEED*cos(angle);
 						fireball->v.y = BALL_SPEED * sin(angle);
 					}else if((bdfdeplacements[1]==1)&&(bdfdeplacements[0]!=1)){ //droite
-						double angle = (currentDirection * (2*M_PI));
+						angle = (currentDirection * (2*M_PI));
 						fireball->v.x = BALL_SPEED*cos(angle);
 						fireball->v.y = -BALL_SPEED * sin(angle);
 					}else if((bdfdeplacements[2]==1)&&(bdfdeplacements[3]!=1)){ //haut
-						double angle = (currentDirection * (2*M_PI));
+						angle = (currentDirection * (2*M_PI));
 						fireball->v.x = BALL_SPEED * sin(angle);
 						fireball->v.y = -BALL_SPEED*cos(angle);
 					}else if((bdfdeplacements[3]==1)&&(bdfdeplacements[2]!=1)){ //bas
-						double angle = (currentDirection * (2*M_PI));
+						angle = (currentDirection * (2*M_PI));
 						fireball->v.x = -BALL_SPEED * sin(angle);
 						fireball->v.y = BALL_SPEED*cos(angle);
 					}else if((bdfdeplacements[0]==0)&&(bdfdeplacements[1]==0)&&(bdfdeplacements[2]==0)&&(bdfdeplacements[3]==0)){
 						switch(currentDirection){
 							case 0 :
-								double angle = (currentDirection * (2*M_PI));
+								angle = (currentDirection * (2*M_PI));
 								fireball->v.x = BALL_SPEED * sin(angle);
 								fireball->v.y = -BALL_SPEED*cos(angle);
 								break;
 							case 1 :
-								double angle = (currentDirection * (2*M_PI));
+								angle = (currentDirection * (2*M_PI));
 								fireball->v.x = BALL_SPEED*cos(angle);
 								fireball->v.y = -BALL_SPEED * sin(angle);
 								break;
 							case 2 :
-								double angle = (currentDirection * (2*M_PI));
+								angle = (currentDirection * (2*M_PI));
 								fireball->v.x = -BALL_SPEED * sin(angle);
 								fireball->v.y = BALL_SPEED*cos(angle);
 								break;
 							case 3 :
-								double angle = (currentDirection * (2*M_PI));
+								angle = (currentDirection * (2*M_PI));
 								fireball->v.x = -BALL_SPEED*cos(angle);
 								fireball->v.y = BALL_SPEED * sin(angle);
 								break;
