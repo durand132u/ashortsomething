@@ -106,18 +106,22 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			if(event.key.keysym.sym==gauche_touche){
 				perso->currDirection = DIR_LEFT;
 				deplacements[0]=1;
+				currentDirection= DIR_LEFT;
 			}
 			if(event.key.keysym.sym==droite_touche){
 				perso->currDirection = DIR_RIGHT;
 				deplacements[1]=1;
+				currentDirection= DIR_RIGHT;
 			}
 			if(event.key.keysym.sym==haut_touche){
 				perso->currDirection = DIR_UP;
 				deplacements[2]=1;
+				currentDirection= DIR_UP;
 			}
 			if(event.key.keysym.sym==bas_touche){
 				perso->currDirection = DIR_DOWN;
 				deplacements[3]=1;
+				currentDirection= DIR_DOWN;
 			}				
 			if(event.key.keysym.sym==bdf_touche&&bdf){
 				if (fireball->display==0) {
@@ -465,7 +469,6 @@ void initAll(){
 		TTF_Init();
 		SDL_WM_SetCaption("Ashortsomething", "Ashortsomething");
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-		currentDirection = DIR_RIGHT;
 		/* set keyboard repeat */
 		SDL_EnableKeyRepeat(10, 10);
 		gameover =1;
@@ -532,7 +535,6 @@ void initAll(){
 		SDL_SetColorKey(spritepnj, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
 		/* initialise struct */
-		perso.currDirection = 0;
 		monster.currDirection =0;
 		perso.display = 1;
 		perso.size = 32;
