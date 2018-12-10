@@ -20,7 +20,7 @@
 #define VITESSE_MOB 	2
 #define BALL_SPEED		6
 
-SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon, *spritepnj; //sprites ingame
+SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon, *spritepnj, *spriteepee; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
 SDL_Surface *background, *message, *fleche; //menu
 SDL_Surface *messageQ1; //quetes
@@ -72,6 +72,7 @@ struct sprite_t deathball;
 struct sprite_t HP_potion;
 struct sprite_t champignon;
 struct sprite_t pnj;
+struct sprite_t epee;
 
 SDLKey bdf_touche = SDLK_SPACE;
 SDLKey haut_touche = SDLK_UP;
@@ -87,8 +88,9 @@ SDLKey Oui_touche = SDLK_o;
 SDLKey Non_touche = SDLK_n;
 SDLKey Continuer_touche = SDLK_c;
 
-void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo,
- struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon,struct sprite_t *pnj, int *display, int *posMouseX, int *posMouseY, int *selection)
+void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo, struct sprite_t *epee,
+ struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, struct sprite_t *pnj,
+ int *display, int *posMouseX, int *posMouseY, int *selection)
 
 {
 	switch (event.type) {
@@ -522,6 +524,9 @@ void initAll(){
 		SDL_Surface *temp = SDL_LoadBMP("sprite.bmp");
 		sprite = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
+		temp = SDL_LoadBMP("epee.bmp");
+		spriteepee = SDL_DisplayFormat(temp);
+		SDL_FreeSurface(temp);
 		temp = SDL_LoadBMP("monster.bmp");
 		spritemonster = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);	
@@ -552,8 +557,11 @@ void initAll(){
 		temp = SDL_LoadBMP("pnj.bmp");
 		spritepnj = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
+		
+		
 		int colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
 		SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+		SDL_SetColorKey(spriteepee, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spriteludo, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritefire, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritemonster, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -562,6 +570,7 @@ void initAll(){
 		SDL_SetColorKey(spritepotion, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritechampignon, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 		SDL_SetColorKey(spritepnj, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+
 
 		/* initialise struct */
 		monster.currDirection =0;
@@ -584,6 +593,7 @@ void initAll(){
 		pnj.size = 32;
 		pnj.pos.x = 500;
 		pnj.pos.y = 500;
+		
 		//Position champignon
 		champignon.display = 1;
 		champignon.size = 32;
@@ -596,6 +606,14 @@ void initAll(){
 		monster.pos.y =0;
 		HP_potion.pos.x=550;
 		HP_potion.pos.y=450;
+		
+		
+		epee.display = 1;
+		epee.size=32;
+		epee.pos.x=perso.pos.x+10;
+		epee.pos.y=perso.pos.y;
+		
+		
 		//Initialisation barre de vie
 		barreDeVie_Ludo = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeVie_monstre = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
@@ -606,6 +624,7 @@ void initAll(){
 void resetAll(){
 		SDL_FreeSurface(screen);
 		SDL_FreeSurface(sprite);
+		SDL_FreeSurface(spriteepee);
 		SDL_FreeSurface(grass);
 		SDL_FreeSurface(spritefire);
 		SDL_FreeSurface(spritemonster);
@@ -644,7 +663,7 @@ int main(int argc, char* argv[]){
 		int disp=display;
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
-			HandleEvent(event, &gameover, &currentDirection, &perso, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection);
+			HandleEvent(event, &gameover, &currentDirection, &perso, &epee, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection);
 		}
 		//gestion du deplacement
 		if(deplacements[0]==1){
@@ -1017,9 +1036,23 @@ int main(int argc, char* argv[]){
 				SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
 				
 
+			
 				//Message quest
 				posMesQ1.x = 2*SCREEN_WIDTH/100;
 				posMesQ1.y = 90*SCREEN_HEIGHT/100;
+			}
+			
+				
+			if (epee.display != 0) { //affiche perso
+				SDL_Rect epeeImage;
+				SDL_Rect epeePos;
+				epeePos.x = perso.pos.x + 20;
+				epeePos.y = perso.pos.y;
+				epeeImage.y = 0;
+				epeeImage.w = epee.size;
+				epeeImage.h = epee.size;
+				epeeImage.x = ludo.size*(ludo.currDirection*2);
+				SDL_BlitSurface(spriteepee, &epeeImage, screen, &epeePos);
 			}
 			
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
@@ -1118,8 +1151,7 @@ int main(int argc, char* argv[]){
 				SDL_Rect pnjImage;
 				SDL_Rect pnjPos;
 				pnjPos.x = pnj.pos.x;
-				pnjPos.y = pnj.pos.y;
-								
+				pnjPos.y = pnj.pos.y;		
 				pnjImage.y = 0;
 				pnjImage.w = champignon.size;
 				pnjImage.h = champignon.size;
