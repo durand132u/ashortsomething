@@ -301,8 +301,34 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				quest1[0][1][0] += 1;
 			}
 			if(event.key.keysym.sym==Continuer_touche){
-				continuer +=1;
-				//Conditions a ajouter pour les quêtes
+			  //CONDITIONS POUR LES QUETES
+			  if(continuer==0&&QTchampignon>5){
+			    continuer=1;
+			  } else {
+			    if(continuer==1){
+			      continuer = 2;
+			    } else {
+			      if(continuer==2&&bdf==1){
+				continuer=3;
+			      } else {
+				if(continuer==3&&tete==1){
+				  continuer=4;
+				} else {
+				  if(continuer==4&&perso->life>=100){
+				    continuer =5; 
+				  } else {
+				    if(continuer==5&&tete_stickman==1){
+				      continuer = 6; 
+				    } else {
+				    if(continuer==6&&monstre==1){
+				      continuer = 7;
+				      }
+				    }
+				  }
+				}
+			      }
+			    }
+			  }
 			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -637,81 +663,81 @@ int main(int argc, char* argv[]){
 			perso.pos.y += SPRITE_STEP;
 		}
 		if(disp==2||disp==5){
-			//Barre de vie Ludo
-			SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-			SDL_Rect HP_ludo;
-			HP_ludo.x = 0;
-			HP_ludo.y = 0;
-			HP_ludo.w = ludo.life*ludo.size/MAX_HP;
-			HP_ludo.h = 3;
-				if(ludo.life>(80*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 0, 255, 0));
-				}
-				if(ludo.life>(60*MAX_HP/100)&&ludo.life<=(80*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 255, 0)); //jaune
-				}
-				if(ludo.life>40&&ludo.life<=(60*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 112, 0)); //orange
-				}
-				if(ludo.life>0&&ludo.life<=(40*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 0, 0)); // rouge
-				}
-			//Barre de vie monstre
-			SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-			SDL_Rect HP_monstre;
-			HP_monstre.x = 0;
-			HP_monstre.y = 0;
-			HP_monstre.w = monster.life*monster.size/MAX_HP;
-			HP_monstre.h = 3;
-			if(monster.life>(80*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 0, 255, 0));
-			}
-			if(monster.life>(60*MAX_HP/100)&&monster.life<=(80*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-					SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 255, 0)); //jaune
-				}
-			if(monster.life>(40*MAX_HP/100)&&monster.life<=(60*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-					SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 112, 0)); //orange
-			}
-			if(monster.life>0&&monster.life<=(40*MAX_HP/100)){
-					SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 0, 0)); // rouge
-			}
-			
-			//Barre de vie personnage
-			SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-			SDL_Rect HP_perso;
-			HP_perso.x = 0;
-			HP_perso.y = 0;
-			HP_perso.w = perso.life*perso.size/MAX_HP;
-			HP_perso.h = 3;
-			SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
-			if(perso.life>(80*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
-			}
-			if(perso.life>(60*MAX_HP/100)&&perso.life<=(80*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
-			}
-			if(perso.life>(40*MAX_HP/100)&&perso.life<=(60*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
-			}
-			if(perso.life>0&&perso.life<=(40*MAX_HP/100)){
-				SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
-			}
-			
-			//Bare de mana personnage
-			SDL_FillRect(barreDeMana_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
-			SDL_Rect MANA_perso;
-			MANA_perso.x = 0;
-			MANA_perso.y = 0;
-			MANA_perso.w = perso.life*perso.size/MAX_MANA;
-			MANA_perso.h = 3;
-			SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
-		}
+			 //Barre de vie Ludo
+            SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+            SDL_Rect HP_ludo;
+            HP_ludo.x = 0;
+            HP_ludo.y = 0;
+            HP_ludo.w = ludo.life*ludo.size/MAX_HP;
+            HP_ludo.h = 3;
+                if(ludo.life>(80*MAX_HP/100)){
+                    SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 0, 255, 0));
+                }
+                if(ludo.life>(60*MAX_HP/100)&&ludo.life<=(80*MAX_HP/100)){
+                    SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                    SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 255, 0)); //jaune
+                }
+                if(ludo.life>40&&ludo.life<=(60*MAX_HP/100)){
+                    SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                    SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 112, 0)); //orange
+                }
+                if(ludo.life>0&&ludo.life<=(40*MAX_HP/100)){
+                    SDL_FillRect(barreDeVie_Ludo, &HP_ludo, SDL_MapRGB(barreDeVie_Ludo->format, 255, 0, 0)); // rouge
+                }
+            //Barre de vie monstre
+            SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+            SDL_Rect HP_monstre;
+            HP_monstre.x = 0;
+            HP_monstre.y = 0;
+            HP_monstre.w = monster.life*monster.size/MAX_HP;
+            HP_monstre.h = 3;
+            if(monster.life>(80*MAX_HP/100)){
+                SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 0, 255, 0));
+            }
+            if(monster.life>(60*MAX_HP/100)&&monster.life<=(80*MAX_HP/100)){
+                    SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                    SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 255, 0)); //jaune
+                }
+            if(monster.life>(40*MAX_HP/100)&&monster.life<=(60*MAX_HP/100)){
+                    SDL_FillRect(barreDeVie_monstre, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                    SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 112, 0)); //orange
+            }
+            if(monster.life>0&&monster.life<=(40*MAX_HP/100)){
+                    SDL_FillRect(barreDeVie_monstre, &HP_monstre, SDL_MapRGB(barreDeVie_monstre->format, 255, 0, 0)); // rouge
+            }
+           
+            //Barre de vie personnage
+            SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+            SDL_Rect HP_perso;
+            HP_perso.x = 0;
+            HP_perso.y = 0;
+            HP_perso.w = perso.life*perso.size/MAX_HP;
+            HP_perso.h = 3;
+            SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
+            if(perso.life>(80*MAX_HP/100)){
+                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
+            }
+            if(perso.life>(60*MAX_HP/100)&&perso.life<=(80*MAX_HP/100)){
+                SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
+            }
+            if(perso.life>(40*MAX_HP/100)&&perso.life<=(60*MAX_HP/100)){
+                SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
+            }
+            if(perso.life>0&&perso.life<=(40*MAX_HP/100)){
+                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
+            }
+           
+            //Bare de mana personnage
+            SDL_FillRect(barreDeMana_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+            SDL_Rect MANA_perso;
+            MANA_perso.x = 0;
+            MANA_perso.y = 0;
+            MANA_perso.w = perso.life*perso.size/MAX_MANA;
+            MANA_perso.h = 3;
+            SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
+        }
 		if(disp==2){ //Gestion des evenements dus aux deplacements collisions actualisations etc
 			if (fireball.display == 1){
 				fireball.pos.x = fireball.pos.x + fireball.v.x;
@@ -1009,28 +1035,26 @@ int main(int argc, char* argv[]){
 						messageQ1 = TTF_RenderText_Solid(fontQ1, "Quete termine. Veuillez appuyer sur c pour la suite", textColor); 
 						//RECOMPENSE DE QUETE ICI
 						perso.argent = perso.argent + 5;
-						if((continuer==1)&&(bdf!=1&&tete!=1)&&(tete_stickman!=1)&&(monstre!=1)){
-							messageQ1 = TTF_RenderText_Solid(fontQ1, "Vous avez gagne 5 shortmoney, et vous pouvez desormais lancer des  boules de feu", textColor); 
+						if((continuer==1)&&(bdf!=1)){
+							messageQ1 = TTF_RenderText_Solid(fontQ1, "Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...", textColor); 
 
 						}
-						if(continuer==2&&tete!=1&&tete_stickman!=1&&monstre!=1){
-							messageQ1 = TTF_RenderText_Solid(fontQ1, "Regardes le, il te suis. Testes donc tes nouvelles boules de feu sur cet individu bizarre", textColor); 
+						if(continuer==2&&perso.argent>=5){
+							messageQ1 = TTF_RenderText_Solid(fontQ1,"Il te suis. Appuies sur espace pour tester tes nouvelles capacites, et tues le.", textColor); 
 							bdf = 1;
-	
 						}
-						if(continuer==3&&tete==1&&tete_stickman!=1&&monstre!=1){
+						if(continuer==3&&tete==1){
 							messageQ1 = TTF_RenderText_Solid(fontQ1, "C'est tres bien! Tu peux te soigner en prenant cette potion", textColor); 
 						}
 						if(continuer==4&&tete_stickman!=1&&monstre!=1){
 							messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre", textColor); 
 						}
 						if(continuer==5&&tete_stickman==1){
-							messageQ1 = TTF_RenderText_Solid(fontQ1, "Desormais tu peux controler ce monstre! Bien joue!", textColor);
+							messageQ1 = TTF_RenderText_Solid(fontQ1, "Desormais tu peux controler ce monstre en appuyant sur F3! Bien joue! ", textColor);
 							monstre=1;
 						}
 						if(continuer>5&&monstre==1){
 						   	messageQ1 = TTF_RenderText_Solid(fontQ1, "Tiens! Ce pnj bizarre est revenue. Tests tes nouveaux pouvoirs!", textColor); 
-
 						}
 					}
 					if(quest1[0][1][0]>0){
@@ -1042,7 +1066,17 @@ int main(int argc, char* argv[]){
 			} else {
 				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
 			}
-			SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
+			if(continuer>=4){
+			    monster.display=1;  
+			} else {
+			    monster.display=0;
+			}
+			if(continuer==2||continuer==6){
+			    ludo.display=1;
+			} else {
+			    ludo.display=0;
+			}
+			  SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
 			
 			if (monster.display != 0) { //affichage monstre
 				SDL_Rect monsterImage;
