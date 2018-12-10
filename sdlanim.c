@@ -349,7 +349,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*selection=-1; //reset
 				}
 				if((*posMouseX>=5*SCREEN_WIDTH/100)&&(*posMouseX<=60*SCREEN_WIDTH/100)&&(*posMouseY>=80*SCREEN_HEIGHT/100)&&(*posMouseY<=85*SCREEN_HEIGHT/100)){
-					printf("AJOUTER GESTION DES CONTROLES"); //controles
+					//controles
 					*display=4; //menu de controles
 					*selection=-1; //reset
 				}
@@ -1175,13 +1175,24 @@ int main(int argc, char* argv[]){
 		}
 		if(disp==4){ // si on est dans les controles
 			FILE* ctrls=fopen("CONTROLS.txt", "r+");
-			while(1){
+			int lecture;
+			if(ctrls!=NULL){
+				lecture=0;
+			}else{
+				lecture=1;
+				printf("IMPOSSIBLE DE LIRE DANS LE FICHIER");
+			}
+			while(lecture==0){
 				char c = fgetc(ctrls);
 				if( feof(ctrls) ) {
-					break ;
+					lecture=1;
+				}else{
+					printf("%c", c);
 				}
-				printf("%c", c);
 			}
+			fclose(ctrls);
+			display=1;
+			
 			//Creation des boutons du menu de controles
 			
 			//touches directionnelles
