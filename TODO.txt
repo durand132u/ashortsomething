@@ -1,12 +1,12 @@
 - Input controles clavier dans TXT >> En cours de travail par félix
-- Interface de changement des controles >> prochain objectif de félix
-- Menu de pause du jeu
+- Interface de changement des controles >> interface presente mais need gestion clics par félix
+- Menu de pause du jeu sans controle des event de deplacement
 
-- quetes 
-- histoire avec debut et fin
-- ecran de defaite et victoire (gameover =1 & display=2)
+- quetes >> debug par Lucas
+- histoire avec debut et fin >> ??
+- ecran de defaite et victoire (gameover =1 & display=2) 
 
 - factorisation dans plusieurs fichiers
-- chargement de la map
+- chargement de la map >> en cours par Flo
 - minimap
-- ecran qui defile sur la map autour de la position du joueur (une sorte de "camera") 
+- ecran qui defile sur la map autour de la position du joueur (une sorte de "camera") >> en cours par Flo

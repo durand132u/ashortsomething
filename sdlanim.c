@@ -73,19 +73,20 @@ struct sprite_t HP_potion;
 struct sprite_t champignon;
 struct sprite_t pnj;
 
-SDLKey bdf_touche = SDLK_SPACE;
 SDLKey haut_touche = SDLK_UP;
 SDLKey bas_touche = SDLK_DOWN;
 SDLKey gauche_touche = SDLK_LEFT;
 SDLKey droite_touche = SDLK_RIGHT;
-SDLKey quitter_touche = SDLK_q;
-SDLKey bdp_touche = SDLK_F1;
-SDLKey bdm_touche = SDLK_F2;
-SDLKey pnj_touche = SDLK_F3;
-SDLKey IA_touche = SDLK_F4;
+SDLKey bdf_touche = SDLK_SPACE;
+SDLKey epee_touche = SDLK_e;
+SDLKey Continuer_touche = SDLK_c;
 SDLKey Oui_touche = SDLK_o;
 SDLKey Non_touche = SDLK_n;
-SDLKey Continuer_touche = SDLK_c;
+SDLKey bdp_touche = SDLK_F1;
+SDLKey bdm_touche = SDLK_F2;
+SDLKey quitter_touche = SDLK_q;
+SDLKey pnj_touche = SDLK_F3;//NON UTILE AU JOUEUR
+SDLKey IA_touche = SDLK_F4;
 
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon,struct sprite_t *pnj, int *display, int *posMouseX, int *posMouseY, int *selection)
@@ -397,7 +398,9 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			if((*display==4)){
 				SDL_GetMouseState(posMouseX,posMouseY);
 				*selection=-1; //reset
-				//Gestion des controles poussée
+				if((*posMouseX>=60*SCREEN_WIDTH/100)&&(*posMouseX<=80*SCREEN_WIDTH/100)&&(*posMouseY>=20*SCREEN_HEIGHT/100)&&(*posMouseY<=25*SCREEN_HEIGHT/100)){
+					*selection=0; //retour menu
+				}
 			}
 			break;
 				
@@ -1144,7 +1147,7 @@ int main(int argc, char* argv[]){
 		}
 		if(disp==3){ // si on est dans les options
 			message = TTF_RenderText_Solid(font50,"OPTIONS :",textColor);
-			posMes.x=50*SCREEN_WIDTH/100-100;
+			posMes.x=50*SCREEN_WIDTH/100-(100/ratio);
 			posMes.y=0.0;
 			SDL_BlitSurface(message,NULL,screen,&posMes);
 			message = TTF_RenderText_Solid(font36,"Agrandir la taille de l'ecran",textColor);
@@ -1174,6 +1177,7 @@ int main(int argc, char* argv[]){
 			}
 		}
 		if(disp==4){ // si on est dans les controles
+			/*
 			FILE* ctrls=fopen("CONTROLS.txt", "r+");
 			int lecture;
 			if(ctrls!=NULL){
@@ -1192,16 +1196,165 @@ int main(int argc, char* argv[]){
 			}
 			fclose(ctrls);
 			display=1;
+			*/
+			char buffer[20]; //char temporaire pour les touches actuelles
+			message = TTF_RenderText_Solid(font50,"Controles :",textColor);
+			posMes.x=50*SCREEN_WIDTH/100-(100/ratio);
+			posMes.y=0.0;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			message = TTF_RenderText_Solid(font36,"Retour",textColor);
+			posMes.x=60*SCREEN_WIDTH/100;
+			posMes.y=20*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
 			
-			//Creation des boutons du menu de controles
+			message = TTF_RenderText_Solid(fontCTRL,"Haut",textColor); //Touche haut
+			posMes.x=10*SCREEN_WIDTH/100;
+			posMes.y=40*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(haut_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=10*SCREEN_WIDTH/100;
+			posMes.y=45*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
 			
-			//touches directionnelles
-			//boule de feu
-			//attaque
-			//pause
-			//boule de poison
-			//boule de mort
+			message = TTF_RenderText_Solid(fontCTRL,"Bas",textColor);  //Touche bas
+			posMes.x=25*SCREEN_WIDTH/100;
+			posMes.y=40*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(bas_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=25*SCREEN_WIDTH/100;
+			posMes.y=45*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
 			
+			message = TTF_RenderText_Solid(fontCTRL,"Gauche",textColor);
+			posMes.x=40*SCREEN_WIDTH/100;
+			posMes.y=40*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(gauche_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=40*SCREEN_WIDTH/100;
+			posMes.y=45*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Droite",textColor);
+			posMes.x=55*SCREEN_WIDTH/100;
+			posMes.y=40*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(droite_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=55*SCREEN_WIDTH/100;
+			posMes.y=45*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Boule de feu",textColor);
+			posMes.x=70*SCREEN_WIDTH/100;
+			posMes.y=40*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(bdf_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=70*SCREEN_WIDTH/100;
+			posMes.y=45*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Coup d'epee",textColor);
+			posMes.x=10*SCREEN_WIDTH/100;
+			posMes.y=60*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(epee_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=10*SCREEN_WIDTH/100;
+			posMes.y=65*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Pause",textColor);
+			posMes.x=25*SCREEN_WIDTH/100;
+			posMes.y=60*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(quitter_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=25*SCREEN_WIDTH/100;
+			posMes.y=65*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Boule Poison",textColor);
+			posMes.x=40*SCREEN_WIDTH/100;
+			posMes.y=60*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(bdp_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=40*SCREEN_WIDTH/100;
+			posMes.y=65*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Controle mob",textColor);
+			posMes.x=55*SCREEN_WIDTH/100;
+			posMes.y=60*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(bdm_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=55*SCREEN_WIDTH/100;
+			posMes.y=65*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Continuer",textColor);
+			posMes.x=10*SCREEN_WIDTH/100;
+			posMes.y=80*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(Continuer_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=10*SCREEN_WIDTH/100;
+			posMes.y=85*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Accepter",textColor);
+			posMes.x=25*SCREEN_WIDTH/100;
+			posMes.y=80*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(Oui_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=25*SCREEN_WIDTH/100;
+			posMes.y=85*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"Refuser",textColor);
+			posMes.x=40*SCREEN_WIDTH/100;
+			posMes.y=80*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(Non_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=40*SCREEN_WIDTH/100;
+			posMes.y=85*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"IA ennemis",textColor);
+			posMes.x=70*SCREEN_WIDTH/100;
+			posMes.y=60*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			sprintf(buffer, "(%s)", SDL_GetKeyName(IA_touche));
+			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
+			posMes.x=70*SCREEN_WIDTH/100;
+			posMes.y=65*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			message = TTF_RenderText_Solid(fontCTRL,"ACTION",textColor);
+			posMes.x=20*SCREEN_WIDTH/100;
+			posMes.y=20*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			message = TTF_RenderText_Solid(fontCTRL,"(TOUCHE ASSOCIEE)",textColor);
+			posMes.x=20*SCREEN_WIDTH/100;
+			posMes.y=25*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			message = TTF_RenderText_Solid(fontCTRL,"<- Cliquez pour changer",textColor);
+			posMes.x=35*SCREEN_WIDTH/100;
+			posMes.y=25*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			
+			if(selection==0){
+				posFleche.x=80*SCREEN_WIDTH/100;
+				posFleche.y=18*SCREEN_HEIGHT/100;
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
 		}
         SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
