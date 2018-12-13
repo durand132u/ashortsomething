@@ -1022,42 +1022,56 @@ int main(int argc, char* argv[]){
 					SDL_BlitSurface(grass, NULL, screen, &position);
 				}
 			}
-			if (perso.display != 0) { //affiche perso
-				SDL_Rect spriteImage;
-				SDL_Rect spritePos;
-				SDL_Rect manaPos;
-				manaPos.x = perso.pos.x;
-				manaPos.y = perso.pos.y - 3;
-				spritePos.x = perso.pos.x;
-				spritePos.y = perso.pos.y;
-				spriteImage.y = 0;
-				spriteImage.w = perso.size;
-				spriteImage.h = perso.size;
-				spriteImage.x = perso.size*(perso.currDirection*2);
-				SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
-				SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos);
-				SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
-				
+		if (perso.display != 0) { //affiche perso
+			SDL_Rect spriteImage;
+			SDL_Rect spritePos;
+			SDL_Rect manaPos;
+			manaPos.x = perso.pos.x;
+			manaPos.y = perso.pos.y - 3;
+			spritePos.x = perso.pos.x;
+			spritePos.y = perso.pos.y;
+			spriteImage.y = 0;
+			spriteImage.w = perso.size;
+			spriteImage.h = perso.size;
+			spriteImage.x = perso.size*(perso.currDirection*2);
+			SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);	
+					
+		      if (epee.display != 0) { //affiche perso
+			SDL_Rect epeeImage;
+			SDL_Rect epeePos;
+			if(perso.currDirection==1){
+			    epeePos.x=perso.pos.x+20;
+			    epeePos.y=perso.pos.y;
+			}
+			if(perso.currDirection==0){
+			    epeePos.x=perso.pos.x;
+			    epeePos.y=perso.pos.y-20;
+			}
+			if(perso.currDirection==2){
+			    epeePos.x=perso.pos.x;
+			    epeePos.y=perso.pos.y+20;
+			}
+			if(perso.currDirection==3){
+			    epeePos.x=perso.pos.x-25;
+			    epeePos.y=perso.pos.y;
+			    
+			}
+			epeeImage.y = 0;
+			epeeImage.w = epee.size;
+			epeeImage.h = epee.size;
+			epeeImage.x = epee.size*(perso.currDirection*2);
+			SDL_BlitSurface(spriteepee, &epeeImage, screen, &epeePos);
+			SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos); // BlitSurface épée AVANT vie/mana -> pour que l'épée ne soit pas AU DESSSUS de vie/mana
+			SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
+		      }
 
+		}
 			
-				//Message quest
-				posMesQ1.x = 2*SCREEN_WIDTH/100;
-				posMesQ1.y = 90*SCREEN_HEIGHT/100;
-			}
 			
+			//Message quest
+			posMesQ1.x = 2*SCREEN_WIDTH/100;
+			posMesQ1.y = 90*SCREEN_HEIGHT/100;
 				
-			if (epee.display != 0) { //affiche perso
-				SDL_Rect epeeImage;
-				SDL_Rect epeePos;
-				epeePos.x = perso.pos.x + 20;
-				epeePos.y = perso.pos.y;
-				epeeImage.y = 0;
-				epeeImage.w = epee.size;
-				epeeImage.h = epee.size;
-				epeeImage.x = ludo.size*(ludo.currDirection*2);
-				SDL_BlitSurface(spriteepee, &epeeImage, screen, &epeePos);
-			}
-			
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
 				if(quest1[0][0][0]==0){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher 5 champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
