@@ -13,9 +13,9 @@
 #define DIR_RIGHT       1
 #define DIR_DOWN        2
 #define DIR_LEFT        3
-#define COLIDE			4/3
-#define MAX_HP    		100
-#define MAX_MANA    	100
+#define COLIDE		4/3
+#define MAX_HP    	100
+#define MAX_MANA    	1000
 #define SPRITE_STEP     5
 #define VITESSE_MOB 	2
 #define BALL_SPEED		6
@@ -126,8 +126,9 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				deplacements[3]=1;
 				currentDirection= DIR_DOWN;
 			}				
-			if(event.key.keysym.sym==bdf_touche&&bdf){
+			if(event.key.keysym.sym==bdf_touche&&bdf&&perso->mana>100){
 				if (fireball->display==0) {
+				      	perso->mana = perso->mana-100;
 					fireball->display=1;
 					fireball->range=7*BALL_SPEED;
 					fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
@@ -292,6 +293,11 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				deplacements[3]=0;
 			}
 			if(event.key.keysym.sym==Oui_touche){
+				quest1[0][0][0] += 1;
+			}
+			if(event.key.keysym.sym==Non_touche){
+				quest1[0][1][0] += 1;
+			}	if(event.key.keysym.sym==Oui_touche){
 				quest1[0][0][0] += 1;
 			}
 			if(event.key.keysym.sym==Non_touche){
@@ -575,6 +581,7 @@ void initAll(){
 		perso.display = 1;
 		perso.size = 32;
 		perso.life = MAX_HP;
+		perso.mana = MAX_MANA;
 		ludo.display = 1;
 		ludo.size = 32;
 		ludo.life = MAX_HP;
@@ -748,7 +755,7 @@ int main(int argc, char* argv[]){
             SDL_Rect MANA_perso;
             MANA_perso.x = 0;
             MANA_perso.y = 0;
-            MANA_perso.w = perso.life*perso.size/MAX_MANA;
+            MANA_perso.w = perso.mana*perso.size/MAX_MANA;
             MANA_perso.h = 3;
             SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
         }
@@ -1029,7 +1036,15 @@ int main(int argc, char* argv[]){
 			spriteImage.w = perso.size;
 			spriteImage.h = perso.size;
 			spriteImage.x = perso.size*(perso.currDirection*2);
-			SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);	
+			SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
+			if(perso.mana<=0){
+			  perso.mana = 0; 
+			}
+			if(perso.mana<1000){ 
+			  perso.mana+=1;
+			}
+
+		
 					
 		      if (epee.display != 0) { //affiche perso
 			SDL_Rect epeeImage;
@@ -1061,6 +1076,8 @@ int main(int argc, char* argv[]){
 		      }
 
 		}
+		
+		
 			
 			
 			//Message quest
