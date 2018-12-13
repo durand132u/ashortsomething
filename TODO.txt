@@ -1,12 +1,12 @@
-- Input controles clavier dans TXT >> En cours de travail par félix
-- Interface de changement des controles >> interface presente mais need gestion clics par félix
-- Menu de pause du jeu sans controle des event de deplacement
+- Menu de pause du jeu sans controle des event de deplacement + controles qui ne font pas de throw event >> Felix taf en cours
 
 - quetes >> debug par Lucas
-- histoire avec debut et fin >> ??
-- ecran de defaite et victoire (gameover =1 & display=2) 
+- histoire avec debut et fin >> Next taf Felix
+- ecran de defaite et victoire (gameover =1 & display=2)  >> Next taf Felix
+- gestion sons >>Lucas en cours
+- maj sprites epee >>Lucas en cours
 
-- factorisation dans plusieurs fichiers
+- factorisation dans plusieurs fichiers >> A faire soon TM
 - chargement de la map >> en cours par Flo
-- minimap
-- ecran qui defile sur la map autour de la position du joueur (une sorte de "camera") >> en cours par Flo
+- minimap >> maybe
+- ecran qui defile sur la map autour de la position du joueur (une sorte de "camera") >> DONE halfway by flo

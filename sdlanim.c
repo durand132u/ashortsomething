@@ -109,7 +109,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
  int *display, int *posMouseX, int *posMouseY, int *selection)
 
 {
-	switch (event.type) {
+	switch (event.type){
 		/* close button clicked */
 		case SDL_QUIT:
 			*gameover = 1;
@@ -414,6 +414,193 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			}
 			if((*display==4)){
 				SDL_GetMouseState(posMouseX,posMouseY); // A GERER : INTERFACE DE REDEFINITION DES CONTROLES
+				if((*posMouseX>=60*SCREEN_WIDTH/100)&&(*posMouseX<=80*SCREEN_WIDTH/100)&&(*posMouseY>=20*SCREEN_HEIGHT/100)&&(*posMouseY<=25*SCREEN_HEIGHT/100)){
+					*display=1; //retour menu
+					*selection=-1; //reset
+				}
+				if((*posMouseX>=10*SCREEN_WIDTH/100)&&(*posMouseX<=20*SCREEN_WIDTH/100)&&(*posMouseY>=45*SCREEN_HEIGHT/100)&&(*posMouseY<=50*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					haut_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=25*SCREEN_WIDTH/100)&&(*posMouseX<=35*SCREEN_WIDTH/100)&&(*posMouseY>=45*SCREEN_HEIGHT/100)&&(*posMouseY<=50*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					bas_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=40*SCREEN_WIDTH/100)&&(*posMouseX<=50*SCREEN_WIDTH/100)&&(*posMouseY>=45*SCREEN_HEIGHT/100)&&(*posMouseY<=50*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					gauche_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=55*SCREEN_WIDTH/100)&&(*posMouseX<=65*SCREEN_WIDTH/100)&&(*posMouseY>=45*SCREEN_HEIGHT/100)&&(*posMouseY<=50*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					droite_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=70*SCREEN_WIDTH/100)&&(*posMouseX<=80*SCREEN_WIDTH/100)&&(*posMouseY>=45*SCREEN_HEIGHT/100)&&(*posMouseY<=50*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					bdf_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=10*SCREEN_WIDTH/100)&&(*posMouseX<=20*SCREEN_WIDTH/100)&&(*posMouseY>=65*SCREEN_HEIGHT/100)&&(*posMouseY<=70*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					epee_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=25*SCREEN_WIDTH/100)&&(*posMouseX<=35*SCREEN_WIDTH/100)&&(*posMouseY>=65*SCREEN_HEIGHT/100)&&(*posMouseY<=70*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					quitter_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=40*SCREEN_WIDTH/100)&&(*posMouseX<=50*SCREEN_WIDTH/100)&&(*posMouseY>=65*SCREEN_HEIGHT/100)&&(*posMouseY<=70*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					bdp_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=55*SCREEN_WIDTH/100)&&(*posMouseX<=65*SCREEN_WIDTH/100)&&(*posMouseY>=65*SCREEN_HEIGHT/100)&&(*posMouseY<=70*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					bdm_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=10*SCREEN_WIDTH/100)&&(*posMouseX<=20*SCREEN_WIDTH/100)&&(*posMouseY>=85*SCREEN_HEIGHT/100)&&(*posMouseY<=90*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					Continuer_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=25*SCREEN_WIDTH/100)&&(*posMouseX<=35*SCREEN_WIDTH/100)&&(*posMouseY>=85*SCREEN_HEIGHT/100)&&(*posMouseY<=90*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					Oui_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=40*SCREEN_WIDTH/100)&&(*posMouseX<=50*SCREEN_WIDTH/100)&&(*posMouseY>=85*SCREEN_HEIGHT/100)&&(*posMouseY<=90*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					Non_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=70*SCREEN_WIDTH/100)&&(*posMouseX<=80*SCREEN_WIDTH/100)&&(*posMouseY>=65*SCREEN_HEIGHT/100)&&(*posMouseY<=70*SCREEN_HEIGHT/100)){
+					SDL_Event keychange;
+					int change = 0;
+					while(change==0){
+						SDL_PollEvent(&keychange);
+						if(keychange.type==SDL_KEYDOWN){
+							change = 1;
+						}
+					}
+					IA_touche=keychange.key.keysym.sym;
+				}
+				if((*posMouseX>=55*SCREEN_WIDTH/100)&&(*posMouseX<=65*SCREEN_WIDTH/100)&&(*posMouseY>=80*SCREEN_HEIGHT/100)&&(*posMouseY<=85*SCREEN_HEIGHT/100)){//SAUVEGARDE des touches
+					FILE* ctrls=fopen("CONTROLS.txt", "w+");
+					int lecture;
+					if(ctrls!=NULL){
+						lecture=0;
+					}else{
+						lecture=1;
+						printf("IMPOSSIBLE DE LIRE DANS LE FICHIER");
+					}
+					if(lecture==0){
+						fputs(SDL_GetKeyName(haut_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(bas_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(gauche_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(droite_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(bdf_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(epee_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(quitter_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(bdp_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(bdm_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(Continuer_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(Oui_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(Non_touche),ctrls);
+						fputs(" ",ctrls);
+						fputs(SDL_GetKeyName(IA_touche),ctrls);
+						lecture=1;
+					}
+					fclose(ctrls);
+				}
+				
 			}
 			break;
 			
@@ -477,6 +664,7 @@ int CollisionBdf(struct sprite_t* a, struct bdf_t* b){
 		return 0;
 		
 	}
+
 int Collision(struct sprite_t* a, struct sprite_t* b){
 		if((a->display==1)&&(b->display==1)){
 			float diffX, diffY;
@@ -512,16 +700,241 @@ int DistanceXY(struct sprite_t* a, struct sprite_t* b){
 	  return 0;
 }
 
-    
-void aleaspawn(struct sprite_t* a)
-{
-	
+void aleaspawn(struct sprite_t* a){
 	int nbalea1 = rand()%500;	
 	int nbalea2 = rand()%500;
 	a->display = 1;
 	a->pos.x = nbalea2;
 	a->pos.y = nbalea1;
 	
+}
+
+SDLKey GetKeyFromName(char* name){
+	SDLKey res=SDLK_UP;
+	if(strcmp(name,"up")==0){
+		res=SDLK_UP;
+	}
+	if(strcmp(name,"down")==0){
+		res=SDLK_DOWN;
+	}
+	if(strcmp(name,"left")==0){
+		res=SDLK_LEFT;
+	}
+	if(strcmp(name,"right")==0){
+		res=SDLK_RIGHT;
+	}
+	if(strcmp(name,"f1")==0){
+		res=SDLK_F1;
+	}
+	if(strcmp(name,"f2")==0){
+		res=SDLK_F2;
+	}
+	if(strcmp(name,"f3")==0){
+		res=SDLK_F3;
+	}
+	if(strcmp(name,"f4")==0){
+		res=SDLK_F4;
+	}
+	if(strcmp(name,"f5")==0){
+		res=SDLK_F5;
+	}
+	if(strcmp(name,"f6")==0){
+		res=SDLK_F6;
+	}
+	if(strcmp(name,"f7")==0){
+		res=SDLK_F7;
+	}
+	if(strcmp(name,"f8")==0){
+		res=SDLK_F8;
+	}
+	if(strcmp(name,"f9")==0){
+		res=SDLK_F9;
+	}
+	if(strcmp(name,"f10")==0){
+		res=SDLK_F10;
+	}
+	if(strcmp(name,"f11")==0){
+		res=SDLK_F11;
+	}
+	if(strcmp(name,"f12")==0){
+		res=SDLK_F12;
+	}
+	if(strcmp(name,"0")==0){
+		res=SDLK_0;
+	}
+	if(strcmp(name,"1")==0){
+		res=SDLK_1;
+	}
+	if(strcmp(name,"2")==0){
+		res=SDLK_2;
+	}
+	if(strcmp(name,"3")==0){
+		res=SDLK_3;
+	}
+	if(strcmp(name,"4")==0){
+		res=SDLK_4;
+	}
+	if(strcmp(name,"5")==0){
+		res=SDLK_5;
+	}
+	if(strcmp(name,"6")==0){
+		res=SDLK_6;
+	}
+	if(strcmp(name,"7")==0){
+		res=SDLK_7;
+	}
+	if(strcmp(name,"8")==0){
+		res=SDLK_8;
+	}
+	if(strcmp(name,"9")==0){
+		res=SDLK_9;
+	}
+	if(strcmp(name,"insert")==0){
+		res=SDLK_INSERT;
+	}
+	if(strcmp(name,"home")==0){
+		res=SDLK_HOME;
+	}
+	if(strcmp(name,"end")==0){
+		res=SDLK_END;
+	}
+	if(strcmp(name,"pageup")==0){
+		res=SDLK_PAGEUP;
+	}
+	if(strcmp(name,"pagedown")==0){
+		res=SDLK_PAGEDOWN;
+	}
+	if(strcmp(name,"delete")==0){
+		res=SDLK_DELETE;
+	}
+	if(strcmp(name,"space")==0){
+		res=SDLK_SPACE;
+	}
+	if(strcmp(name,"backspace")==0){
+		res=SDLK_BACKSPACE;
+	}
+	if(strcmp(name,"tab")==0){
+		res=SDLK_TAB;
+	}
+	if(strcmp(name,"clear")==0){
+		res=SDLK_CLEAR;
+	}
+	if(strcmp(name,"return")==0){
+		res=SDLK_RETURN;
+	}
+	if(strcmp(name,"pause")==0){
+		res=SDLK_PAUSE;
+	}
+	if(strcmp(name,"a")==0){
+		res=SDLK_a;
+	}
+	if(strcmp(name,"b")==0){
+		res=SDLK_b;
+	}
+	if(strcmp(name,"c")==0){
+		res=SDLK_c;
+	}
+	if(strcmp(name,"d")==0){
+		res=SDLK_d;
+	}
+	if(strcmp(name,"e")==0){
+		res=SDLK_e;
+	}
+	if(strcmp(name,"f")==0){
+		res=SDLK_f;
+	}
+	if(strcmp(name,"g")==0){
+		res=SDLK_g;
+	}
+	if(strcmp(name,"h")==0){
+		res=SDLK_h;
+	}
+	if(strcmp(name,"i")==0){
+		res=SDLK_i;
+	}
+	if(strcmp(name,"j")==0){
+		res=SDLK_j;
+	}
+	if(strcmp(name,"k")==0){
+		res=SDLK_k;
+	}
+	if(strcmp(name,"l")==0){
+		res=SDLK_l;
+	}
+	if(strcmp(name,"m")==0){
+		res=SDLK_m;
+	}
+	if(strcmp(name,"n")==0){
+		res=SDLK_n;
+	}
+	if(strcmp(name,"o")==0){
+		res=SDLK_o;
+	}
+	if(strcmp(name,"p")==0){
+		res=SDLK_p;
+	}
+	if(strcmp(name,"q")==0){
+		res=SDLK_q;
+	}
+	if(strcmp(name,"r")==0){
+		res=SDLK_r;
+	}
+	if(strcmp(name,"s")==0){
+		res=SDLK_s;
+	}
+	if(strcmp(name,"t")==0){
+		res=SDLK_t;
+	}
+	if(strcmp(name,"u")==0){
+		res=SDLK_u;
+	}
+	if(strcmp(name,"v")==0){
+		res=SDLK_v;
+	}
+	if(strcmp(name,"w")==0){
+		res=SDLK_w;
+	}
+	if(strcmp(name,"x")==0){
+		res=SDLK_x;
+	}
+	if(strcmp(name,"y")==0){
+		res=SDLK_y;
+	}
+	if(strcmp(name,"z")==0){
+		res=SDLK_z;
+	}
+	return res;
+}
+
+void chargerTouches(){
+	FILE* ctrls=NULL;
+	ctrls=fopen("CONTROLS.txt", "r+"); //lecture seule pour charger les touches
+	int lecture;
+	if(ctrls!=NULL){
+		lecture=0;
+	}else{
+		lecture=1;
+		printf("IMPOSSIBLE DE LIRE DANS LE FICHIER");
+	}
+	if(lecture==0){
+		char touche1[10];char touche2[10];char touche3[10];char touche4[10];char touche5[10];char touche6[10];char touche7[10];char touche8[10];char touche9[10];char touche10[10];char touche11[10];char touche12[10];char touche13[10];
+		fscanf(ctrls,"%s %s %s %s %s %s %s %s %s %s %s %s %s",touche1,touche2,touche3,touche4,touche5,touche6,touche7,touche8,touche9,touche10,touche11,touche12,touche13);
+		haut_touche=GetKeyFromName(touche1);
+		bas_touche=GetKeyFromName(touche2);
+		gauche_touche=GetKeyFromName(touche3);
+		droite_touche=GetKeyFromName(touche4);
+		bdf_touche=GetKeyFromName(touche5);
+		epee_touche=GetKeyFromName(touche6);
+		quitter_touche=GetKeyFromName(touche7);
+		bdp_touche=GetKeyFromName(touche8);
+		bdm_touche=GetKeyFromName(touche9);
+		Continuer_touche=GetKeyFromName(touche10);
+		Oui_touche=GetKeyFromName(touche11);
+		Non_touche=GetKeyFromName(touche12);
+		IA_touche=GetKeyFromName(touche13);
+		lecture=1;
+	}
+	fclose(ctrls);
 }
 
 void initAll(){
@@ -649,7 +1062,8 @@ void initAll(){
 		barreDeVie_monstre = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeVie_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
-		
+
+		chargerTouches();
 }
 
 void resetAll(){
@@ -1465,6 +1879,10 @@ int main(int argc, char* argv[]){
 			message = TTF_RenderText_Solid(fontCTRL,buffer,textColor);
 			posMes.x=70*SCREEN_WIDTH/100;
 			posMes.y=65*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			message = TTF_RenderText_Solid(fontCTRL,"SAVE",textColor);
+			posMes.x=55*SCREEN_WIDTH/100;
+			posMes.y=80*SCREEN_HEIGHT/100;
 			SDL_BlitSurface(message,NULL,screen,&posMes);
 			
 			message = TTF_RenderText_Solid(fontCTRL,"ACTION",textColor);
