@@ -296,11 +296,6 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			}
 			if(event.key.keysym.sym==Non_touche){
 				quest1[0][1][0] += 1;
-			}	if(event.key.keysym.sym==Oui_touche){
-				quest1[0][0][0] += 1;
-			}
-			if(event.key.keysym.sym==Non_touche){
-				quest1[0][1][0] += 1;
 			}
 			if(event.key.keysym.sym==Continuer_touche){
 			  //CONDITIONS POUR LES QUETES
