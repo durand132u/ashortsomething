@@ -20,6 +20,7 @@ struct sprite_t
 	int argent;
 	SDL_Surface *sprite;
 	int display;
+        int mana;
 };
 
 struct bdf_t
