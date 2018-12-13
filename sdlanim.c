@@ -6,6 +6,7 @@
 #include <math.h>
 #include <time.h>
 #include <SDL_ttf.h>
+#include <SDL/SDL_mixer.h>
 #include "game.h"
 
 #define GRASS_SIZE 32
@@ -61,6 +62,7 @@ int tete = 0;
 int bdf;
 int monstre = 0;
 int tete_stickman = 0;
+int z = 0;
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -88,6 +90,19 @@ SDLKey bdm_touche = SDLK_F2;
 SDLKey quitter_touche = SDLK_q;
 SDLKey pnj_touche = SDLK_F3;//NON UTILE AU JOUEUR
 SDLKey IA_touche = SDLK_F4;
+/*
+//SDL_mixer
+Mix_Music *music; //Création du pointeur de type Mix_Music
+music = Mix_LoadMUS("Bruh.wav"); // Chargement de la musique
+
+if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
+{
+   printf("%s", Mix_GetError());
+}*/
+
+
+
+
 
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo, struct sprite_t *epee,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, struct sprite_t *pnj,
@@ -262,6 +277,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					}
 				}
 			}
+			
 			if(event.key.keysym.sym==pnj_touche){
 				/* Apparition PNJ Ludo */
 				ludo->life= 100;
@@ -333,6 +349,14 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			    }
 			  }
 			}
+			
+		if(event.key.keysym.sym==epee_touche){
+		  if(z==0){
+		    z = 1;
+		  } else {
+		    z = 0;
+		  }
+		}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if((*display==1)){
@@ -485,9 +509,10 @@ int DistanceXY(struct sprite_t* a, struct sprite_t* b){
 	    res = sqrt(puissance(diffX,2)+puissance(diffY,2));
 	    return res;
 	  }
-	  return 10;
-	}
+	  return 0;
+}
 
+    
 void aleaspawn(struct sprite_t* a)
 {
 	
@@ -624,6 +649,7 @@ void initAll(){
 		barreDeVie_monstre = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeVie_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
+		
 }
 
 void resetAll(){
@@ -647,6 +673,8 @@ void resetAll(){
 		SDL_FreeSurface(fleche);
 		SDL_FreeSurface(messageQ1);
 		SDL_FreeSurface(spritepnj);
+		//Mix_FreeMusic(effect1); //Libération de la musique
+		//Mix_CloseAudio();
 		TTF_CloseFont(font50); 
 		TTF_CloseFont(font36); 
 		TTF_CloseFont(fontCTRL); 
@@ -801,6 +829,13 @@ int main(int argc, char* argv[]){
 					monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
 					monster.pos.y = monster.pos.y + deathball.v.y;
 				}
+				
+				//Mix_PlayMusic(music, -1); // Jouer infiniment la musique;
+
+				
+				
+				
+				
 				/* // Le monstre tourne en rond
 				double angle2 = (rand()%90);
 				ludo.display = 1;
@@ -1070,6 +1105,9 @@ int main(int argc, char* argv[]){
 			epeeImage.w = epee.size;
 			epeeImage.h = epee.size;
 			epeeImage.x = epee.size*(perso.currDirection*2);
+			if(z){
+			 epeeImage.x +=32;
+			}
 			SDL_BlitSurface(spriteepee, &epeeImage, screen, &epeePos);
 			SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos); // BlitSurface épée AVANT vie/mana -> pour que l'épée ne soit pas AU DESSSUS de vie/mana
 			SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
