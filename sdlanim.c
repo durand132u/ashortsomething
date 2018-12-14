@@ -313,6 +313,11 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			}
 			if(event.key.keysym.sym==Non_touche){
 				quest1[0][1][0] += 1;
+			}	if(event.key.keysym.sym==Oui_touche){
+				quest1[0][0][0] += 1;
+			}
+			if(event.key.keysym.sym==Non_touche){
+				quest1[0][1][0] += 1;
 			}
 			if(event.key.keysym.sym==Continuer_touche){
 			  //CONDITIONS POUR LES QUETES
@@ -1537,16 +1542,15 @@ void rungame(){
 				}
 				if(quest1[0][0][0]>0){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor); //Si acceptation quête
-					if(QTchampignon>5){ //Si on a été cueillir le champignon
+					if(QTchampignon>=5){ //Si on a été cueillir le champignon
 						messageQ1 = TTF_RenderText_Solid(fontQ1, "Quete termine. Veuillez appuyer sur c pour la suite", textColor); 
 						//RECOMPENSE DE QUETE ICI
 						perso.argent = perso.argent + 5;
 						if((continuer==1)&&(bdf!=1)){
 							messageQ1 = TTF_RenderText_Solid(fontQ1, "Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...", textColor); 
-
 						}
 						if(continuer==2&&perso.argent>=5){
-							messageQ1 = TTF_RenderText_Solid(fontQ1,"Il te suis. Appuies sur espace pour tester tes nouvelles capacites, et tues le.", textColor); 
+							messageQ1 = TTF_RenderText_Solid(fontQ1,"Il te suis. Appuies sur espace pour tester tes nouvelles capacites, et tues le.", textColor);
 							bdf = 1;
 						}
 						if(continuer==3&&tete==1){
