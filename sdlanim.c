@@ -1092,7 +1092,7 @@ void resetAll(){
 		SDL_Quit();
 	}
 
-int main(int argc, char* argv[]){
+void rungame(){
 	initAll(); //initialise tout
 	while (gameover) // Boucle principale dexecution
 	{
@@ -1903,5 +1903,4 @@ int main(int argc, char* argv[]){
 		SDL_Delay(12);
 	}
 	resetAll(); //casse tout avant de finir le programme
-	return 0;
 }
