@@ -905,7 +905,7 @@ void rungame(){
             Mix_Music *Zelda;
             Zelda = Mix_LoadMUS("Zelda.mp3");
             Mix_PlayMusic(Zelda, -1); //Jouer infiniment la musique
-
+            Mix_VolumeMusic(MIX_MAX_VOLUME /4);
 
 			message = TTF_RenderText_Solid(font50,"Welcome to AShortSomething !",textColor);
 			posMes.x=50*SCREEN_WIDTH/100-(400/ratio);
