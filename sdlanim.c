@@ -27,7 +27,7 @@ SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath,
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
 SDL_Surface *HUD_HP, *HUD_MANA;
 SDL_Surface *background, *message, *fleche; //menu
-SDL_Surface *messageQ1; //quetes
+SDL_Surface *messageQ1, *messageQ2; //quetes
 SDL_Rect posMes;
 SDL_Rect posFleche;
 SDL_Rect posMesQ1;
@@ -67,6 +67,10 @@ int z = 0; // Variable pour animation épée
     int questInteract;
     int enable_Epee = 0;
     int i = 0;  //Compteur pour quêtes
+    int k = 1;
+
+//Var pour après les quêtes
+    int score = 0;
 struct vector vit = {0,0};
 struct sprite_t perso;
 struct sprite_t monster;
@@ -543,6 +547,7 @@ void resetAll(){
 		SDL_FreeSurface(message);
 		SDL_FreeSurface(fleche);
 		SDL_FreeSurface(messageQ1);
+        SDL_FreeSurface(messageQ2);
 		SDL_FreeSurface(spritepnj);
 		Mix_FreeMusic(Zelda); //Libération de la musique
 		Mix_CloseAudio();
@@ -697,8 +702,6 @@ void rungame(){
             HUD_MANA_perso.w = perso.mana*300/MAX_MANA;
             HUD_MANA_perso.h = 25;
             SDL_FillRect(HUD_MANA, &HUD_MANA_perso, SDL_MapRGB(HUD_MANA->format, 148,  0, 211));
-
-            
         }
 		if(disp==2){ //Gestion des evenements dus aux deplacements collisions actualisations etc
 			if (fireball.display == 1){
@@ -854,6 +857,7 @@ void rungame(){
 			if(monster.life <= 0){
 				monster.display = 0;
 				tete_stickman +=1;
+                score+=100;
 				aleaspawn(&monster);
 				monster.life=100;
 
@@ -861,6 +865,8 @@ void rungame(){
 			}
 			if(ludo.life <= 0){
 				ludo.display = 0;
+                score+=100;
+
 				ludo.life=100;
 				aleaspawn(&ludo);
 			}
@@ -887,6 +893,7 @@ void rungame(){
 				ludo.life -=10;
 				if(ludo.life<=0){ //SI LUDO MEURT, ON GAGNE SA TETE
 					tete+=1; //Pour quete 2
+					score+=100;
 				}
 			}
 			
@@ -1039,12 +1046,13 @@ void rungame(){
 
 		}
 			//Message quest
-			posMesQ1.x = 2*SCREEN_WIDTH/100;
+
+            posMesQ1.x = 2*SCREEN_WIDTH/100;
 			posMesQ1.y = 90*SCREEN_HEIGHT/100;            
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
                 questInteract = 1;
 				if(quest1[0][0][0]==0){
-					messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher 5 champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
+                    messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher 5 champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
 				}
 				if(quest1[0][0][0]>0&&continuer<9){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor); //Si acceptation quête
@@ -1058,20 +1066,20 @@ void rungame(){
                         messageQ1 = TTF_RenderText_Solid(fontQ1,"Il te suis. Appuies sur espace pour tester tes nouvelles capacites, et tues le.", textColor);
                         bdf = 1;
                     }
-                    if(continuer==3&&tete==1){
+                    if(continuer==3&&tete>=1){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "C'est tres bien! Tu peux te soigner en prenant cette potion", textColor); 
                     }
                     if(continuer==4&&tete_stickman!=1&&monstre!=1){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre", textColor); 
                     }
-                    if(continuer==5&&tete_stickman==1){
+                    if(continuer==5&&tete_stickman>=1){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Desormais tu peux controler ce monstre en appuyant sur F2! Bien joue! ", textColor);
                         monstre=1;
                     }
                     if(continuer==6&&monstre==1){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Tiens! Ce pnj bizarre est revenue. Tests tes nouveaux pouvoirs!", textColor); 
                     }
-                    if(continuer==7&&tete==2){
+                    if(continuer==7&&tete>=2){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu as reussi! Tu peux desormais utiliser l'epee!", textColor);
                         enable_Epee = 1;
                     }
@@ -1079,9 +1087,9 @@ void rungame(){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel finit", textColor);
                         quest1[1][0][0]=1;
                         if(quest1[1][0][0]==1){
-                            if(i<=200)
+                            if(i<50)
                                 i++;
-                            if(i>=200)
+                            if(i>=50)
                                 messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
                         }
                     }
@@ -1106,17 +1114,35 @@ void rungame(){
         } else {
             ludo.display=0;
         }
-            SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
-            
-            
-            if(quest1[1][0][0] == 1){
-             ludo.display = 0;
-             HP_potion.display = 0;
-             champignon.display = 0;
-             pnj.display = 0;
+            SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage les message de quête
+                        
+            if(quest1[1][0][0] == 1){ // SI TUTORIEL FINIT
                 
                 
+                //Desaffichage sprite
+                ludo.display = 0;
+                HP_potion.display = 0;
+                champignon.display = 0;
+                pnj.display = 0;
+                
+                if(k==1){
+                    score = 0; //Remise à 0 du score
+                    k=2;
+                }
+                
+                //Position du score
+                SDL_Rect scorePos;
+                scorePos.x = 350;
+                scorePos.y = 50;
+                
+                //Convertir un int en char* + affichage
+                char stringstore[50];
+                snprintf(stringstore, 50,"Score : %d",score);
+                messageQ2 = TTF_RenderText_Solid(fontQ1,stringstore, textColor);
+                SDL_BlitSurface(messageQ2, NULL, screen, &scorePos);
+                               
             }
+
 			if (monster.display != 0) { //affichage monstre
 				SDL_Rect monsterImage;
 				SDL_Rect monsterPos;
