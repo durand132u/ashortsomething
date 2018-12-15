@@ -63,6 +63,9 @@ int monstre = 0;
 int tete_stickman = 0;
 int z = 0;
 
+int questInteract;
+int enable_Epee = 0;
+
 struct vector vit = {0,0};
 struct sprite_t perso;
 struct sprite_t monster;
@@ -495,9 +498,10 @@ void initAll(){
 		HP_potion.pos.y=450;
 		
 		
-		epee.display = 1;
-		epee.size=32;
-		epee.pos.x=perso.pos.x+10;
+        epee.display = 1;
+        
+        epee.size=32;
+		epee.pos.x=perso.pos.x;
 		epee.pos.y=perso.pos.y;
 		
 		
@@ -567,7 +571,7 @@ void rungame(){
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
 			HandleEvent(event, &gameover, &currentDirection, &perso, &epee, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection,&haut_touche,&bas_touche,&gauche_touche,&droite_touche,&bdf_touche,
- &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,&continuer,&quest1,&choice,&choiceTEST,&deplacements);
+ &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements);
 		}
 		//gestion du deplacement
 		if(deplacements[0]==1){
@@ -962,9 +966,9 @@ void rungame(){
 
 		
 					
-		      if (epee.display != 0) { //affiche perso
-			SDL_Rect epeeImage;
-			SDL_Rect epeePos;
+            if (epee.display != 0) { //affiche perso
+                SDL_Rect epeeImage;
+                SDL_Rect epeePos;
 			if(perso.currDirection==1){
 			    epeePos.x=perso.pos.x+20;
 			    epeePos.y=perso.pos.y;
@@ -989,7 +993,10 @@ void rungame(){
 			if(z){
 			 epeeImage.x +=32;
 			}
-			SDL_BlitSurface(spriteepee, &epeeImage, screen, &epeePos);
+			if(enable_Epee){
+                
+                SDL_BlitSurface(spriteepee, &epeeImage, screen, &epeePos);
+            }
 			SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos); // BlitSurface épée AVANT vie/mana -> pour que l'épée ne soit pas AU DESSSUS de vie/mana
 			SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
 		      }
@@ -999,58 +1006,67 @@ void rungame(){
 			posMesQ1.x = 2*SCREEN_WIDTH/100;
 			posMesQ1.y = 90*SCREEN_HEIGHT/100;
 				
+            
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
+                printf("continuer : %d",continuer);
+                questInteract = 1;
 				if(quest1[0][0][0]==0){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher 5 champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
 				}
-				if(quest1[0][0][0]>0){
+				if(quest1[0][0][0]>0&&continuer<9){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor); //Si acceptation quête
-					if(QTchampignon>=5){ //Si on a été cueillir le champignon
+					if(QTchampignon>=5&&continuer<9){ //Si on a été cueillir le champignon
 						messageQ1 = TTF_RenderText_Solid(fontQ1, "Quete termine. Veuillez appuyer sur c pour la suite", textColor); 
-						//RECOMPENSE DE QUETE ICI
 						perso.argent = perso.argent + 5;
-						if((continuer==1)&&(bdf!=1)){
-							messageQ1 = TTF_RenderText_Solid(fontQ1, "Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...", textColor); 
-						}
-						if(continuer==2&&perso.argent>=5){
-							messageQ1 = TTF_RenderText_Solid(fontQ1,"Il te suis. Appuies sur espace pour tester tes nouvelles capacites, et tues le.", textColor);
-							bdf = 1;
-						}
-						if(continuer==3&&tete==1){
-							messageQ1 = TTF_RenderText_Solid(fontQ1, "C'est tres bien! Tu peux te soigner en prenant cette potion", textColor); 
-						}
-						if(continuer==4&&tete_stickman!=1&&monstre!=1){
-							messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre", textColor); 
-						}
-						if(continuer==5&&tete_stickman==1){
-							messageQ1 = TTF_RenderText_Solid(fontQ1, "Desormais tu peux controler ce monstre en appuyant sur F3! Bien joue! ", textColor);
-							monstre=1;
-						}
-						if(continuer>5&&monstre==1){
-						   	messageQ1 = TTF_RenderText_Solid(fontQ1, "Tiens! Ce pnj bizarre est revenue. Tests tes nouveaux pouvoirs!", textColor); 
-						}
-					}
-					if(quest1[0][1][0]>0){
-						messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor); //Si refus de la quête(press n)
-						quest1[0][1][0]=0;
-					}	
-				}
+                    if((continuer==1)&&(bdf!=1)&&(perso.argent>=5)){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...", textColor); 
+                    }
+                    if(continuer==2&&perso.argent>=5){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,"Il te suis. Appuies sur espace pour tester tes nouvelles capacites, et tues le.", textColor);
+                        bdf = 1;
+                    }
+                    if(continuer==3&&tete==1){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "C'est tres bien! Tu peux te soigner en prenant cette potion", textColor); 
+                    }
+                    if(continuer==4&&tete_stickman!=1&&monstre!=1){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre", textColor); 
+                    }
+                    if(continuer==5&&tete_stickman==1){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Desormais tu peux controler ce monstre en appuyant sur F2! Bien joue! ", textColor);
+                        monstre=1;
+                    }
+                    if(continuer==6&&monstre==1){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tiens! Ce pnj bizarre est revenue. Tests tes nouveaux pouvoirs!", textColor); 
+                    }
+                    if(continuer==7&&tete==2){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu as reussi! Tu peux desormais utiliser l'epee!", textColor);
+                        enable_Epee = 1;
+                    }
+                    if(continuer==8&&enable_Epee==1){
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel finit", textColor);
+                    }
+                }
+                if(quest1[0][1][0]>0){
+                    messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor); //Si refus de la quête(press n)
+                    quest1[0][1][0]=0;
+                }	
+            }
 					
-			} else {
-				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
-			}
-			if(continuer>=4){
-			    monster.display=1;  
-			} else {
-			    monster.display=0;
-			}
-			if(continuer==2||continuer==6){
-			    ludo.display=1;
-			} else {
-			    ludo.display=0;
-			}
-			  SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
-			
+        } else {
+            questInteract = 0;
+            messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
+        }
+        if(continuer>=4){
+            monster.display=1;  
+        } else {
+            monster.display=0;
+        }
+        if(continuer==2||continuer==6){
+            ludo.display=1;
+        } else {
+            ludo.display=0;
+        }
+            SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
 			if (monster.display != 0) { //affichage monstre
 				SDL_Rect monsterImage;
 				SDL_Rect monsterPos;
