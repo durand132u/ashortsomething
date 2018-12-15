@@ -6,7 +6,7 @@
 #include <math.h>
 #include <time.h>
 #include <SDL_ttf.h>
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include "game.h"
 #include "events.c"
 
@@ -89,15 +89,7 @@ SDLKey bdm_touche = SDLK_F2;
 SDLKey quitter_touche = SDLK_q;
 SDLKey pnj_touche = SDLK_F3;//NON UTILE AU JOUEUR
 SDLKey IA_touche = SDLK_F4;
-/*
-//SDL_mixer
-Mix_Music *music; //Création du pointeur de type Mix_Music
-music = Mix_LoadMUS("Bruh.wav"); // Chargement de la musique
 
-if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
-{
-   printf("%s", Mix_GetError());
-}*/
 
 /*Working Collision Ludo -> Perso*/ 	
 
@@ -388,6 +380,8 @@ void chargerTouches(){
 }
 
 void initAll(){
+    
+
 		SDL_Init(SDL_INIT_VIDEO);
 		TTF_Init();
 		SDL_WM_SetCaption("Ashortsomething", "Ashortsomething");
@@ -512,8 +506,20 @@ void initAll(){
 		barreDeVie_monstre = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeVie_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
+        
+        //Initialisation musique
+        //SDL_mixer
 
+        if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
+        {
+        printf("%s", Mix_GetError());
+        }
+        Mix_Music *Zelda;
+        Zelda = Mix_LoadMUS("Zelda.mp3");
+
+        
 		chargerTouches();
+        
 }
 
 void resetAll(){
@@ -537,7 +543,7 @@ void resetAll(){
 		SDL_FreeSurface(fleche);
 		SDL_FreeSurface(messageQ1);
 		SDL_FreeSurface(spritepnj);
-		//Mix_FreeMusic(effect1); //Libération de la musique
+		//Mix_FreeMusic(musique); //Libération de la musique
 		//Mix_CloseAudio();
 		TTF_CloseFont(font50); 
 		TTF_CloseFont(font36); 
@@ -892,6 +898,15 @@ void rungame(){
 			SDL_BlitSurface(background,NULL,screen,NULL);
 		}
 		if(disp==1){ // si on est dans le menu
+            if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
+            {
+                printf("%s", Mix_GetError());
+            }
+            Mix_Music *Zelda;
+            Zelda = Mix_LoadMUS("Zelda.mp3");
+            Mix_PlayMusic(Zelda, -1); //Jouer infiniment la musique
+
+
 			message = TTF_RenderText_Solid(font50,"Welcome to AShortSomething !",textColor);
 			posMes.x=50*SCREEN_WIDTH/100-(400/ratio);
 			posMes.y=0.0;
@@ -916,6 +931,7 @@ void rungame(){
 			}
 		}
 		if(disp==2 ||disp==5){ // si le jeu est en route
+            
 			for(int x =0; x< SCREEN_WIDTH/GRASS_SIZE; x++){  //dessine le fond du jeu
 				for(int y =0; y< SCREEN_HEIGHT/GRASS_SIZE; y++){				
 					SDL_Rect position;
