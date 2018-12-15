@@ -9,6 +9,7 @@
 #include <SDL_mixer.h>
 #include "game.h"
 #include "events.c"
+#include "musique.c"
 
 #define GRASS_SIZE 32
 #define DIR_UP          0
@@ -35,9 +36,6 @@ TTF_Font *font36;
 TTF_Font *fontCTRL;
 TTF_Font *fontQ1;
 
-Mix_Music *Zelda;
-
-
 int currentDirection = DIR_RIGHT;
 int lastDir = DIR_RIGHT;
 int animationFlip = 0;
@@ -52,26 +50,22 @@ int choiceTEST = 0;
 int SCREEN_WIDTH=1024;
 int SCREEN_HEIGHT=768;
 int resolutions[4][2];
-
 int resChange=0;
-int quest = 0;
-int questTEST = 0;
-int quest1[5][2][2];
-int QTchampignon = 0;
-int deplacements[4];
-int continuer = 0;
-int tete = 0;
-int bdf=0;
-int monstre = 0;
-int tete_stickman = 0;
-int z = 0;
-
-int i = 0;
-
-
-int questInteract;
-int enable_Epee = 0;
-
+int z = 0; // Variable pour animation épée
+//VAR pour quêtes, surement à mettre dans l'inventaire plus tard?
+    int quest = 0;
+    int questTEST = 0;
+    int quest1[5][2][2];
+    int QTchampignon = 0;
+    int deplacements[4];
+    int continuer = 0;
+    int tete = 0;
+    int bdf=0;
+    int monstre = 0;
+    int tete_stickman = 0;
+    int questInteract;
+    int enable_Epee = 0;
+    int i = 0;  //Compteur pour quêtes
 struct vector vit = {0,0};
 struct sprite_t perso;
 struct sprite_t monster;
