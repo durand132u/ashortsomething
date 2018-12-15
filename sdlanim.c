@@ -387,6 +387,20 @@ void chargerTouches(){
 	fclose(ctrls);
 }
 
+
+void initRect(SDL_Rect* a[2]){
+    a[1]->x=0;
+    a[1]->y=32;
+    a[1]->h=32;
+    a[1]->x=32;
+    
+    a[2]->y=0;
+    a[2]->w=32;
+    a[2]->h=32;
+    a[2]->x=32;
+}
+
+
 void initAll(){
     
 
