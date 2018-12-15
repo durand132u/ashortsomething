@@ -1,1 +1,1 @@
-z q s d y u i o p c o n f4
+up down left right y u i ^ p c o n f4
