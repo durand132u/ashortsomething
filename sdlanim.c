@@ -159,6 +159,16 @@ void aleaspawn(struct sprite_t* a){
 	
 }
 
+
+void initPosImg(SDL_Rect* Image,SDL_Rect* Pos, struct sprite_t* sprite){
+    Pos->x=sprite->pos.x;
+    Pos->y=sprite->pos.y;
+    Image->y=0;
+    Image->w=sprite->size;
+    Image->h=sprite->size;
+    Image->x=sprite->size*(sprite->currDirection*2);
+}
+
 SDLKey GetKeyFromName(char* name){
 	SDLKey res=SDLK_UP;
 	if(strcmp(name,"up")==0){
@@ -389,6 +399,7 @@ void chargerTouches(){
 
 
 void initRect(SDL_Rect* a[2]){
+    
     a[1]->x=0;
     a[1]->y=32;
     a[1]->h=32;
@@ -399,7 +410,6 @@ void initRect(SDL_Rect* a[2]){
     a[2]->h=32;
     a[2]->x=32;
 }
-
 
 void initAll(){
     
@@ -430,7 +440,8 @@ void initAll(){
 		fontCTRL = TTF_OpenFont( "ALoveOfThunder.ttf", 16/ratio); //taille du menu de controle uniquement 16 = 1024 768
 		fontQ1 = TTF_OpenFont( "ALoveOfThunder.ttf", 26/ratio);
 		/* load sprite */
-		SDL_Surface *temp = SDL_LoadBMP("sprite.bmp");
+        
+        SDL_Surface *temp = SDL_LoadBMP("sprite.bmp");
 		sprite = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
 		temp = SDL_LoadBMP("epee.bmp");
@@ -995,12 +1006,7 @@ void rungame(){
 			SDL_Rect manaPos;
 			manaPos.x = perso.pos.x;
 			manaPos.y = perso.pos.y - 3;
-			spritePos.x = perso.pos.x;
-			spritePos.y = perso.pos.y;
-			spriteImage.y = 0;
-			spriteImage.w = perso.size;
-			spriteImage.h = perso.size;
-			spriteImage.x = perso.size*(perso.currDirection*2);
+            initPosImg(&spriteImage,&spritePos,&perso);
 			SDL_BlitSurface(sprite, &spriteImage, screen, &spritePos);
 			if(perso.mana<=0){
 			  perso.mana = 0; 
@@ -1160,12 +1166,7 @@ void rungame(){
 			if (monster.display != 0) { //affichage monstre
 				SDL_Rect monsterImage;
 				SDL_Rect monsterPos;
-				monsterPos.x = monster.pos.x;
-				monsterPos.y = monster.pos.y;
-				monsterImage.y = 0;
-				monsterImage.w = monster.size;
-				monsterImage.h = monster.size;
-				monsterImage.x = monster.size*(monster.currDirection*2);
+                initPosImg(&monsterImage,&monsterPos,&monster);
 				SDL_BlitSurface(spritemonster, &monsterImage, screen, &monsterPos);
 				SDL_BlitSurface(barreDeVie_monstre, NULL, screen, &monsterPos);
 			}
@@ -1173,12 +1174,7 @@ void rungame(){
 			if (ludo.display != 0) { //affichage ludo
 				SDL_Rect ludoImage;
 				SDL_Rect ludoPos;
-				ludoPos.x = ludo.pos.x;
-				ludoPos.y = ludo.pos.y;
-				ludoImage.y = 0;
-				ludoImage.w = ludo.size;
-				ludoImage.h = ludo.size;
-				ludoImage.x = ludo.size*(ludo.currDirection*2);
+                initPosImg(&ludoImage,&ludoPos,&ludo);
 				SDL_BlitSurface(spriteludo, &ludoImage, screen, &ludoPos);
 				SDL_BlitSurface(barreDeVie_Ludo, NULL, screen, &ludoPos);
 			}
@@ -1186,25 +1182,14 @@ void rungame(){
 			if(champignon.display != 0){ //affichage champi
 				SDL_Rect champignonImage;
 				SDL_Rect champignonPos;
-				champignonPos.x = champignon.pos.x;
-				champignonPos.y = champignon.pos.y;
-								
-				champignonImage.y = 0;
-				champignonImage.w = champignon.size;
-				champignonImage.h = champignon.size;
-				champignonImage.x = ludo.size*(ludo.currDirection*2);
+                initPosImg(&champignonImage,&champignonPos,&champignon);
 				SDL_BlitSurface(spritechampignon, &champignonImage, screen, &champignonPos);
 			}
 			
 			if(pnj.display != 0){ //affichage champi
 				SDL_Rect pnjImage;
 				SDL_Rect pnjPos;
-				pnjPos.x = pnj.pos.x;
-				pnjPos.y = pnj.pos.y;		
-				pnjImage.y = 0;
-				pnjImage.w = champignon.size;
-				pnjImage.h = champignon.size;
-				pnjImage.x = ludo.size*(ludo.currDirection*2);
+				initPosImg(&pnjImage,&pnjPos,&pnj);
 				SDL_BlitSurface(spritepnj, &pnjImage, screen, &pnjPos);
 			}
 
@@ -1223,36 +1208,21 @@ void rungame(){
 			if (poisonball.display != 0) { //afficahge bdp
 				SDL_Rect poisonballImage;
 				SDL_Rect poisonballPosition;
-				poisonballPosition.x = poisonball.pos.x;
-				poisonballPosition.y = poisonball.pos.y;
-				poisonballImage.y = 0;
-				poisonballImage.w = poisonball.size;
-				poisonballImage.h = poisonball.size;
-				poisonballImage.x = 0;
+				initPosImg(&poisonballImage,&poisonballPosition,&poisonball);
 				SDL_BlitSurface(spritepoison, &poisonballImage, screen, &poisonballPosition);
 			}
 
 			if (deathball.display != 0) { //affichage bdm
 				SDL_Rect deathballImage;
 				SDL_Rect deathballPosition;
-				deathballPosition.x = deathball.pos.x;
-				deathballPosition.y = deathball.pos.y;
-				deathballImage.y = 0;
-				deathballImage.w = deathball.size;
-				deathballImage.h = deathball.size;
-				deathballImage.x = 0;
+				initPosImg(&deathballImage,&deathballPosition,&deathball);
 				SDL_BlitSurface(spritedeath, &deathballImage, screen, &deathballPosition);
 			}
 				
 			if (HP_potion.display != 0) { //affichage popo
 				SDL_Rect HP_potionImage;
 				SDL_Rect HP_potionPosition;
-				HP_potionPosition.x = HP_potion.pos.x;
-				HP_potionPosition.y = HP_potion.pos.y;
-				HP_potionImage.y = 0;
-				HP_potionImage.w = HP_potion.size;
-				HP_potionImage.h = HP_potion.size;
-				HP_potionImage.x = 0;
+				initPosImg(&HP_potionImage,&HP_potionPosition,&HP_potion);
 				SDL_BlitSurface(spritepotion, &HP_potionImage, screen, &HP_potionPosition);
 			}
 			
