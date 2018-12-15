@@ -168,6 +168,14 @@ void initPosImg(SDL_Rect* Image,SDL_Rect* Pos, struct sprite_t* sprite){
     Image->h=sprite->size;
     Image->x=sprite->size*(sprite->currDirection*2);
 }
+void initPosImgB(SDL_Rect* Image,SDL_Rect* Pos, struct bdf_t* sprite){
+    Pos->x=sprite->pos.x;
+    Pos->y=sprite->pos.y;
+    Image->y=0;
+    Image->w=sprite->size;
+    Image->h=sprite->size;
+    Image->x=sprite->size*(sprite->currDirection*2);
+}
 
 SDLKey GetKeyFromName(char* name){
 	SDLKey res=SDLK_UP;
@@ -1196,6 +1204,7 @@ void rungame(){
 			if (fireball.display != 0) { //affichage bdf
 				SDL_Rect fireballImage;
 				SDL_Rect fireballPosition;
+                initPosImgB(&fireballImage,&fireballPosition,&fireball);
 				fireballPosition.x = fireball.pos.x;
 				fireballPosition.y = fireball.pos.y;
 				fireballImage.y = 0;
@@ -1205,7 +1214,7 @@ void rungame(){
 				SDL_BlitSurface(spritefire, &fireballImage, screen, &fireballPosition);
 			}
 
-			if (poisonball.display != 0) { //afficahge bdp
+			if (poisonball.display != 0) { //affichage bdp
 				SDL_Rect poisonballImage;
 				SDL_Rect poisonballPosition;
 				initPosImg(&poisonballImage,&poisonballPosition,&poisonball);
