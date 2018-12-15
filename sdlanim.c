@@ -63,6 +63,9 @@ int monstre = 0;
 int tete_stickman = 0;
 int z = 0;
 
+int i = 0;
+
+
 int questInteract;
 int enable_Epee = 0;
 
@@ -1004,11 +1007,8 @@ void rungame(){
 		}
 			//Message quest
 			posMesQ1.x = 2*SCREEN_WIDTH/100;
-			posMesQ1.y = 90*SCREEN_HEIGHT/100;
-				
-            
+			posMesQ1.y = 90*SCREEN_HEIGHT/100;            
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
-                printf("continuer : %d",continuer);
                 questInteract = 1;
 				if(quest1[0][0][0]==0){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher 5 champignons O:Accepter la quete N:Quitter",textColor); //O pour accepter, N pour refuser
@@ -1042,8 +1042,15 @@ void rungame(){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu as reussi! Tu peux desormais utiliser l'epee!", textColor);
                         enable_Epee = 1;
                     }
-                    if(continuer==8&&enable_Epee==1){
+                    if(continuer>=8&&enable_Epee==1){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel finit", textColor);
+                        quest1[1][0][0]=1;
+                        if(quest1[1][0][0]==1){
+                            if(i<=200)
+                                i++;
+                            if(i>=200)
+                                messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
+                        }
                     }
                 }
                 if(quest1[0][1][0]>0){
@@ -1067,6 +1074,16 @@ void rungame(){
             ludo.display=0;
         }
             SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage message
+            
+            
+            if(quest1[1][0][0] == 1){
+             ludo.display = 0;
+             HP_potion.display = 0;
+             champignon.display = 0;
+             pnj.display = 0;
+                
+                
+            }
 			if (monster.display != 0) { //affichage monstre
 				SDL_Rect monsterImage;
 				SDL_Rect monsterPos;
