@@ -35,6 +35,9 @@ TTF_Font *font36;
 TTF_Font *fontCTRL;
 TTF_Font *fontQ1;
 
+Mix_Music *Zelda;
+
+
 int currentDirection = DIR_RIGHT;
 int lastDir = DIR_RIGHT;
 int animationFlip = 0;
@@ -398,6 +401,7 @@ void initAll(){
 		display=1; // 1 menu 2 jeu 3 config 4 controles 5 menu de pause
 		//Les surfaces du menu
 		selection=-1;
+
 		resolutions[0][1]=640;
 		resolutions[0][0]=480;
 		resolutions[1][1]=800;
@@ -514,16 +518,11 @@ void initAll(){
 		barreDeVie_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
         
+
+
         //Initialisation musique
         //SDL_mixer
-
-        if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
-        {
-        printf("%s", Mix_GetError());
-        }
-        Mix_Music *Zelda;
-        Zelda = Mix_LoadMUS("Zelda.mp3");
-
+        
         
 		chargerTouches();
         
@@ -550,8 +549,8 @@ void resetAll(){
 		SDL_FreeSurface(fleche);
 		SDL_FreeSurface(messageQ1);
 		SDL_FreeSurface(spritepnj);
-		//Mix_FreeMusic(musique); //Libération de la musique
-		//Mix_CloseAudio();
+		Mix_FreeMusic(Zelda); //Libération de la musique
+		Mix_CloseAudio();
 		TTF_CloseFont(font50); 
 		TTF_CloseFont(font36); 
 		TTF_CloseFont(fontCTRL); 
@@ -564,6 +563,9 @@ void rungame(){
 	initAll(); //initialise tout
 	while (gameover) // Boucle principale dexecution
 	{
+        
+
+
 		if(resChange==1){ //si agrandissement / reduction ecran reboot laffichage
 			resetAll();
 			initAll();
@@ -572,6 +574,7 @@ void rungame(){
 		}
 		int disp=display;
 		SDL_Event event;
+
 		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
 			HandleEvent(event, &gameover, &currentDirection, &perso, &epee, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection,&haut_touche,&bas_touche,&gauche_touche,&droite_touche,&bdf_touche,
  &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements);
@@ -589,8 +592,11 @@ void rungame(){
 		if(deplacements[3]==1){
 			perso.pos.y += SPRITE_STEP;
 		}
+		
+
 		if(disp==2||disp==5){
 			 //Barre de vie Ludo
+            
             SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
             SDL_Rect HP_ludo;
             HP_ludo.x = 0;
@@ -905,14 +911,6 @@ void rungame(){
 			SDL_BlitSurface(background,NULL,screen,NULL);
 		}
 		if(disp==1){ // si on est dans le menu
-            if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
-            {
-                printf("%s", Mix_GetError());
-            }
-            Mix_Music *Zelda;
-            Zelda = Mix_LoadMUS("Zelda.mp3");
-            Mix_PlayMusic(Zelda, -1); //Jouer infiniment la musique
-            Mix_VolumeMusic(MIX_MAX_VOLUME /4);
 
 			message = TTF_RenderText_Solid(font50,"Welcome to AShortSomething !",textColor);
 			posMes.x=50*SCREEN_WIDTH/100-(400/ratio);
