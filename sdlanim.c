@@ -25,7 +25,7 @@
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon, *spritepnj, *spriteepee; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
-SDL_Surface *HUD_HP;
+SDL_Surface *HUD_HP, *HUD_MANA;
 SDL_Surface *background, *message, *fleche; //menu
 SDL_Surface *messageQ1; //quetes
 SDL_Rect posMes;
@@ -514,7 +514,8 @@ void initAll(){
 		barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
         
         HUD_HP = SDL_CreateRGBSurface(SDL_HWSURFACE, 300, 25, 32, 0, 0, 0, 0);
-        
+        HUD_MANA = SDL_CreateRGBSurface(SDL_HWSURFACE, 300, 25, 32, 0, 0, 0, 0);
+
         
 		chargerTouches();
         
@@ -537,6 +538,7 @@ void resetAll(){
 		SDL_FreeSurface(barreDeVie_perso);
 		SDL_FreeSurface(barreDeMana_perso);
         SDL_FreeSurface(HUD_HP);
+        SDL_FreeSurface(HUD_MANA);
 		SDL_FreeSurface(background);
 		SDL_FreeSurface(message);
 		SDL_FreeSurface(fleche);
@@ -641,18 +643,18 @@ void rungame(){
             HP_perso.h = 3;
             SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
             if(perso.life>(80*MAX_HP/100)){
-                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
+                SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 0, 255, 0));
             }
             if(perso.life>(60*MAX_HP/100)&&perso.life<=(80*MAX_HP/100)){
                 SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
+                SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 255, 255, 0)); //jaune
             }
             if(perso.life>(40*MAX_HP/100)&&perso.life<=(60*MAX_HP/100)){
                 SDL_FillRect(barreDeVie_perso, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
+                SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 255, 112, 0)); //orange
             }
             if(perso.life>0&&perso.life<=(40*MAX_HP/100)){
-                SDL_FillRect(barreDeVie_perso, &HP_monstre, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
+                SDL_FillRect(barreDeVie_perso, &HP_perso, SDL_MapRGB(barreDeVie_perso->format, 255, 0, 0)); // rouge
             }
            
             //Bare de mana personnage
@@ -672,6 +674,29 @@ void rungame(){
             HUD_HP_perso.w = perso.life*300/MAX_HP;
             HUD_HP_perso.h = 25;
             SDL_FillRect(HUD_HP, &HUD_HP_perso, SDL_MapRGB(HUD_HP->format, 0, 255, 0));
+            if(perso.life>(80*MAX_HP/100)){
+                SDL_FillRect(HUD_HP, &HUD_HP_perso, SDL_MapRGB(HUD_HP->format, 0, 255, 0));
+            }
+            if(perso.life>(60*MAX_HP/100)&&perso.life<=(80*MAX_HP/100)){
+                SDL_FillRect(HUD_HP, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                SDL_FillRect(HUD_HP, &HUD_HP_perso, SDL_MapRGB(HUD_HP->format, 255, 255, 0)); //jaune
+            }
+            if(perso.life>(40*MAX_HP/100)&&perso.life<=(60*MAX_HP/100)){
+                SDL_FillRect(HUD_HP, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+                SDL_FillRect(HUD_HP, &HUD_HP_perso, SDL_MapRGB(HUD_HP->format, 255, 112, 0)); //orange
+            }
+            if(perso.life>0&&perso.life<=(40*MAX_HP/100)){
+                SDL_FillRect(HUD_HP, &HUD_HP_perso, SDL_MapRGB(HUD_HP->format, 255, 0, 0)); // rouge
+            }
+            
+            //HUD_MANA
+            SDL_FillRect(HUD_MANA, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+            SDL_Rect HUD_MANA_perso;
+            HUD_MANA_perso.x = 0;
+            HUD_MANA_perso.y = 0;
+            HUD_MANA_perso.w = perso.mana*300/MAX_MANA;
+            HUD_MANA_perso.h = 25;
+            SDL_FillRect(HUD_MANA, &HUD_MANA_perso, SDL_MapRGB(HUD_MANA->format, 148,  0, 211));
 
             
         }
@@ -997,10 +1022,15 @@ void rungame(){
             }
 			SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos); // BlitSurface épée AVANT vie/mana -> pour que l'épée ne soit pas AU DESSSUS de vie/mana
             
-            SDL_Rect HUDPos;
-            HUDPos.x = 10;
-            HUDPos.y = 10;
-            SDL_BlitSurface(HUD_HP, NULL, screen, &HUDPos);
+            SDL_Rect HUD_HPPos;
+            HUD_HPPos.x = 10;
+            HUD_HPPos.y = 10;
+            SDL_BlitSurface(HUD_HP, NULL, screen, &HUD_HPPos);
+            
+            SDL_Rect HUD_MANAPos;
+            HUD_MANAPos.x = HUD_HPPos.x;
+            HUD_MANAPos.y = HUD_HPPos.y+32;
+            SDL_BlitSurface(HUD_MANA, NULL, screen, &HUD_MANAPos);
 
             
             
