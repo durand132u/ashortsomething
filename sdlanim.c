@@ -25,6 +25,7 @@
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon, *spritepnj, *spriteepee; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
+SDL_Surface *HUD_HP;
 SDL_Surface *background, *message, *fleche; //menu
 SDL_Surface *messageQ1; //quetes
 SDL_Rect posMes;
@@ -512,10 +513,7 @@ void initAll(){
 		barreDeVie_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
 		barreDeMana_perso = SDL_CreateRGBSurface(SDL_HWSURFACE, 31, 3, 32, 0, 0, 0, 0);
         
-
-
-        //Initialisation musique
-        //SDL_mixer
+        HUD_HP = SDL_CreateRGBSurface(SDL_HWSURFACE, 300, 25, 32, 0, 0, 0, 0);
         
         
 		chargerTouches();
@@ -538,6 +536,7 @@ void resetAll(){
 		SDL_FreeSurface(barreDeVie_monstre);
 		SDL_FreeSurface(barreDeVie_perso);
 		SDL_FreeSurface(barreDeMana_perso);
+        SDL_FreeSurface(HUD_HP);
 		SDL_FreeSurface(background);
 		SDL_FreeSurface(message);
 		SDL_FreeSurface(fleche);
@@ -664,6 +663,17 @@ void rungame(){
             MANA_perso.w = perso.mana*perso.size/MAX_MANA;
             MANA_perso.h = 3;
             SDL_FillRect(barreDeMana_perso, &MANA_perso, SDL_MapRGB(barreDeMana_perso->format, 148, 0, 211));
+            
+            //HUD_HP
+            SDL_FillRect(HUD_HP, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
+            SDL_Rect HUD_HP_perso;
+            HUD_HP_perso.x = 0;
+            HUD_HP_perso.y = 0;
+            HUD_HP_perso.w = perso.life*300/MAX_HP;
+            HUD_HP_perso.h = 25;
+            SDL_FillRect(HUD_HP, &HUD_HP_perso, SDL_MapRGB(HUD_HP->format, 0, 255, 0));
+
+            
         }
 		if(disp==2){ //Gestion des evenements dus aux deplacements collisions actualisations etc
 			if (fireball.display == 1){
@@ -707,13 +717,7 @@ void rungame(){
 					monster.pos.x = monster.pos.x + deathball.v.x; //Contrôle du monstre avec la deathball
 					monster.pos.y = monster.pos.y + deathball.v.y;
 				}
-				
-				//Mix_PlayMusic(music, -1); // Jouer infiniment la musique;
-
-				
-				
-				
-				
+                            
 				/* // Le monstre tourne en rond
 				double angle2 = (rand()%90);
 				ludo.display = 1;
@@ -989,10 +993,17 @@ void rungame(){
 			 epeeImage.x +=32;
 			}
 			if(enable_Epee){
-                
                 SDL_BlitSurface(spriteepee, &epeeImage, screen, &epeePos);
             }
 			SDL_BlitSurface(barreDeVie_perso, NULL, screen, &manaPos); // BlitSurface épée AVANT vie/mana -> pour que l'épée ne soit pas AU DESSSUS de vie/mana
+            
+            SDL_Rect HUDPos;
+            HUDPos.x = 10;
+            HUDPos.y = 10;
+            SDL_BlitSurface(HUD_HP, NULL, screen, &HUDPos);
+
+            
+            
 			SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
 		      }
 
