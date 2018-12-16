@@ -1047,45 +1047,58 @@ void rungame(){
 			SDL_BlitSurface(barreDeMana_perso, NULL, screen, &spritePos);
             }
         }
+        
+        
+        //STRING DE QUETES:
+        char storequest[500];
             //Tutorial
             posMesQ1.x = 2*SCREEN_WIDTH/100;
 			posMesQ1.y = 90*SCREEN_HEIGHT/100;            
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
                 questInteract = 1;
 				if(quest1[0][0][0]==0){
-                    messageQ1 = TTF_RenderText_Solid(fontQ1, "Va me chercher 5 champignons O:Accepter la quete N:Quitter",textColor);
+                    snprintf(storequest, 500,"Va me chercher 5 champignons %s : Accepter la quete, %s : Quitter",SDL_GetKeyName(Oui_touche), SDL_GetKeyName(Non_touche));
+                    messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor);
 				}
 				if(quest1[0][0][0]>0&&continuer<9){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor);
 					if(QTchampignon>=5&&continuer<9){
-						messageQ1 = TTF_RenderText_Solid(fontQ1, "Quete termine. Veuillez appuyer sur c pour la suite", textColor); 
+                        snprintf(storequest, 500,"Quete termine. Veuillez appuyer sur %s pour la suite",SDL_GetKeyName(Continuer_touche));
+						messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor); 
 						perso.argent = perso.argent + 5;
                     if((continuer==1)&&(bdf!=1)&&(perso.argent>=5)){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...", textColor); 
+                        snprintf(storequest, 500,"Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...(%s)",SDL_GetKeyName(Continuer_touche));
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
                     }
                     if(continuer==2&&perso.argent>=5){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,"Il te suis. Appuies sur espace pour tester tes nouvelles capacites, et tues le.", textColor);
+                        snprintf(storequest, 500,"Il te suis. Appuies sur %s pour tester tes nouvelles capacites, et tues le.(%s)",SDL_GetKeyName(bdf_touche), SDL_GetKeyName(Continuer_touche));
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
                         bdf = 1;
                     }
                     if(continuer==3&&tete>=1){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "C'est tres bien! Tu peux te soigner en prenant cette potion", textColor); 
+                        snprintf(storequest, 500,"C'est tres bien! Tu peux te soigner en prenant cette potion.(%s)", SDL_GetKeyName(Continuer_touche));
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor); 
                     }
                     if(continuer==4&&tete_stickman!=1&&monstre!=1){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre", textColor); 
+                        snprintf(storequest, 500,"Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre (%s)", SDL_GetKeyName(Continuer_touche));
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
                     }
                     if(continuer==5&&tete_stickman>=1){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Desormais tu peux controler ce monstre en appuyant sur F2! Bien joue! ", textColor);
+                        snprintf(storequest, 500,"Desormais tu peux controler ce monstre en appuyant sur %s! Bien joue!(%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
                         monstre=1;
                     }
                     if(continuer==6&&monstre==1){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tiens! Ce pnj bizarre est revenue. Tests tes nouveaux pouvoirs!", textColor); 
+                        snprintf(storequest, 500,"Tiens! Ce pnj bizarre est revenue. Tests tes nouveaux pouvoirs en appuyant sur %s !(%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
                     }
                     if(continuer==7&&tete>=2){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu as reussi! Tu peux desormais utiliser l'epee!", textColor);
+                        snprintf(storequest, 500,"Tu as reussi! Prends cette epee tu en est desormais digne! Appuies sur %s pour l'utiliser (%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
                         enable_Epee = 1;
                     }
                     if(continuer>=8&&enable_Epee==1){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel finit", textColor);
+                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel fini", textColor);
                         quest1[1][0][0]=1;
                         if(quest1[1][0][0]==1){ //SI TUTORIEL FINIT
                             if(i<50)
@@ -1132,8 +1145,8 @@ void rungame(){
                 scorePos.x = 350;
                 scorePos.y = 50;
                 //Convertir un int en char* + affichage
-                char stringstore[50];
-                snprintf(stringstore, 50,"Score : %d",score);
+                char stringstore[500];
+                snprintf(stringstore, 500,"Score : %d",score);
                 messageQ2 = TTF_RenderText_Solid(fontQ1,stringstore, textColor);
                 SDL_BlitSurface(messageQ2, NULL, screen, &scorePos);
             }

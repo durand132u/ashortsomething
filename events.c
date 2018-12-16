@@ -24,9 +24,6 @@ double angle;
 int actualRes=2;
 int bdfdeplacements[4];
 
-
-
-
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo, struct sprite_t *epee,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, struct sprite_t *pnj,
  int *display, int *posMouseX, int *posMouseY, int *selection,SDLKey *haut_touche,SDLKey *bas_touche,SDLKey *gauche_touche,SDLKey *droite_touche,SDLKey *bdf_touche,
@@ -277,7 +274,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
                 }
             }	
         }
-			if(event.key.keysym.sym==*epee_touche){
+            if(event.key.keysym.sym==*epee_touche){
 				if(z==0){
 					z = 1;
 				}else{
