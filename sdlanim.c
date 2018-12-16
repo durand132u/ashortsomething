@@ -1442,6 +1442,7 @@ void rungame(){
 			SDL_BlitSurface(message,NULL,screen,&posMes);
 			
 			if(selection==0){
+				fleche = TTF_RenderText_Solid(font50,">>>",textColor);
 				posFleche.x=80*SCREEN_WIDTH/100;
 				posFleche.y=18*SCREEN_HEIGHT/100;
 				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
@@ -1469,6 +1470,19 @@ void rungame(){
 			posMes.x=85*SCREEN_WIDTH/100;
 			posMes.y=90*SCREEN_HEIGHT/100;
 			SDL_BlitSurface(message,NULL,screen,&posMes); //quitter le jeu => retour menu 1
+			if(selection==1){
+				fleche = TTF_RenderText_Solid(font50,">",textColor);
+				posFleche.x=81*SCREEN_WIDTH/100;
+				posFleche.y=89*SCREEN_HEIGHT/100;
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
+			if(selection==0){
+				fleche = TTF_RenderText_Solid(font50,">",textColor);
+				posFleche.x=81*SCREEN_WIDTH/100;
+				posFleche.y=79*SCREEN_HEIGHT/100;
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
+			
 		}
 		SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);

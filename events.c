@@ -216,9 +216,9 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*display=2;
 				}
 			}
-			if(event.key.keysym.sym==SDLK_ESCAPE){
+			/*if(event.key.keysym.sym==SDLK_ESCAPE){
 				*display=1;
-			}
+			}*/
 			if(event.key.keysym.sym==*gauche_touche){
 				(*deplacements)[0]=0;
 			}
@@ -345,7 +345,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				}
 			}
 			if((*display==4)){ //clic souris dans controles
-				SDL_GetMouseState(posMouseX,posMouseY); // A GERER : INTERFACE DE REDEFINITION DES CONTROLES
+				SDL_GetMouseState(posMouseX,posMouseY); 
 				if((*posMouseX>=60**SCREEN_WIDTH/100)&&(*posMouseX<=80**SCREEN_WIDTH/100)&&(*posMouseY>=20**SCREEN_HEIGHT/100)&&(*posMouseY<=25**SCREEN_HEIGHT/100)){
 					*display=1; //retour menu
 					*selection=-1; //reset
@@ -560,6 +560,17 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				}
 				
 			}
+			if((*display==5)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=80**SCREEN_HEIGHT/100)&&(*posMouseY<=85**SCREEN_HEIGHT/100)){
+					*display=3;
+					*selection=-1;
+				}
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=90**SCREEN_HEIGHT/100)&&(*posMouseY<=95**SCREEN_HEIGHT/100)){
+					*display=1; //retour menu
+					*selection=-1; //reset
+				}
+			}
 			break;
 		case SDL_MOUSEMOTION:
 			*selection=-1; //reset
@@ -597,6 +608,16 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				*selection=-1; //reset
 				if((*posMouseX>=60**SCREEN_WIDTH/100)&&(*posMouseX<=80**SCREEN_WIDTH/100)&&(*posMouseY>=20**SCREEN_HEIGHT/100)&&(*posMouseY<=25**SCREEN_HEIGHT/100)){
 					*selection=0; //retour menu
+				}
+			}
+			if((*display==5)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				*selection=-1;
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=80**SCREEN_HEIGHT/100)&&(*posMouseY<=85**SCREEN_HEIGHT/100)){
+					*selection=0; //retour menu
+				}
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=90**SCREEN_HEIGHT/100)&&(*posMouseY<=95**SCREEN_HEIGHT/100)){
+					*selection=1; //retour menu
 				}
 			}
 			break;
