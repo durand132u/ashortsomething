@@ -69,6 +69,8 @@ int z = 0; // Variable pour animation épée
     int enable_Epee = 0;
     int i = 0;  //Compteur pour quêtes
     int k = 1;
+    int l = 1;
+
 
 //Var pour après les quêtes
     int score = 0;
@@ -1098,7 +1100,11 @@ void rungame(){
                     }
                     if(continuer==3&&tete>=1){
                         snprintf(storequest, 500,"C'est tres bien! Tu peux te soigner en prenant cette potion.(%s)", SDL_GetKeyName(Continuer_touche));
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor); 
+                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor);
+                        if(l){
+                            perso.life-=25;
+                            l = 0;
+                        }
                     }
                     if(continuer==4&&tete_stickman!=1&&monstre!=1){
                         snprintf(storequest, 500,"Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre (%s)", SDL_GetKeyName(Continuer_touche));
@@ -1121,34 +1127,34 @@ void rungame(){
                     if(continuer>=8&&enable_Epee==1){
                         messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel fini", textColor);
                         quest1[1][0][0]=1;
-                        if(quest1[1][0][0]==1){ //SI TUTORIEL FINIT
-                            if(i<50)
-                                i++;
-                            if(i>=50)
-                                messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
-                        }
+                    if(quest1[1][0][0]==1){ //SI TUTORIEL FINIT
+                        if(i<50)
+                            i++;
+                        if(i>=50)
+                            messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
                     }
                 }
-                if(quest1[0][1][0]>0){
-                    messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor);
-                    quest1[0][1][0]=0;
-                }	
             }
+            if(quest1[0][1][0]>0){
+                messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor);
+                quest1[0][1][0]=0;
+            }	
+        }
 					
-        } else {
+            } else {
             questInteract = 0;
             messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
-        }
-        if(continuer>=4){
-            monster.display=1;  
-        } else {
-            monster.display=0;
-        }
-        if(continuer==2||continuer==6){
-            ludo.display=1;
-        } else {
-            ludo.display=0;
-        }
+            }
+            if(continuer>=4){
+                monster.display=1;  
+            } else {
+                monster.display=0;
+            }
+            if(continuer==2||continuer==6){
+                ludo.display=1;
+            } else {
+                ludo.display=0;
+            }
             SDL_BlitSurface(messageQ1, NULL, screen, &posMesQ1); //Affichage les message de quête
                         
             if(quest1[1][0][0] == 1){ // SI TUTORIEL FINIT
