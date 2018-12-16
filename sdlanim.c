@@ -27,10 +27,11 @@ SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath,
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
 SDL_Surface *HUD_HP, *HUD_MANA;
 SDL_Surface *background, *message, *fleche; //menu
-SDL_Surface *messageQ1, *messageQ2; //quetes
+SDL_Surface *messageQ1, *messageQ2, *messageQ3; //quetes
 SDL_Rect posMes;
 SDL_Rect posFleche;
 SDL_Rect posMesQ1;
+SDL_Rect posInventory;
 SDL_Color textColor = { 255, 255, 255 };
 TTF_Font *font50;
 TTF_Font *font36;
@@ -71,6 +72,10 @@ int z = 0; // Variable pour animation épée
 
 //Var pour après les quêtes
     int score = 0;
+    //STRING DE QUETES:
+    char storequest[500];
+    char Inventory[500];
+
 struct vector vit = {0,0};
 struct sprite_t perso;
 struct sprite_t monster;
@@ -579,6 +584,7 @@ void resetAll(){
 		SDL_FreeSurface(fleche);
 		SDL_FreeSurface(messageQ1);
         SDL_FreeSurface(messageQ2);
+        SDL_FreeSurface(messageQ3);
 		SDL_FreeSurface(spritepnj);
 		Mix_FreeMusic(Zelda); //Libération de la musique
 		Mix_CloseAudio();
@@ -1049,23 +1055,38 @@ void rungame(){
         }
         
         
-        //STRING DE QUETES:
-        char storequest[500];
+            //Si plus de 1 champignon : afficher en haut à droite le nombre de champignon
+            if(QTchampignon==1&&continuer<=1){
+                snprintf(Inventory, 500,"Champignon : %d ",QTchampignon);
+                messageQ3 = TTF_RenderText_Solid(fontQ1,Inventory,textColor);
+                posInventory.x = 70*SCREEN_WIDTH/100;
+                posInventory.y = 5*SCREEN_HEIGHT/100;
+                SDL_BlitSurface(messageQ3, NULL, screen, &posInventory); //Affichage les message de quête
+            }
+            if(QTchampignon>1&&continuer<=1){
+                snprintf(Inventory, 500,"Champignons : %d ",QTchampignon);
+                messageQ3 = TTF_RenderText_Solid(fontQ1,Inventory,textColor);
+                posInventory.x = 70*SCREEN_WIDTH/100;
+                posInventory.y = 5*SCREEN_HEIGHT/100;
+                SDL_BlitSurface(messageQ3, NULL, screen, &posInventory); //Affichage les message de quête
+            }
+
             //Tutorial
             posMesQ1.x = 2*SCREEN_WIDTH/100;
 			posMesQ1.y = 90*SCREEN_HEIGHT/100;            
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
                 questInteract = 1;
 				if(quest1[0][0][0]==0){
-                    snprintf(storequest, 500,"Va me chercher 5 champignons %s : Accepter la quete, %s : Quitter",SDL_GetKeyName(Oui_touche), SDL_GetKeyName(Non_touche));
+                    snprintf(storequest, 500,"Va me chercher 6 champignons %s : Accepter la quete, %s : Quitter",SDL_GetKeyName(Oui_touche), SDL_GetKeyName(Non_touche));
                     messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor);
 				}
 				if(quest1[0][0][0]>0&&continuer<9){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor);
-					if(QTchampignon>=5&&continuer<9){
+					if(QTchampignon>5&&continuer<9){
                         snprintf(storequest, 500,"Quete termine. Veuillez appuyer sur %s pour la suite",SDL_GetKeyName(Continuer_touche));
 						messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor); 
 						perso.argent = perso.argent + 5;
+                        champignon.display = 0;
                     if((continuer==1)&&(bdf!=1)&&(perso.argent>=5)){
                         snprintf(storequest, 500,"Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...(%s)",SDL_GetKeyName(Continuer_touche));
                         messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
