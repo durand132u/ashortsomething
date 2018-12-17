@@ -1113,7 +1113,6 @@ void rungame(){
             //Tutorial
             posMesQ1.x = 2*SCREEN_WIDTH/100;
 			posMesQ1.y = 90*SCREEN_HEIGHT/100;     
-			printf("Continuer : %d Tete Stickman : %d \n", continuer, tete_stickman);
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
                 questInteract = 1;
 				if(quest1[0][0][0]==0){
