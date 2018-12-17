@@ -608,7 +608,7 @@ void rungame(){
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Fonction de lecture des evenements
 			HandleEvent(event, &gameover, &currentDirection, &perso, &epee, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection,&haut_touche,&bas_touche,&gauche_touche,&droite_touche,&bdf_touche,
- &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,&z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements,&frappe);
+ &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,&z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements);
 		}
 		if(disp==2||disp==5){ //si le jeu est en cours ou en pause
 			//gestion du deplacement
@@ -748,7 +748,6 @@ void rungame(){
 			}
 			//Gestion IA Aléatoire
 			srand(time(NULL));
-			if(monstre==0){
 				int a = rand()%5;		
 				switch(a){
 					case(0):
@@ -768,15 +767,14 @@ void rungame(){
 					default :
 						break;
 				}
-			}
-				//Contrôle du monstre avec la deathball
-				if(monstre==1){
-					monster.pos.x = monster.pos.x + deathball.v.x; 
-					monster.pos.y = monster.pos.y + deathball.v.y;
+				//Contrôle de ludo avec la deathball
+				if((ludo.display==1)&&(monstre==1)){
+					ludo.pos.x = ludo.pos.x + deathball.v.x; 
+					ludo.pos.y = ludo.pos.y + deathball.v.y;
 				}
 				
 			//IA Aggressive
-			if (choice ==1){
+			if ((choice ==1)&&(monstre==0)){
 				if(perso.pos.x>ludo.pos.x){
 					ludo.pos.x+=2;
 				} 
@@ -792,7 +790,7 @@ void rungame(){
 			}
 			
             //IA Fuyarde 
-			if(choice == 0){
+			if((choice == 0)&&(monstre==0)){
 			    if(DistanceXY(&perso,&ludo)<=100){
 				if(perso.pos.x<ludo.pos.x){
 					ludo.pos.x+=3;
