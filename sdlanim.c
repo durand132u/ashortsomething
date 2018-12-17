@@ -78,6 +78,7 @@ int frappe=0;
 //STRING DE QUETES:
 char storequest[500];
 char Inventory[500];
+int initmob=0;
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -110,8 +111,8 @@ SDLKey IA_touche = SDLK_F4;
 int CollisionBdf(struct sprite_t* a, struct bdf_t* b){
 		if((a->display==1)&&(b->display==1)){
 			float diffX, diffY;
-			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size/2));
-			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size/2));
+			diffX = fabs((b->pos.x+b->size)-(a->pos.x+a->size));
+			diffY = fabs((b->pos.y+b->size)-(a->pos.y+a->size));
 			if((diffX<b->size)&&(diffY<b->size)&&(b->display!=0)){
 				return 1;
 			}
@@ -879,18 +880,25 @@ void rungame(){
 			else{
 				deathball.life = deathball.life -10;
 			}
-			if((tete_stickman==0)){
+			if(continuer>=4){
+				if(initmob==0){
+					monster.display=1;
+					initmob=1;
+				}
+            } else {
+                monster.display=0;
+            }
+			if((tete_stickman==0)&&(continuer==4)){
 				if(monster.display==0){
 					aleaspawn(&monster);
 					monster.life=100;
 					tete_stickman +=1;
 				}
 			}
-			if((continuer==7)&&(tete_stickman<2)){
+			if((continuer==6)&&(tete_stickman<=2)){
 				if(monster.display==0){
-					aleaspawn(&monster);
-					monster.life=100;
 					tete_stickman+=1;
+					aleaspawn(&monster);
 				}
 			}
 			if((continuer>=8)){
@@ -936,10 +944,6 @@ void rungame(){
 				perso.life-=1;
 				if(perso.life<=0){
 					display=6; //ecran de  mort
-				}
-				monster.life -=5;
-				if(monster.life<=0){
-					monster.display=0;
 				}
 			}
 			
@@ -1108,7 +1112,8 @@ void rungame(){
 
             //Tutorial
             posMesQ1.x = 2*SCREEN_WIDTH/100;
-			posMesQ1.y = 90*SCREEN_HEIGHT/100;            
+			posMesQ1.y = 90*SCREEN_HEIGHT/100;     
+			printf("Continuer : %d Tete Stickman : %d \n", continuer, tete_stickman);
 			if(DistanceXY(&pnj,&perso)<50){ //affichage d'une quete
                 questInteract = 1;
 				if(quest1[0][0][0]==0){
@@ -1154,7 +1159,7 @@ void rungame(){
 							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
 						}
 						if(continuer==7&&tete_stickman>=2){
-							snprintf(storequest, 500,"Tu as reussi! Prends cette epee tu en est desormais digne! Appuies sur %s pour l'utiliser (%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
+							snprintf(storequest, 500,"Tu as reussi! Prends cette epee tu en est desormais digne! Appuies sur %s pour l'utiliser (%s)", SDL_GetKeyName(epee_touche),SDL_GetKeyName(Continuer_touche));
 							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
 							enable_Epee = 1;
 						}
@@ -1177,16 +1182,6 @@ void rungame(){
 			} else {
 				questInteract = 0;
 				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
-            }
-            if(continuer>=4){
-				if(monster.life<=0){
-					monster.display=1;
-					aleaspawn(&monster);
-				}else{
-					monster.display=1;
-				}
-            } else {
-                monster.display=0;
             }
             if(((continuer==2)&&(tete==0))||(continuer>=6)){
                 ludo.display=1;
