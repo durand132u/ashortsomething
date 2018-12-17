@@ -922,6 +922,13 @@ void rungame(){
 				ludo.life -=1;
 			}
 			
+			if(Collision(&monster,&perso)&&(monster.display!=0)&&(perso.life>0)){
+				perso.life-=5;
+				if(perso.life<=0){
+					display=6; //ecran de  mort
+				}
+			}
+			
 			if(CollisionBdf(&ludo, &fireball)&&fireball.display!=0){
 				fireball.display = 0;
 				ludo.life -=10;
