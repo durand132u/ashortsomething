@@ -73,6 +73,7 @@ int l = 1;
 //Var pour après les quêtes
 int score = 0;
 int startchampi=0;
+int frappe=0;
 //STRING DE QUETES:
 char storequest[500];
 char Inventory[500];
@@ -607,7 +608,7 @@ void rungame(){
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Fonction de lecture des evenements
 			HandleEvent(event, &gameover, &currentDirection, &perso, &epee, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection,&haut_touche,&bas_touche,&gauche_touche,&droite_touche,&bdf_touche,
- &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,&z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements);
+ &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,&z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements,&frappe);
 		}
 		if(disp==2||disp==5){ //si le jeu est en cours ou en pause
 			//gestion du deplacement

@@ -19,7 +19,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, struct sprite_t *pnj,
  int *display, int *posMouseX, int *posMouseY, int *selection,SDLKey *haut_touche,SDLKey *bas_touche,SDLKey *gauche_touche,SDLKey *droite_touche,SDLKey *bdf_touche,
  SDLKey *epee_touche,SDLKey *Continuer_touche,SDLKey *Oui_touche,SDLKey *Non_touche,SDLKey *bdp_touche,SDLKey *bdm_touche,SDLKey *quitter_touche,SDLKey *pnj_touche,
- SDLKey *IA_touche,int bdf,int *SCREEN_HEIGHT,int *SCREEN_WIDTH,int *z,int *resChange,int resolutions[4][2],int tete,int tete_stickman,int monstre,int QTchampignon, int questInteract,int *continuer,int (*quest1)[5][2][2],int *choice,int *choiceTEST,int (*deplacements)[4]){
+ SDLKey *IA_touche,int bdf,int *SCREEN_HEIGHT,int *SCREEN_WIDTH,int *z,int *resChange,int resolutions[4][2],int tete,int tete_stickman,int monstre,int QTchampignon, int questInteract,int *continuer,int (*quest1)[5][2][2],int *choice,int *choiceTEST,int (*deplacements)[4],int *frappe){
 	switch (event.type){
 		case SDL_QUIT:
 			*gameover = 1;
@@ -277,6 +277,9 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*z = 1;
 				}else{
 					*z = 0;
+				}
+				if(*frappe==0){
+				  *frappe=1;
 				}
 			}
 			break;
