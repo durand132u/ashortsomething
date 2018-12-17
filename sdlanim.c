@@ -1503,6 +1503,21 @@ void rungame(){
 			}
 			
 		}
+		if(disp==6){
+            BGDead = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 255, 255, 255, 0);
+			SDL_Rect BGDeadPos;
+            BGDeadPos.x = 0;
+            BGDeadPos.y = 0;
+            SDL_BlitSurface(BGDead, NULL, screen, &BGDeadPos); //cree un arriere plan noir
+            message = TTF_RenderText_Solid(font50, "You're DEAD", red);
+            posMes.x = 50*SCREEN_WIDTH/100-(400/ratio);
+            posMes.y = 20*SCREEN_HEIGHT/100-(400/ratio);
+            SDL_BlitSurface(mesage, NULL, screen, &posMes);
+            message = TTF_RenderText_Solid(font36,"Quit",textColor);
+			posMes.x=50*SCREEN_WIDTH/100;
+			posMes.y=70*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+        }
 		SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
 	}
