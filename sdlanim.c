@@ -25,7 +25,7 @@
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon, *spritepnj, *spriteepee; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
-SDL_Surface *HUD_HP, *HUD_MANA, *BGPause;
+SDL_Surface *HUD_HP, *HUD_MANA, *BGPause, *BGDead;
 SDL_Surface *background, *message, *fleche; //menu
 SDL_Surface *messageQ1, *messageQ2, *messageQ3; //quetes
 SDL_Rect posMes;
@@ -33,6 +33,7 @@ SDL_Rect posFleche;
 SDL_Rect posMesQ1;
 SDL_Rect posInventory;
 SDL_Color textColor = { 255, 255, 255 };
+SDL_Color red = {255, 0, 2};
 TTF_Font *font50;
 TTF_Font *font36;
 TTF_Font *fontCTRL;
@@ -577,6 +578,7 @@ void resetAll(){
         SDL_FreeSurface(HUD_HP);
         SDL_FreeSurface(HUD_MANA);
         SDL_FreeSurface(BGPause);
+        SDL_FreeSurface(BGDead);
 		SDL_FreeSurface(background);
 		SDL_FreeSurface(message);
 		SDL_FreeSurface(fleche);
@@ -1511,8 +1513,8 @@ void rungame(){
             SDL_BlitSurface(BGDead, NULL, screen, &BGDeadPos); //cree un arriere plan noir
             message = TTF_RenderText_Solid(font50, "You're DEAD", red);
             posMes.x = 50*SCREEN_WIDTH/100-(400/ratio);
-            posMes.y = 20*SCREEN_HEIGHT/100-(400/ratio);
-            SDL_BlitSurface(mesage, NULL, screen, &posMes);
+            posMes.y = 20*SCREEN_HEIGHT/100;
+            SDL_BlitSurface(message, NULL, screen, &posMes);
             message = TTF_RenderText_Solid(font36,"Quit",textColor);
 			posMes.x=50*SCREEN_WIDTH/100;
 			posMes.y=70*SCREEN_HEIGHT/100;
