@@ -1,4 +1,5 @@
 #include "sdlanim.c"
+
 int main(){
     zeldaMusique();
 	rungame();
