@@ -456,7 +456,7 @@ void initAll(){
 		fontQ1 = TTF_OpenFont( "ALoveOfThunder.ttf", 26/ratio);
 		/* load sprite */
         
-        SDL_Surface *temp = SDL_LoadBMP("sprite.bmp");
+		SDL_Surface *temp = SDL_LoadBMP("sprite.bmp");
 		sprite = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
 		temp = SDL_LoadBMP("epee.bmp");
