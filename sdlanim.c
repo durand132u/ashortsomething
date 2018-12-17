@@ -25,7 +25,7 @@
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon, *spritepnj, *spriteepee; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
-SDL_Surface *HUD_HP, *HUD_MANA, *BGPause;
+SDL_Surface *HUD_HP, *HUD_MANA, *BGPause, *BGDead;
 SDL_Surface *background, *message, *fleche; //menu
 SDL_Surface *messageQ1, *messageQ2, *messageQ3; //quetes
 SDL_Rect posMes;
@@ -33,6 +33,7 @@ SDL_Rect posFleche;
 SDL_Rect posMesQ1;
 SDL_Rect posInventory;
 SDL_Color textColor = { 255, 255, 255 };
+SDL_Color red = {255, 0, 2};
 TTF_Font *font50;
 TTF_Font *font36;
 TTF_Font *fontCTRL;
@@ -60,9 +61,9 @@ int questTEST = 0;
 int quest1[5][2][2];
 int QTchampignon = 0;
 int deplacements[4];
-int continuer = 7;
+int continuer = 0;
 int tete = 0;
-int bdf=1;
+int bdf=0;
 int monstre = 0;
 int tete_stickman = 0;
 int questInteract;
@@ -72,6 +73,8 @@ int k = 1;
 int l = 1;
 //Var pour après les quêtes
 int score = 0;
+int startchampi=0;
+int frappe=0;
 //STRING DE QUETES:
 char storequest[500];
 char Inventory[500];
@@ -157,6 +160,8 @@ void aleaspawn(struct sprite_t* a){
 	int nbalea1 = rand()%500;	
 	int nbalea2 = rand()%500;
 	a->display = 1;
+	a->size =32;
+	a->life=100;
 	a->pos.x = nbalea2;
 	a->pos.y = nbalea1;
 	
@@ -452,7 +457,7 @@ void initAll(){
 		fontQ1 = TTF_OpenFont( "ALoveOfThunder.ttf", 26/ratio);
 		/* load sprite */
         
-        SDL_Surface *temp = SDL_LoadBMP("sprite.bmp");
+		SDL_Surface *temp = SDL_LoadBMP("sprite.bmp");
 		sprite = SDL_DisplayFormat(temp);
 		SDL_FreeSurface(temp);
 		temp = SDL_LoadBMP("epee.bmp");
@@ -520,17 +525,11 @@ void initAll(){
 		deathball.size = 16;
 		HP_potion.size = 32;
 		HP_potion.life=1;
-		HP_potion.display = 1;
+		HP_potion.display = 0;
 		pnj.display = 1;
 		pnj.size = 32;
 		pnj.pos.x = 500;
 		pnj.pos.y = 500;
-		
-		//Position champignon
-		champignon.display = 1;
-		champignon.size = 32;
-		champignon.pos.x = 400;
-		champignon.pos.y = 400;
 		
 		perso.pos.x = (SCREEN_WIDTH - perso.size)/2;
 		perso.pos.y = (SCREEN_HEIGHT - perso.size)/2;
@@ -538,7 +537,6 @@ void initAll(){
 		monster.pos.y =0;
 		HP_potion.pos.x=550;
 		HP_potion.pos.y=450;
-		
 		
         epee.display = 1;
         
@@ -580,6 +578,7 @@ void resetAll(){
         SDL_FreeSurface(HUD_HP);
         SDL_FreeSurface(HUD_MANA);
         SDL_FreeSurface(BGPause);
+        SDL_FreeSurface(BGDead);
 		SDL_FreeSurface(background);
 		SDL_FreeSurface(message);
 		SDL_FreeSurface(fleche);
@@ -751,7 +750,6 @@ void rungame(){
 			}
 			//Gestion IA Aléatoire
 			srand(time(NULL));
-			if(monstre==0){
 				int a = rand()%5;		
 				switch(a){
 					case(0):
@@ -771,15 +769,14 @@ void rungame(){
 					default :
 						break;
 				}
-			}
-				//Contrôle du monstre avec la deathball
-				if(monstre==1){
-					monster.pos.x = monster.pos.x + deathball.v.x; 
-					monster.pos.y = monster.pos.y + deathball.v.y;
+				//Contrôle de ludo avec la deathball
+				if((ludo.display==1)&&(monstre==1)){
+					ludo.pos.x = ludo.pos.x + deathball.v.x; 
+					ludo.pos.y = ludo.pos.y + deathball.v.y;
 				}
 				
 			//IA Aggressive
-			if (choice ==1){
+			if ((choice ==1)&&(monstre==0)){
 				if(perso.pos.x>ludo.pos.x){
 					ludo.pos.x+=2;
 				} 
@@ -795,7 +792,7 @@ void rungame(){
 			}
 			
             //IA Fuyarde 
-			if(choice == 0){
+			if((choice == 0)&&(monstre==0)){
 			    if(DistanceXY(&perso,&ludo)<=100){
 				if(perso.pos.x<ludo.pos.x){
 					ludo.pos.x+=3;
@@ -879,12 +876,35 @@ void rungame(){
 			else{
 				deathball.life = deathball.life -10;
 			}
-			if(monster.life <= 0){
-				monster.display = 0;
-				tete_stickman +=1;
-                score+=100;
-				aleaspawn(&monster);
-				monster.life=100;
+			if((continuer==4)&&(tete_stickman==0)){
+				if(monster.life <= 0){
+					monster.display = 0;
+					tete_stickman +=1;
+				}
+				if(monster.display==0){
+					aleaspawn(&monster);
+					monster.life=100;
+				}
+			}
+			if(quest1[1][0][0]==1){
+				if(monster.life <= 0){
+					monster.display = 0;
+					score+=100;
+				}
+				if(monster.display==0){
+					aleaspawn(&monster);
+					monster.life=100;
+				}
+			}
+			if((continuer==7)&&(tete<2)){
+				if(monster.life <= 0){
+					monster.display = 0;
+					tete+=1;
+				}
+				if(monster.display==0){
+					aleaspawn(&monster);
+					monster.life=100;
+				}
 			}
 			if(ludo.life <= 0){
 				ludo.display = 0;
@@ -902,21 +922,28 @@ void rungame(){
 			if(Collision(&champignon, &perso)&&((champignon.display!=0)||(champignon.life!=0))){ 
 				champignon.display = 0;
 				QTchampignon +=1;
-				aleaspawn(&champignon);
 			}	
-			
+			if((QTchampignon<=5)&&(startchampi)&&(champignon.display==0)){
+				aleaspawn(&champignon);
+			}
+			if(continuer==3){
+				HP_potion.display=1;
+			}
 			//Collisions si le jeu tourne
 			if(Collision(&ludo, &perso)&&((ludo.display!=0)||(ludo.life!=0))){ 
 				ludo.life -=1;
 			}
 			
+			if(Collision(&monster,&perso)&&(monster.display!=0)&&(perso.life>0)){
+				perso.life-=5;
+				if(perso.life<=0){
+					display=6; //ecran de  mort
+				}
+			}
+			
 			if(CollisionBdf(&ludo, &fireball)&&fireball.display!=0){
 				fireball.display = 0;
 				ludo.life -=10;
-				if(ludo.life<=0){
-					tete+=1; //Pour quete 2
-					score+=100; //Pour après tutoriel
-				}
 			}
 			
 			if(CollisionBdf(&monster, &fireball)&&fireball.display!=0){
@@ -957,6 +984,9 @@ void rungame(){
 			if(Collision(&ludo,&monster)){
 				monster.life--;
 				ludo.life--;
+				if(monster.life==0){
+					
+				}
 			}
 		}
 		if((disp==1)||(disp==3)||(disp==4)){ //Affiche un ecran noir pour cacher le jeu (et donc ne pas le cacher dans les autres display)
@@ -1082,73 +1112,73 @@ void rungame(){
 				}
 				if(quest1[0][0][0]>0&&continuer<9){
 					messageQ1 = TTF_RenderText_Solid(fontQ1, "Merci d'avoir accepter la quete... J'attends mes champignons", textColor);
+					startchampi=1;
 					if(QTchampignon>5&&continuer<9){
                         snprintf(storequest, 500,"Quete termine. Veuillez appuyer sur %s pour la suite",SDL_GetKeyName(Continuer_touche));
 						messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor); 
 						perso.argent = perso.argent + 5;
                         champignon.display = 0;
-                    if((continuer==1)&&(bdf!=1)&&(perso.argent>=5)){
-                        snprintf(storequest, 500,"Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...(%s)",SDL_GetKeyName(Continuer_touche));
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
-                    }
-                    if(continuer==2&&perso.argent>=5){
+						if((continuer==1)&&(bdf!=1)&&(perso.argent>=5)){
+							snprintf(storequest, 500,"Vous avez gagne 5 shortmoney, et vous avez acquis un nouveau pouvoir...(%s)",SDL_GetKeyName(Continuer_touche));
+							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
+						}
+						if(continuer==2&&perso.argent>=5){
                         snprintf(storequest, 500,"Il te suis. Appuies sur %s pour tester tes nouvelles capacites, et tues le.(%s)",SDL_GetKeyName(bdf_touche), SDL_GetKeyName(Continuer_touche));
                         messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
                         bdf = 1;
-                    }
-                    if(continuer==3&&tete>=1){
-                        snprintf(storequest, 500,"C'est tres bien! Tu peux te soigner en prenant cette potion.(%s)", SDL_GetKeyName(Continuer_touche));
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor);
-                        if(l){
-                            perso.life-=25;
-                            l = 0;
-                        }
-                    }
-                    if(continuer==4&&tete_stickman!=1&&monstre!=1){
-                        snprintf(storequest, 500,"Tu le vois ce stickman? Ramenes moi sa tete et je te donnerai de quoi te battre (%s)", SDL_GetKeyName(Continuer_touche));
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
-                    }
-                    if(continuer==5&&tete_stickman>=1){
-                        snprintf(storequest, 500,"Desormais tu peux controler ce monstre en appuyant sur %s! Bien joue!(%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
-                        monstre=1;
-                    }
-                    if(continuer==6&&monstre==1){
-                        snprintf(storequest, 500,"Tiens! Ce pnj bizarre est revenue. Tests tes nouveaux pouvoirs en appuyant sur %s !(%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
-                    }
-                    if(continuer==7&&tete>=2){
-                        snprintf(storequest, 500,"Tu as reussi! Prends cette epee tu en est desormais digne! Appuies sur %s pour l'utiliser (%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
-                        messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
-                        enable_Epee = 1;
-                    }
-                    if(continuer>=8&&enable_Epee==1){
-                        messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel fini", textColor);
-                        quest1[1][0][0]=1;
-                    if(quest1[1][0][0]==1){ //SI TUTORIEL FINIT
-                        if(i<50)
-                            i++;
-                        if(i>=50)
-                            messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
-                    }
-                }
-            }
-            if(quest1[0][1][0]>0){
-                messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor);
-                quest1[0][1][0]=0;
-            }	
-        }
-					
-            } else {
-            questInteract = 0;
-            messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
+						}
+						if(continuer==3&&tete>=1){
+							snprintf(storequest, 500,"C'est tres bien! Tu peux te soigner en prenant cette potion.(%s)", SDL_GetKeyName(Continuer_touche));
+							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest,textColor);
+							if(l){
+								perso.life-=25;
+								l = 0;
+							}
+						}
+						if(continuer==4&&tete_stickman!=1&&monstre!=1){
+							snprintf(storequest, 500,"Tu le vois ce stickman? Ramenes moi sa tete (voici d'autres potions pour t'aider) (%s)", SDL_GetKeyName(Continuer_touche));
+							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
+						}
+						if(continuer==5&&tete_stickman>=1){
+							snprintf(storequest, 500,"Desormais tu peux controler ce monstre en appuyant sur %s! Bien joue!(%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
+							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
+							monstre=1;
+						}
+						if(continuer==6&&monstre==1){
+							snprintf(storequest, 500,"Tiens! Ce pnj bizarre est revenu. Testes tes nouveaux pouvoirs en appuyant sur %s !(%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
+							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
+						}
+						if(continuer==7&&tete>=2){
+							snprintf(storequest, 500,"Tu as reussi! Prends cette epee tu en est desormais digne! Appuies sur %s pour l'utiliser (%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
+							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
+							enable_Epee = 1;
+						}
+						if(continuer>=8&&enable_Epee==1){
+							messageQ1 = TTF_RenderText_Solid(fontQ1, "Tutoriel fini", textColor);
+							quest1[1][0][0]=1;
+						}
+						if(quest1[1][0][0]==1){ //SI TUTORIEL FINIT
+							if(i<50)
+								i++;
+							if(i>=50)
+								messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
+						}
+					}
+				}
+				if(quest1[0][1][0]>0){
+					messageQ1 = TTF_RenderText_Solid(fontQ1, "Tu veux pas ma quete? :(", textColor);
+					quest1[0][1][0]=0;
+				}	
+			} else {
+				questInteract = 0;
+				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
             }
             if(continuer>=4){
                 monster.display=1;  
             } else {
                 monster.display=0;
             }
-            if(continuer==2||continuer==6){
+            if(((continuer==2)&&(tete==0))||(continuer==6)){
                 ludo.display=1;
             } else {
                 ludo.display=0;
@@ -1484,6 +1514,27 @@ void rungame(){
 			}
 			
 		}
+		if(disp==6){
+            BGDead = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 255, 255, 255, 0);
+			SDL_Rect BGDeadPos;
+            BGDeadPos.x = 0;
+            BGDeadPos.y = 0;
+            SDL_BlitSurface(BGDead, NULL, screen, &BGDeadPos); //cree un arriere plan noir
+            message = TTF_RenderText_Solid(font50, "You're DEAD", red);
+            posMes.x = 50*SCREEN_WIDTH/100-(400/ratio);
+            posMes.y = 20*SCREEN_HEIGHT/100;
+            SDL_BlitSurface(message, NULL, screen, &posMes);
+            message = TTF_RenderText_Solid(font36,"Quit",textColor);
+			posMes.x=50*SCREEN_WIDTH/100;
+			posMes.y=70*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes);
+			if(selection==0){
+				fleche = TTF_RenderText_Solid(font50,">>>",textColor);
+				posFleche.x=40*SCREEN_WIDTH/100;
+				posFleche.y=68*SCREEN_HEIGHT/100;
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
+        }
 		SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
 	}

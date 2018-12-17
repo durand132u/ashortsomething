@@ -561,6 +561,13 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*selection=-1; //reset
 				}
 			}
+			if((*display==6)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				if((*posMouseX>=50**SCREEN_WIDTH/100)&&(*posMouseX<=70**SCREEN_WIDTH/100)&&(*posMouseY>=70**SCREEN_HEIGHT/100)&&(*posMouseY<=80**SCREEN_HEIGHT/100)){
+					*display=1;
+					*selection=-1;
+				}
+			}
 			break;
 		case SDL_MOUSEMOTION:
 			*selection=-1; //reset
@@ -608,6 +615,13 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				}
 				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=90**SCREEN_HEIGHT/100)&&(*posMouseY<=95**SCREEN_HEIGHT/100)){
 					*selection=1; //retour menu
+				}
+			}
+			if((*display==6)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				*selection=-1;
+				if((*posMouseX>=50**SCREEN_WIDTH/100)&&(*posMouseX<=60**SCREEN_WIDTH/100)&&(*posMouseY>=70**SCREEN_HEIGHT/100)&&(*posMouseY<=75**SCREEN_HEIGHT/100)){
+					*selection=0; //retour menu
 				}
 			}
 			break;
