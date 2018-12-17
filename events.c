@@ -47,7 +47,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			}				
 			if((event.key.keysym.sym==*bdf_touche)&&(bdf)&&(perso->mana>100)&&(*display==2)){
 				if (fireball->display==0) {
-				      	perso->mana = perso->mana-100;
+				    perso->mana = perso->mana-100;
 					fireball->display=1;
 					fireball->range=7*BALL_SPEED;
 					fireball->pos.x = perso->pos.x+(GRASS_SIZE/3);
@@ -241,19 +241,19 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
                     if(*continuer==1){
                     *continuer = 2;
                     }else{
-                        if(*continuer==2&&tete==1){
-                        *continuer=3;
+                        if(*continuer==2&&tete>=1){
+							*continuer=3;
                         }else{
                             if(*continuer==3&&perso->life>=100){
                                 *continuer=4;
                             }else{
-                                if(*continuer==4&&tete_stickman==1){
+                                if(*continuer==4&&tete_stickman>=1){
                                     *continuer =5; 
                                 }else{
                                     if(*continuer==5&&monstre==1){
                                         *continuer = 6; 
                                     }else{
-                                        if(*continuer==6&&tete>=2){
+                                        if(*continuer==6&&tete_stickman>=2){
                                             *continuer = 7;
                                         } else {
                                             if(*continuer==7){
@@ -289,6 +289,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				if((*posMouseX>=78**SCREEN_WIDTH/100)&&(*posMouseX<=90**SCREEN_WIDTH/100)&&(*posMouseY>=20**SCREEN_HEIGHT/100)&&(*posMouseY<=25**SCREEN_HEIGHT/100)){
 					//Lancement du jeu
 					*display=2;
+					perso->life=100;
 					*selection=-1; //reset
 				}
 				if((*posMouseX>=78**SCREEN_WIDTH/100)&&(*posMouseX<=96**SCREEN_WIDTH/100)&&(*posMouseY>=40**SCREEN_HEIGHT/100)&&(*posMouseY<=45**SCREEN_HEIGHT/100)){

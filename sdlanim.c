@@ -379,6 +379,9 @@ SDLKey GetKeyFromName(char* name){
 	if(strcmp(name,"z")==0){
 		res=SDLK_z;
 	}
+	if(strcmp(name,"escape")==0){
+		res=SDLK_ESCAPE;
+	}
 	return res;
 }
 
@@ -610,7 +613,7 @@ void rungame(){
 		SDL_Event event;
 		if (SDL_PollEvent(&event)) { //Fonction de lecture des evenements
 			HandleEvent(event, &gameover, &currentDirection, &perso, &epee, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection,&haut_touche,&bas_touche,&gauche_touche,&droite_touche,&bdf_touche,
- &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,&z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements);
+ &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,&z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements,&frappe);
 		}
 		if(disp==2||disp==5){ //si le jeu est en cours ou en pause
 			//gestion du deplacement
@@ -876,41 +879,36 @@ void rungame(){
 			else{
 				deathball.life = deathball.life -10;
 			}
-			if((continuer==4)&&(tete_stickman==0)){
-				if(monster.life <= 0){
-					monster.display = 0;
+			if((tete_stickman==0)){
+				if(monster.display==0){
+					aleaspawn(&monster);
+					monster.life=100;
 					tete_stickman +=1;
 				}
+			}
+			if((continuer==7)&&(tete_stickman<2)){
 				if(monster.display==0){
 					aleaspawn(&monster);
 					monster.life=100;
+					tete_stickman+=1;
 				}
 			}
-			if(quest1[1][0][0]==1){
-				if(monster.life <= 0){
-					monster.display = 0;
+			if((continuer>=8)){
+				if(monster.display==0){
+					aleaspawn(&monster);
+					monster.life=100;
 					score+=100;
 				}
-				if(monster.display==0){
-					aleaspawn(&monster);
-					monster.life=100;
-				}
 			}
-			if((continuer==7)&&(tete<2)){
-				if(monster.life <= 0){
-					monster.display = 0;
-					tete+=1;
-				}
-				if(monster.display==0){
-					aleaspawn(&monster);
-					monster.life=100;
-				}
-			}
-			if(ludo.life <= 0){
+			if((ludo.life <= 0)&&(continuer!=2)){
 				ludo.display = 0;
-                score+=100;
 				ludo.life=100;
 				aleaspawn(&ludo);
+			}
+			if((ludo.life <= 0)&&(continuer==2)){
+				ludo.display=0;
+				ludo.life=100;
+				tete+=1;
 			}
 			if(fireball.display!=0&&fireball.range!=0){
 			    fireball.range--;
@@ -934,11 +932,20 @@ void rungame(){
 				ludo.life -=1;
 			}
 			
-			if(Collision(&monster,&perso)&&(monster.display!=0)&&(perso.life>0)){
-				perso.life-=5;
+			if(Collision(&monster,&perso)&&(monster.display!=0)&&(perso.life>=0)){
+				perso.life-=1;
 				if(perso.life<=0){
 					display=6; //ecran de  mort
 				}
+				monster.life -=5;
+				if(monster.life<=0){
+					monster.display=0;
+				}
+			}
+			
+			if(Collision(&epee,&monster)&&(frappe==1)){
+			  monster.life-=10;
+			  frappe=0;
 			}
 			
 			if(CollisionBdf(&ludo, &fireball)&&fireball.display!=0){
@@ -950,12 +957,8 @@ void rungame(){
 				fireball.display=0;
 				monster.life -=10;
 				if(monster.life<=0){
-					tete_stickman+=1; //Pour quete
+					monster.display=0;
 				}
-			}
-			
-			if(Collision(&monster, &perso)){ 
-				monster.life -=1;
 			}
 			
 			if(Collision(&HP_potion,&perso)&&(HP_potion.display!=0)&&(perso.life<MAX_HP)){
@@ -971,6 +974,7 @@ void rungame(){
 			if(Collision(&HP_potion,&monster)&&HP_potion.display!=0&&monster.life<MAX_HP){
 				HP_potion.display=0;
 				monster.life +=50;
+				aleaspawn(&HP_potion);
 			}
 			
 			if(Collision(&HP_potion,&ludo)&&HP_potion.display!=0&&ludo.life<MAX_HP){
@@ -980,12 +984,13 @@ void rungame(){
 				}else{
 					ludo.life=MAX_HP;
 				}
+				aleaspawn(&HP_potion);
 			}
 			if(Collision(&ludo,&monster)){
 				monster.life--;
 				ludo.life--;
 				if(monster.life==0){
-					
+					monster.display=0;
 				}
 			}
 		}
@@ -1123,7 +1128,7 @@ void rungame(){
 							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
 						}
 						if(continuer==2&&perso.argent>=5){
-                        snprintf(storequest, 500,"Il te suis. Appuies sur %s pour tester tes nouvelles capacites, et tues le.(%s)",SDL_GetKeyName(bdf_touche), SDL_GetKeyName(Continuer_touche));
+                        snprintf(storequest, 500,"Il te suis. Appuies sur %s pour tester tes nouvelles capacites, et ramene moi sa tete.(%s)",SDL_GetKeyName(bdf_touche), SDL_GetKeyName(Continuer_touche));
                         messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
                         bdf = 1;
 						}
@@ -1148,7 +1153,7 @@ void rungame(){
 							snprintf(storequest, 500,"Tiens! Ce pnj bizarre est revenu. Testes tes nouveaux pouvoirs en appuyant sur %s !(%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
 							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor); 
 						}
-						if(continuer==7&&tete>=2){
+						if(continuer==7&&tete_stickman>=2){
 							snprintf(storequest, 500,"Tu as reussi! Prends cette epee tu en est desormais digne! Appuies sur %s pour l'utiliser (%s)", SDL_GetKeyName(bdm_touche),SDL_GetKeyName(Continuer_touche));
 							messageQ1 = TTF_RenderText_Solid(fontQ1,storequest, textColor);
 							enable_Epee = 1;
@@ -1174,11 +1179,16 @@ void rungame(){
 				messageQ1 = TTF_RenderText_Solid(fontQ1, "",textColor); //Message vide
             }
             if(continuer>=4){
-                monster.display=1;  
+				if(monster.life<=0){
+					monster.display=1;
+					aleaspawn(&monster);
+				}else{
+					monster.display=1;
+				}
             } else {
                 monster.display=0;
             }
-            if(((continuer==2)&&(tete==0))||(continuer==6)){
+            if(((continuer==2)&&(tete==0))||(continuer>=6)){
                 ludo.display=1;
             } else {
                 ludo.display=0;
