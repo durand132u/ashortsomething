@@ -6,7 +6,7 @@
 #include <math.h>
 #include <time.h>
 #include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL/SDL_mixer.h>
 #include "game.h"
 #include "events.c"
 #include "musique.c"
@@ -25,7 +25,7 @@
 
 SDL_Surface *screen, *sprite, *grass, *spritefire, *spritemonster, *spritedeath, *spritepoison, *spriteludo, *spritepotion, *spritechampignon, *spritepnj, *spriteepee; //sprites ingame
 SDL_Surface *barreDeVie_Ludo, *barreDeVie_monstre, *barreDeVie_perso, *barreDeMana_perso; //barres
-SDL_Surface *HUD_HP, *HUD_MANA;
+SDL_Surface *HUD_HP, *HUD_MANA, *BGPause;
 SDL_Surface *background, *message, *fleche; //menu
 SDL_Surface *messageQ1, *messageQ2, *messageQ3; //quetes
 SDL_Rect posMes;
@@ -55,28 +55,26 @@ int resolutions[4][2];
 int resChange=0;
 int z = 0; // Variable pour animation épée
 //VAR pour quêtes, surement à mettre dans l'inventaire plus tard?
-    int quest = 0;
-    int questTEST = 0;
-    int quest1[5][2][2];
-    int QTchampignon = 0;
-    int deplacements[4];
-    int continuer = 0;
-    int tete = 0;
-    int bdf=0;
-    int monstre = 0;
-    int tete_stickman = 0;
-    int questInteract;
-    int enable_Epee = 0;
-    int i = 0;  //Compteur pour quêtes
-    int k = 1;
-    int l = 1;
-
-
+int quest = 0;
+int questTEST = 0;
+int quest1[5][2][2];
+int QTchampignon = 0;
+int deplacements[4];
+int continuer = 7;
+int tete = 0;
+int bdf=1;
+int monstre = 0;
+int tete_stickman = 0;
+int questInteract;
+int enable_Epee = 0;
+int i = 0;  //Compteur pour quêtes
+int k = 1;
+int l = 1;
 //Var pour après les quêtes
-    int score = 0;
-    //STRING DE QUETES:
-    char storequest[500];
-    char Inventory[500];
+int score = 0;
+//STRING DE QUETES:
+char storequest[500];
+char Inventory[500];
 
 struct vector vit = {0,0};
 struct sprite_t perso;
@@ -581,6 +579,7 @@ void resetAll(){
 		SDL_FreeSurface(barreDeMana_perso);
         SDL_FreeSurface(HUD_HP);
         SDL_FreeSurface(HUD_MANA);
+        SDL_FreeSurface(BGPause);
 		SDL_FreeSurface(background);
 		SDL_FreeSurface(message);
 		SDL_FreeSurface(fleche);
@@ -610,25 +609,25 @@ void rungame(){
 		}
 		int disp=display;
 		SDL_Event event;
-		if (SDL_PollEvent(&event)) { //Si entrée clavier ou souris il lance la fonction reliée
+		if (SDL_PollEvent(&event)) { //Fonction de lecture des evenements
 			HandleEvent(event, &gameover, &currentDirection, &perso, &epee, &ludo, &fireball, &poisonball, &deathball, &HP_potion, &champignon, &pnj, &display,&posMouseX,&posMouseY,&selection,&haut_touche,&bas_touche,&gauche_touche,&droite_touche,&bdf_touche,
  &epee_touche,&Continuer_touche,&Oui_touche,&Non_touche,&bdp_touche,&bdm_touche,&quitter_touche,&pnj_touche,&IA_touche,bdf,&SCREEN_HEIGHT,&SCREEN_WIDTH,&z,&resChange,resolutions,tete,tete_stickman,monstre,QTchampignon,questInteract, &continuer,&quest1,&choice,&choiceTEST,&deplacements);
 		}
-		//gestion du deplacement
-		if(deplacements[0]==1){
-			perso.pos.x -= SPRITE_STEP;
-		}
-		if(deplacements[1]==1){
-			perso.pos.x += SPRITE_STEP;
-		}
-		if(deplacements[2]==1){
-			perso.pos.y -= SPRITE_STEP;
-		}
-		if(deplacements[3]==1){
-			perso.pos.y += SPRITE_STEP;
-        }
-		if(disp==2||disp==5){
-            //Barre de vie Ludo
+		if(disp==2||disp==5){ //si le jeu est en cours ou en pause
+			//gestion du deplacement
+			if(deplacements[0]==1){
+				perso.pos.x -= SPRITE_STEP;
+			}
+			if(deplacements[1]==1){
+				perso.pos.x += SPRITE_STEP;
+			}
+			if(deplacements[2]==1){
+				perso.pos.y -= SPRITE_STEP;
+			}
+			if(deplacements[3]==1){
+				perso.pos.y += SPRITE_STEP;
+			}
+			//Barre de vie Ludo
             SDL_FillRect(barreDeVie_Ludo, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); //fond noir
             SDL_Rect HP_ludo;
             HP_ludo.x = 0;
@@ -735,7 +734,7 @@ void rungame(){
             HUD_MANA_perso.h = 25;
             SDL_FillRect(HUD_MANA, &HUD_MANA_perso, SDL_MapRGB(HUD_MANA->format, 148,  0, 211));
         }
-		if(disp==2){ //Gestion des evenements dus aux deplacements collisions actualisations etc
+		if(disp==2){ //Gestion des evenements dus aux deplacements collisions actualisations etc uniquement quand le jeu est en cours et non en pause
 			if (fireball.display == 1){
 				fireball.pos.x = fireball.pos.x + fireball.v.x;
 				fireball.pos.y = fireball.pos.y + fireball.v.y;
@@ -964,7 +963,6 @@ void rungame(){
 			SDL_BlitSurface(background,NULL,screen,NULL);
 		}
 		if(disp==1){ // si on est dans le menu
-
 			message = TTF_RenderText_Solid(font50,"Welcome to AShortSomething !",textColor);
 			posMes.x=50*SCREEN_WIDTH/100-(400/ratio);
 			posMes.y=0.0;
@@ -988,7 +986,7 @@ void rungame(){
 				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
 			}
 		}
-		if(disp==2 ||disp==5){ // si le jeu est en route
+		if(disp==2 ||disp==5){ // si le jeu est en route ou en pause
             
 			for(int x =0; x< SCREEN_WIDTH/GRASS_SIZE; x++){  //dessine le fond du jeu
 				for(int y =0; y< SCREEN_HEIGHT/GRASS_SIZE; y++){				
@@ -1444,12 +1442,49 @@ void rungame(){
 			SDL_BlitSurface(message,NULL,screen,&posMes);
 			
 			if(selection==0){
+				fleche = TTF_RenderText_Solid(font50,"<<<",textColor);
 				posFleche.x=80*SCREEN_WIDTH/100;
 				posFleche.y=18*SCREEN_HEIGHT/100;
 				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
 			}
 		}
-        SDL_UpdateRect(screen,0,0,0,0);
+        if(disp==5){
+			BGPause = SDL_CreateRGBSurface(SDL_HWSURFACE, 20*SCREEN_WIDTH/100, SCREEN_HEIGHT, 32, 255, 255, 255, 0);
+			SDL_Rect BGPausePos;
+            BGPausePos.x = 80*SCREEN_WIDTH/100;
+            BGPausePos.y = 0;
+            SDL_BlitSurface(BGPause, NULL, screen, &BGPausePos); //cree un arriere plan noir a droite du jeu
+			message = TTF_RenderText_Solid(font36,"Jeu en pause",textColor);
+			posMes.x=40*SCREEN_WIDTH/100;
+			posMes.y=50*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes); //message de pause
+			message = TTF_RenderText_Solid(font36,"Objets :",textColor);
+			posMes.x=85*SCREEN_WIDTH/100;
+			posMes.y=5*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes); //objets
+			message = TTF_RenderText_Solid(font36,"Options",textColor);
+			posMes.x=85*SCREEN_WIDTH/100;
+			posMes.y=80*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes); //options
+			message = TTF_RenderText_Solid(font36,"Quit",textColor);
+			posMes.x=85*SCREEN_WIDTH/100;
+			posMes.y=90*SCREEN_HEIGHT/100;
+			SDL_BlitSurface(message,NULL,screen,&posMes); //quitter le jeu => retour menu 1
+			if(selection==1){
+				fleche = TTF_RenderText_Solid(font50,">",textColor);
+				posFleche.x=81*SCREEN_WIDTH/100;
+				posFleche.y=89*SCREEN_HEIGHT/100;
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
+			if(selection==0){
+				fleche = TTF_RenderText_Solid(font50,">",textColor);
+				posFleche.x=81*SCREEN_WIDTH/100;
+				posFleche.y=79*SCREEN_HEIGHT/100;
+				SDL_BlitSurface(fleche,NULL,screen,&posFleche);
+			}
+			
+		}
+		SDL_UpdateRect(screen,0,0,0,0);
 		SDL_Delay(12);
 	}
 	resetAll(); //casse tout avant de finir le programme

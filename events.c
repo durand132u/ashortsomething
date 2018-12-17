@@ -1,13 +1,3 @@
-#include <SDL.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-#include <time.h>
-#include <SDL_ttf.h>
-#include <SDL/SDL_mixer.h>
-#include "game.h"
-
 #define GRASS_SIZE 32
 #define DIR_UP          0
 #define DIR_RIGHT       1
@@ -23,6 +13,7 @@
 double angle;
 int actualRes=2;
 int bdfdeplacements[4];
+int changertouche=0;
 
 void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct sprite_t *perso, struct sprite_t *ludo, struct sprite_t *epee,
  struct bdf_t *fireball, struct sprite_t *poisonball, struct sprite_t *deathball, struct sprite_t *HP_potion,struct sprite_t *champignon, struct sprite_t *pnj,
@@ -34,30 +25,27 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			*gameover = 1;
 			break;
 		case SDL_KEYDOWN:
-			if((event.key.keysym.sym==SDLK_ESCAPE)||(event.key.keysym.sym==*quitter_touche)){   // retour au menu
-				*display =1 ;
-			}
-			if(event.key.keysym.sym==*gauche_touche){
+			if((event.key.keysym.sym==*gauche_touche)&&(*display==2)){
 				perso->currDirection = DIR_LEFT;
 				(*deplacements)[0]=1;
 				*currDirection= DIR_LEFT;
 			}
-			if(event.key.keysym.sym==*droite_touche){
+			if((event.key.keysym.sym==*droite_touche)&&(*display==2)){
 				perso->currDirection = DIR_RIGHT;
 				(*deplacements)[1]=1;
 				*currDirection= DIR_RIGHT;
 			}
-			if(event.key.keysym.sym==*haut_touche){
+			if((event.key.keysym.sym==*haut_touche)&&(*display==2)){
 				perso->currDirection = DIR_UP;
 				(*deplacements)[2]=1;
 				*currDirection= DIR_UP;
 			}
-			if(event.key.keysym.sym==*bas_touche){
+			if((event.key.keysym.sym==*bas_touche)&&(*display==2)){
 				perso->currDirection = DIR_DOWN;
 				(*deplacements)[3]=1;
 				*currDirection= DIR_DOWN;
 			}				
-			if(event.key.keysym.sym==*bdf_touche&&bdf&&perso->mana>100){
+			if((event.key.keysym.sym==*bdf_touche)&&(bdf)&&(perso->mana>100)&&(*display==2)){
 				if (fireball->display==0) {
 				      	perso->mana = perso->mana-100;
 					fireball->display=1;
@@ -131,7 +119,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					}
 				}
 			}
-			if(event.key.keysym.sym==*bdp_touche){
+			if((event.key.keysym.sym==*bdp_touche)&&(*display==2)){
 				if (poisonball->life ==0) {
 					poisonball->life = 80;
 					poisonball->pos.x = perso->pos.x+(GRASS_SIZE/3);
@@ -162,7 +150,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					}
 				}
 			}
-			if(event.key.keysym.sym==*bdm_touche){
+			if((event.key.keysym.sym==*bdm_touche)&&(*display==2)){
 				if (deathball->life ==0) {
 					deathball->life = 80;
 					deathball->pos.x = perso->pos.x+(GRASS_SIZE/3);
@@ -193,14 +181,14 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					}
 				}
 			}
-			if(event.key.keysym.sym==*pnj_touche){
+			if((event.key.keysym.sym==*pnj_touche)&&(*display==2)){
 				/* Apparition PNJ Ludo */
 				ludo->life= 100;
 				ludo->display = 1;
 				ludo->pos.x = 200;
 				ludo->pos.y = 200;
 			}	
-			if(event.key.keysym.sym==*IA_touche){
+			if((event.key.keysym.sym==*IA_touche)&&(*display==2)){
 				if(*choiceTEST){
 					*choice = 1;
 					*choiceTEST= 0;
@@ -210,7 +198,17 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				}
 			}
 			break;
-		case SDL_KEYUP:
+		case SDL_KEYUP: //touche relachee
+			if((event.key.keysym.sym==*quitter_touche)&&(changertouche==0)){   // ouverture menu pause si jeu en cours / retour au jeu si dans menu pause
+				if(*display==2){
+					*display=5;
+				}else if(*display==5){
+					*display=2;
+				}
+			}
+			/*if(event.key.keysym.sym==SDLK_ESCAPE){
+				*display=1;
+			}*/
 			if(event.key.keysym.sym==*gauche_touche){
 				(*deplacements)[0]=0;
 			}
@@ -283,7 +281,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if((*display==1)){
+			if((*display==1)){ //clic souris dans menu
 				SDL_GetMouseState(posMouseX,posMouseY);
 				if((*posMouseX>=78**SCREEN_WIDTH/100)&&(*posMouseX<=90**SCREEN_WIDTH/100)&&(*posMouseY>=20**SCREEN_HEIGHT/100)&&(*posMouseY<=25**SCREEN_HEIGHT/100)){
 					//Lancement du jeu
@@ -301,7 +299,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*selection=-1; //reset
 				}
 			}
-			if((*display==3)){
+			if((*display==3)){ //clic souris dans options
 				SDL_GetMouseState(posMouseX,posMouseY);
 				if((*posMouseX>=5**SCREEN_WIDTH/100)&&(*posMouseX<=60**SCREEN_WIDTH/100)&&(*posMouseY>=40**SCREEN_HEIGHT/100)&&(*posMouseY<=45**SCREEN_HEIGHT/100)){
 					if(actualRes<3){
@@ -336,13 +334,14 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*selection=-1; //reset
 				}
 			}
-			if((*display==4)){
-				SDL_GetMouseState(posMouseX,posMouseY); // A GERER : INTERFACE DE REDEFINITION DES CONTROLES
+			if((*display==4)){ //clic souris dans controles
+				SDL_GetMouseState(posMouseX,posMouseY); 
 				if((*posMouseX>=60**SCREEN_WIDTH/100)&&(*posMouseX<=80**SCREEN_WIDTH/100)&&(*posMouseY>=20**SCREEN_HEIGHT/100)&&(*posMouseY<=25**SCREEN_HEIGHT/100)){
 					*display=1; //retour menu
 					*selection=-1; //reset
 				}
 				if((*posMouseX>=10**SCREEN_WIDTH/100)&&(*posMouseX<=20**SCREEN_WIDTH/100)&&(*posMouseY>=45**SCREEN_HEIGHT/100)&&(*posMouseY<=50**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -352,8 +351,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*haut_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=25**SCREEN_WIDTH/100)&&(*posMouseX<=35**SCREEN_WIDTH/100)&&(*posMouseY>=45**SCREEN_HEIGHT/100)&&(*posMouseY<=50**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -363,8 +364,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*bas_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=40**SCREEN_WIDTH/100)&&(*posMouseX<=50**SCREEN_WIDTH/100)&&(*posMouseY>=45**SCREEN_HEIGHT/100)&&(*posMouseY<=50**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -374,8 +377,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*gauche_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=55**SCREEN_WIDTH/100)&&(*posMouseX<=65**SCREEN_WIDTH/100)&&(*posMouseY>=45**SCREEN_HEIGHT/100)&&(*posMouseY<=50**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -385,8 +390,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*droite_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=70**SCREEN_WIDTH/100)&&(*posMouseX<=80**SCREEN_WIDTH/100)&&(*posMouseY>=45**SCREEN_HEIGHT/100)&&(*posMouseY<=50**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -396,8 +403,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*bdf_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=10**SCREEN_WIDTH/100)&&(*posMouseX<=20**SCREEN_WIDTH/100)&&(*posMouseY>=65**SCREEN_HEIGHT/100)&&(*posMouseY<=70**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -407,8 +416,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*epee_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=25**SCREEN_WIDTH/100)&&(*posMouseX<=35**SCREEN_WIDTH/100)&&(*posMouseY>=65**SCREEN_HEIGHT/100)&&(*posMouseY<=70**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -418,8 +429,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*quitter_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=40**SCREEN_WIDTH/100)&&(*posMouseX<=50**SCREEN_WIDTH/100)&&(*posMouseY>=65**SCREEN_HEIGHT/100)&&(*posMouseY<=70**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -429,8 +442,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*bdp_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=55**SCREEN_WIDTH/100)&&(*posMouseX<=65**SCREEN_WIDTH/100)&&(*posMouseY>=65**SCREEN_HEIGHT/100)&&(*posMouseY<=70**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -440,8 +455,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*bdm_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=10**SCREEN_WIDTH/100)&&(*posMouseX<=20**SCREEN_WIDTH/100)&&(*posMouseY>=85**SCREEN_HEIGHT/100)&&(*posMouseY<=90**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -451,8 +468,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*Continuer_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=25**SCREEN_WIDTH/100)&&(*posMouseX<=35**SCREEN_WIDTH/100)&&(*posMouseY>=85**SCREEN_HEIGHT/100)&&(*posMouseY<=90**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -462,8 +481,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*Oui_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=40**SCREEN_WIDTH/100)&&(*posMouseX<=50**SCREEN_WIDTH/100)&&(*posMouseY>=85**SCREEN_HEIGHT/100)&&(*posMouseY<=90**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -473,8 +494,10 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*Non_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=70**SCREEN_WIDTH/100)&&(*posMouseX<=80**SCREEN_WIDTH/100)&&(*posMouseY>=65**SCREEN_HEIGHT/100)&&(*posMouseY<=70**SCREEN_HEIGHT/100)){
+					changertouche=1;
 					SDL_Event keychange;
 					int change = 0;
 					while(change==0){
@@ -484,6 +507,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 						}
 					}
 					*IA_touche=keychange.key.keysym.sym;
+					changertouche=0;
 				}
 				if((*posMouseX>=55**SCREEN_WIDTH/100)&&(*posMouseX<=65**SCREEN_WIDTH/100)&&(*posMouseY>=80**SCREEN_HEIGHT/100)&&(*posMouseY<=85**SCREEN_HEIGHT/100)){//SAUVEGARDE des touches
 					FILE* ctrls=fopen("CONTROLS.txt", "w+");
@@ -526,10 +550,21 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 				}
 				
 			}
+			if((*display==5)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=80**SCREEN_HEIGHT/100)&&(*posMouseY<=85**SCREEN_HEIGHT/100)){
+					*display=3;
+					*selection=-1;
+				}
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=90**SCREEN_HEIGHT/100)&&(*posMouseY<=95**SCREEN_HEIGHT/100)){
+					*display=1; //retour menu
+					*selection=-1; //reset
+				}
+			}
 			break;
 		case SDL_MOUSEMOTION:
 			*selection=-1; //reset
-			if((*display==1)){
+			if((*display==1)){ //deplacement souris dans menu
 				SDL_GetMouseState(posMouseX,posMouseY);
 				*selection=-1; //reset
 				if((*posMouseX>=78**SCREEN_WIDTH/100)&&(*posMouseX<=90**SCREEN_WIDTH/100)&&(*posMouseY>=20**SCREEN_HEIGHT/100)&&(*posMouseY<=25**SCREEN_HEIGHT/100)){
@@ -542,7 +577,7 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*selection=3; //quit
 				}
 			}
-			if((*display==3)){
+			if((*display==3)){ //deplacement souris dans options
 				SDL_GetMouseState(posMouseX,posMouseY);
 				*selection=-1; //reset
 				if((*posMouseX>=5**SCREEN_WIDTH/100)&&(*posMouseX<=60**SCREEN_WIDTH/100)&&(*posMouseY>=40**SCREEN_HEIGHT/100)&&(*posMouseY<=45**SCREEN_HEIGHT/100)){
@@ -558,11 +593,21 @@ void HandleEvent(SDL_Event event, int *gameover, int *currDirection, struct spri
 					*selection=0; //retour menu
 				}
 			}
-			if((*display==4)){
+			if((*display==4)){ //deplacement souris dans controles
 				SDL_GetMouseState(posMouseX,posMouseY);
 				*selection=-1; //reset
 				if((*posMouseX>=60**SCREEN_WIDTH/100)&&(*posMouseX<=80**SCREEN_WIDTH/100)&&(*posMouseY>=20**SCREEN_HEIGHT/100)&&(*posMouseY<=25**SCREEN_HEIGHT/100)){
 					*selection=0; //retour menu
+				}
+			}
+			if((*display==5)){
+				SDL_GetMouseState(posMouseX,posMouseY);
+				*selection=-1;
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=80**SCREEN_HEIGHT/100)&&(*posMouseY<=85**SCREEN_HEIGHT/100)){
+					*selection=0; //retour menu
+				}
+				if((*posMouseX>=85**SCREEN_WIDTH/100)&&(*posMouseX<=95**SCREEN_WIDTH/100)&&(*posMouseY>=90**SCREEN_HEIGHT/100)&&(*posMouseY<=95**SCREEN_HEIGHT/100)){
+					*selection=1; //retour menu
 				}
 			}
 			break;
