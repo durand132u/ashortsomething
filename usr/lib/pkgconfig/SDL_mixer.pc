@@ -1,4 +1,4 @@
-prefix=/usr
+prefix=/home/profil/dufour65u/Espace-Etudiant/info18/S3/tilemapping/dll
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
